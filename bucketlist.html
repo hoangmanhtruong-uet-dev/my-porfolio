@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bucket List - Những Ước Mơ Chung ❤️</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/833/833472.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Outfit:wght@300;400;600;800&family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .bucket-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+        .bucket-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+        .bucket-header h2 {
+            font-family: 'Pacifico', cursive;
+            font-size: 3.5rem;
+            color: #ff4d4d;
+            margin-bottom: 1rem;
+        }
+        .bucket-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .bucket-category {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 35px;
+            padding: 2.5rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .bucket-category:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 77, 77, 0.3);
+        }
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .category-title {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #ff4d4d;
+        }
+        .edit-controls {
+            display: flex;
+            gap: 10px;
+            opacity: 0.3;
+            transition: 0.3s;
+        }
+        .bucket-category:hover .edit-controls { opacity: 1; }
+        .edit-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .edit-btn:hover { color: #ff4d4d; }
+
+        .bucket-list {
+            list-style: none;
+            padding: 0;
+        }
+        .bucket-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 1.05rem;
+        }
+        .bucket-item-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            flex: 1;
+        }
+        .bucket-item.done .item-text {
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+        .delete-item-btn {
+            opacity: 0;
+            transition: 0.3s;
+            color: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+        }
+        .bucket-item:hover .delete-item-btn { opacity: 1; }
+        .delete-item-btn:hover { color: #ff4d4d; }
+
+        .add-item-trigger {
+            margin-top: 1.5rem;
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        .add-item-trigger:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-color: #ff4d4d;
+        }
+
+        /* Global Controls */
+        .global-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 4rem;
+        }
+        .action-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 100px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+        }
+        .action-btn:hover {
+            background: #ff4d4d;
+            transform: translateY(-3px);
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+        }
+        .modal-card {
+            background: rgba(30, 41, 59, 0.95);
+            padding: 2.5rem;
+            border-radius: 30px;
+            width: 400px;
+            border: 1px solid rgba(255, 77, 77, 0.3);
+        }
+        .modal-card h3 { margin-bottom: 1.5rem; color: #ff4d4d; }
+        .modal-input {
+            width: 100%;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 12px;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body class="love-page-body">
+    <!-- Global Widgets -->
+    <div class="dark-mode-toggle" onclick="toggleDarkMode()">
+        <i class="fa-solid fa-moon" id="dark-mode-icon"></i>
+    </div>
+
+    <div class="music-player">
+        <i class="fa-solid fa-play music-btn" id="play-pause" onclick="toggleMusic()"></i>
+        <span id="song-title">Perfect - Ed Sheeran ❤️</span>
+        <audio id="bg-music" loop>
+            <source src="https://github.com/hoangtran0410/Pretty-In-Love/blob/master/music/perfect.mp3?raw=true" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <div class="back-nav">
+        <a href="love.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Quay lại trang chủ</a>
+    </div>
+
+    <main class="bucket-container">
+        <div class="bucket-header">
+            <h2>Bucket List</h2>
+            <p>Những điều tuyệt vời chúng mình sẽ cùng làm ❤️</p>
+        </div>
+
+        <div id="bucket-grid" class="bucket-grid">
+            <!-- Categories will be rendered here -->
+        </div>
+
+        <div class="global-actions">
+            <button class="action-btn" onclick="openCategoryModal()">
+                <i class="fa-solid fa-plus"></i> Thêm Ô Vuông Mới
+            </button>
+            <button class="action-btn" onclick="resetBucketList()">
+                <i class="fa-solid fa-rotate-left"></i> Cài Lại Mặc Định
+            </button>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <div id="item-modal" class="modal-overlay">
+        <div class="modal-card">
+            <h3>Thêm mục tiêu mới</h3>
+            <input type="text" id="new-item-text" class="modal-input" placeholder="Nhập việc muốn làm...">
+            <div style="display: flex; gap: 10px;">
+                <button class="action-btn" style="flex: 1; justify-content: center;" onclick="confirmAddItem()">Thêm</button>
+                <button class="action-btn" style="flex: 1; justify-content: center; background: none;" onclick="closeModals()">Hủy</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="category-modal" class="modal-overlay">
+        <div class="modal-card">
+            <h3>Thêm danh mục mới</h3>
+            <input type="text" id="new-cat-title" class="modal-input" placeholder="Tên danh mục (VD: Chill...)">
+            <div style="display: flex; gap: 10px;">
+                <button class="action-btn" style="flex: 1; justify-content: center;" onclick="confirmAddCategory()">Thêm</button>
+                <button class="action-btn" style="flex: 1; justify-content: center; background: none;" onclick="closeModals()">Hủy</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentCatId = null;
+        let bucketData = JSON.parse(localStorage.getItem('loveBucketList')) || [
+            {
+                id: 1,
+                title: "Du Lịch",
+                icon: "fa-plane-departure",
+                items: [
+                    { text: "Đi ngắm tuyết tại Sapa ❄️", done: false },
+                    { text: "Check-in Đà Lạt 🌲", done: false }
+                ]
+            },
+            {
+                id: 2,
+                title: "Ẩm Thực",
+                icon: "fa-utensils",
+                items: [
+                    { text: "Thử lẩu Haidilao 🍲", done: false },
+                    { text: "Tự nấu bữa tối 🍝", done: false }
+                ]
+            },
+            {
+                id: 3,
+                title: "Mục Tiêu",
+                icon: "fa-bullseye",
+                items: [
+                    { text: "Cùng tốt nghiệp UET 🎓", done: false },
+                    { text: "Nuôi một chú mèo 🐱", done: false }
+                ]
+            }
+        ];
+
+        function renderBucketList() {
+            const grid = document.getElementById('bucket-grid');
+            grid.innerHTML = bucketData.map(cat => `
+                <div class="bucket-category">
+                    <div class="category-header">
+                        <div class="category-title">
+                            <i class="fa-solid ${cat.icon || 'fa-heart'}"></i> ${cat.title}
+                        </div>
+                        <div class="edit-controls">
+                            <button class="edit-btn" onclick="deleteCategory(${cat.id})"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <ul class="bucket-list">
+                        ${cat.items.map((item, idx) => `
+                            <li class="bucket-item ${item.done ? 'done' : ''}">
+                                <div class="bucket-item-content" onclick="toggleItem(${cat.id}, ${idx})">
+                                    <i class="${item.done ? 'fa-regular fa-circle-check' : 'fa-regular fa-circle'}" style="color: ${item.done ? '#4ade80' : 'rgba(255,255,255,0.3)'}"></i>
+                                    <span class="item-text">${item.text}</span>
+                                </div>
+                                <i class="fa-solid fa-xmark delete-item-btn" onclick="deleteItem(${cat.id}, ${idx})"></i>
+                            </li>
+                        `).join('')}
+                    </ul>
+                    <button class="add-item-trigger" onclick="openItemModal(${cat.id})">
+                        <i class="fa-solid fa-plus"></i> Thêm mục tiêu
+                    </button>
+                </div>
+            `).join('');
+            localStorage.setItem('loveBucketList', JSON.stringify(bucketData));
+        }
+
+        // Item Actions
+        function toggleItem(catId, itemIdx) {
+            const cat = bucketData.find(c => c.id === catId);
+            cat.items[itemIdx].done = !cat.items[itemIdx].done;
+            renderBucketList();
+        }
+
+        function deleteItem(catId, itemIdx) {
+            const cat = bucketData.find(c => c.id === catId);
+            cat.items.splice(itemIdx, 1);
+            renderBucketList();
+        }
+
+        function openItemModal(id) {
+            currentCatId = id;
+            document.getElementById('item-modal').style.display = 'flex';
+        }
+
+        function confirmAddItem() {
+            const text = document.getElementById('new-item-text').value;
+            if (!text) return;
+            const cat = bucketData.find(c => c.id === currentCatId);
+            cat.items.push({ text: text, done: false });
+            document.getElementById('new-item-text').value = '';
+            closeModals();
+            renderBucketList();
+        }
+
+        // Category Actions
+        function openCategoryModal() {
+            document.getElementById('category-modal').style.display = 'flex';
+        }
+
+        function confirmAddCategory() {
+            const title = document.getElementById('new-cat-title').value;
+            if (!title) return;
+            bucketData.push({
+                id: Date.now(),
+                title: title,
+                icon: "fa-heart",
+                items: []
+            });
+            document.getElementById('new-cat-title').value = '';
+            closeModals();
+            renderBucketList();
+        }
+
+        function deleteCategory(id) {
+            if (confirm('Xóa ô vuông này và toàn bộ mục tiêu bên trong?')) {
+                bucketData = bucketData.filter(c => c.id !== id);
+                renderBucketList();
+            }
+        }
+
+        function resetBucketList() {
+            if (confirm('Cài lại toàn bộ danh sách về mặc định?')) {
+                localStorage.removeItem('loveBucketList');
+                location.reload();
+            }
+        }
+
+        function closeModals() {
+            document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
+        }
+
+        // Global functions
+        function toggleDarkMode() {
+            document.body.classList.toggle('light-mode');
+            const icon = document.getElementById('dark-mode-icon');
+            icon.className = document.body.classList.contains('light-mode') ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        }
+
+        const audio = document.getElementById('bg-music');
+        function toggleMusic() {
+            if (audio.paused) { audio.play(); document.getElementById('play-pause').className = 'fa-solid fa-pause music-btn'; }
+            else { audio.pause(); document.getElementById('play-pause').className = 'fa-solid fa-play music-btn'; }
+        }
+
+        window.onload = renderBucketList;
+    </script>
+</body>
+</html>

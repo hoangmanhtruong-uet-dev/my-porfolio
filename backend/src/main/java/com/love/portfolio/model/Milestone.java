@@ -1,0 +1,22 @@
+package com.love.portfolio.model;
+
+import jakarta.persistence.*;
+import lombok.Data;
+import java.util.List;
+
+@Entity
+@Data
+public class Milestone {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String date;
+    private String title;
+    
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @ElementCollection
+    private List<String> images; // Lưu danh sách đường dẫn ảnh
+}

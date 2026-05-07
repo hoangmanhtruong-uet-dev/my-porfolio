@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Chat - Trò Chuyện Thời Gian Thực ❤️</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/833/833472.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Outfit:wght@300;400;600;800&family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .chat-container {
+            max-width: 900px;
+            height: 80vh;
+            margin: 2rem auto;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(30px);
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        }
+
+        .chat-header {
+            padding: 1.5rem 2rem;
+            background: rgba(255, 77, 77, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .chat-status {
+            width: 12px;
+            height: 12px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #10b981;
+        }
+
+        .messages-area {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            scroll-behavior: smooth;
+        }
+
+        /* Message Bubbles */
+        .msg {
+            max-width: 70%;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            position: relative;
+            animation: msgPop 0.3s ease-out;
+        }
+
+        @keyframes msgPop {
+            from { opacity: 0; transform: translateY(10px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .msg.sent {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #ff4d4d, #f43f5e);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .msg.received {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            border-bottom-left-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .msg-time {
+            font-size: 0.7rem;
+            opacity: 0.5;
+            margin-top: 5px;
+            display: block;
+            text-align: right;
+        }
+
+        /* Input Area */
+        .chat-input-wrapper {
+            padding: 1.5rem 2rem;
+            background: rgba(0, 0, 0, 0.2);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            padding: 12px 25px;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .chat-input:focus {
+            border-color: #ff4d4d;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .send-btn {
+            width: 50px;
+            height: 50px;
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 77, 77, 0.3);
+        }
+
+        .send-btn:hover { transform: scale(1.1) rotate(-10deg); }
+
+        .typing-indicator {
+            padding: 5px 20px;
+            font-size: 0.8rem;
+            opacity: 0.5;
+            font-style: italic;
+            display: none;
+        }
+
+        .heart-reaction {
+            position: absolute;
+            bottom: -20px;
+            right: 10px;
+            font-size: 1.2rem;
+            animation: floatHeart 1s forwards;
+        }
+
+        @keyframes floatHeart {
+            to { transform: translateY(-50px); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="love-page-body">
+    <div class="back-nav">
+        <a href="love.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Quay lại</a>
+    </div>
+
+    <main class="page-content">
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-status"></div>
+                <div>
+                    <h3 style="margin: 0; font-family: 'Outfit', sans-serif;">Love Chat</h3>
+                    <span style="font-size: 0.8rem; opacity: 0.6;">Đang trực tuyến • Hai ta cùng trò chuyện</span>
+                </div>
+            </div>
+
+            <div class="messages-area" id="chat-messages">
+                <!-- Messages will appear here -->
+                <div class="msg received">
+                    Chào em yêu! Hôm nay của em thế nào? ❤️
+                    <span class="msg-time">12:00 PM</span>
+                </div>
+                <div class="msg sent">
+                    Dạ anh, em đang xem lại album của chúng mình nè.
+                    <span class="msg-time">12:01 PM</span>
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typing">Đối phương đang nhập...</div>
+
+            <div class="chat-input-wrapper">
+                <button class="action-btn" style="background: none; padding: 0;" onclick="sendHeart()">
+                    <i class="fa-solid fa-heart" style="color: #ff4d4d; font-size: 1.5rem;"></i>
+                </button>
+                <input type="text" id="msg-input" class="chat-input" placeholder="Nhập lời muốn nói..." onkeypress="handleKey(event)">
+                <button class="send-btn" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = "http://localhost:8080/api/chat";
+        const chatArea = document.getElementById('chat-messages');
+        const msgInput = document.getElementById('msg-input');
+
+        let messages = [];
+
+        async function fetchMessages() {
+            try {
+                const response = await fetch(API_URL);
+                messages = await response.json();
+                renderMessages();
+            } catch (error) {
+                console.error("Lỗi tải tin nhắn:", error);
+            }
+        }
+
+        function renderMessages() {
+            chatArea.innerHTML = messages.map(m => {
+                const time = new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                return `
+                    <div class="msg ${m.sender === 'Hoàng Mạnh Trường' ? 'sent' : 'received'}">
+                        ${m.text}
+                        <span class="msg-time">${time}</span>
+                    </div>
+                `;
+            }).join('');
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const text = msgInput.value.trim();
+            if (!text) return;
+
+            // Get current user from config
+            const config = JSON.parse(localStorage.getItem('inLoveConfig'));
+            const senderName = config ? config.nameMale : "Hoàng Mạnh Trường";
+
+            const newMsg = {
+                sender: senderName,
+                text: text
+            };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newMsg)
+                });
+                
+                if (response.ok) {
+                    msgInput.value = '';
+                    fetchMessages();
+                }
+            } catch (error) {
+                alert("Lỗi gửi tin nhắn!");
+            }
+        }
+
+        function handleKey(e) {
+            if (e.key === 'Enter') sendMessage();
+        }
+
+        function sendHeart() {
+            msgInput.value = "❤️";
+            sendMessage();
+        }
+
+        // Poll for new messages every 3 seconds (Simple real-time simulation)
+        setInterval(fetchMessages, 3000);
+
+        // Initialize
+        fetchMessages();
+    </script>
+</body>
+</html>

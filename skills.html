@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kỹ Năng Lập Trình - Hoàng Mạnh Trường</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .skills-page-container {
+            padding-top: 120px;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding-bottom: 80px;
+        }
+
+        .skills-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .skills-section {
+            margin-bottom: 50px;
+        }
+
+        .skills-category-title {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: #3b82f6;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .skill-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .skill-item-card {
+            background: rgba(30, 41, 59, 0.5);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .skill-item-card:hover {
+            border-color: #3b82f6;
+            transform: scale(1.02);
+        }
+
+        .skill-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .skill-name { font-weight: 600; color: white; }
+        .skill-level { color: #94a3b8; font-size: 0.9rem; }
+
+        .progress-bar-bg {
+            height: 8px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 4px;
+        }
+
+        /* Roadmap Section */
+        .roadmap-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            padding: 40px;
+            border-radius: 25px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            text-align: center;
+        }
+
+        .roadmap-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .roadmap-progress {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .roadmap-status {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header-logo-area">
+        <div class="header-content">
+            <div class="logo">
+                <a href="index.html" style="text-decoration:none; color:inherit;"><i class="fa-solid fa-circle-user logo-icon"></i> <span>Mtruong</span>_dev</a>
+            </div>
+            <div class="header-right">
+                Học vấn & Kỹ năng
+            </div>
+        </div>
+    </header>
+
+    <nav class="main-nav">
+        <div class="nav-content">
+            <ul class="nav-links">
+                <li><a href="index.html">Trang chủ</a></li>
+                <li class="dropdown">
+                    <a href="about.html">Cá nhân <i class="fa-solid fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="love.html">Tình yêu</a></li>
+                        <li><a href="education.html">Học vấn</a></li>
+                        <li><a href="skills.html">Kỹ năng</a></li>
+                        <li><a href="experience.html">Kinh nghiệm</a></li>
+                    </ul>
+                </li>
+                <li><a href="giasu.html">Hồ sơ Gia sư</a></li>
+                <li><a href="practice.html">Luyện Code</a></li>
+                <li><a href="projects.html">Dự án</a></li>
+                <li class="dropdown">
+                    <a href="manage.html">Quản trị <i class="fa-solid fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="manage.html">Quản lý Lớp học</a></li>
+                        <li><a href="manage_projects.html">Quản lý Dự án</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="skills-page-container">
+        <div class="skills-header">
+            <h1 class="section-title">Technical Skills</h1>
+            <p style="color: #94a3b8; font-size: 1.1rem;">Nền tảng kỹ thuật và lộ trình phát triển bản thân</p>
+        </div>
+
+        <!-- Roadmap -->
+        <section class="skills-section">
+            <div class="roadmap-card">
+                <i class="fa-solid fa-rocket" style="font-size: 2.5rem; color: #f15a24; margin-bottom: 20px;"></i>
+                <h2 class="roadmap-title">Lộ trình học tập 2026</h2>
+                <div class="roadmap-progress">
+                    <p style="color: white; margin-bottom: 15px; font-weight: 600;">Đang chinh phục Java Core & DSA</p>
+                    <div class="progress-bar-bg">
+                        <div class="progress-fill" style="width: 75%;"></div>
+                    </div>
+                    <div class="roadmap-status">
+                        <span>Cơ bản</span>
+                        <span>75% Hoàn thành</span>
+                        <span>Nâng cao</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CodeLearn Integration -->
+        <section class="skills-section">
+            <div class="roadmap-card" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 182, 212, 0.1)); border-color: rgba(16, 185, 129, 0.3);">
+                <i class="fa-solid fa-laptop-code" style="font-size: 2.5rem; color: #10b981; margin-bottom: 20px;"></i>
+                <h2 class="roadmap-title" style="background: linear-gradient(to right, #10b981, #06b6d4); -webkit-background-clip: text; color: transparent;">CodeLearn.io Live Stats</h2>
+                <p style="color: #94a3b8; font-size: 0.95rem; margin-bottom: 20px;">Kết nối trực tiếp tới CodeLearn qua Spring Boot Jsoup API</p>
+                <div style="display: flex; gap: 10px; max-width: 400px; margin: 0 auto 20px;">
+                    <input type="text" id="cl-username" placeholder="Nhập username CodeLearn..." style="flex: 1; padding: 12px 20px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; outline: none;">
+                    <button onclick="fetchCodeLearnStats()" style="background: #10b981; color: white; border: none; padding: 0 20px; border-radius: 10px; cursor: pointer; font-weight: 600; transition: 0.3s;" id="btn-fetch-cl">Đồng bộ</button>
+                </div>
+                <div id="cl-result" style="display: none; text-align: left; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 15px;">
+                    <p id="cl-msg" style="color: #10b981; margin-bottom: 15px; font-weight: bold;"></p>
+                    <div id="cl-skills-container" style="display: grid; gap: 15px;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Languages -->
+        <section class="skills-section">
+            <h2 class="skills-category-title"><i class="fa-solid fa-code"></i> Ngôn ngữ lập trình</h2>
+            <div class="skill-grid">
+                <div class="skill-item-card">
+                    <div class="skill-info">
+                        <span class="skill-name">Java (JDK 21)</span>
+                        <span class="skill-level">Intermediate</span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-fill" style="width: 80%;"></div></div>
+                </div>
+                <div class="skill-item-card">
+                    <div class="skill-info">
+                        <span class="skill-name">SQL</span>
+                        <span class="skill-level">Intermediate</span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-fill" style="width: 70%;"></div></div>
+                </div>
+                <div class="skill-item-card">
+                    <div class="skill-info">
+                        <span class="skill-name">Python</span>
+                        <span class="skill-level">Basic</span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-fill" style="width: 50%;"></div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tools & Tech -->
+        <section class="skills-section">
+            <h2 class="skills-category-title"><i class="fa-solid fa-layer-group"></i> Công nghệ & Công cụ</h2>
+            <div class="skill-grid">
+                <div class="skill-item-card">
+                    <div class="skill-info">
+                        <span class="skill-name">MySQL</span>
+                        <span class="skill-level">Active Use</span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-fill" style="width: 85%;"></div></div>
+                </div>
+                <div class="skill-item-card">
+                    <div class="skill-info">
+                        <span class="skill-name">Spring Boot</span>
+                        <span class="skill-level">Learning</span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-fill" style="width: 30%;"></div></div>
+                </div>
+                <div class="skill-item-card">
+                    <div class="skill-info">
+                        <span class="skill-name">Git / GitHub</span>
+                        <span class="skill-level">Proficient</span>
+                    </div>
+                    <div class="progress-bar-bg"><div class="progress-fill" style="width: 90%;"></div></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Hoàng Mạnh Trường. Designed and Built with ❤️</p>
+    </footer>
+
+    <script>
+        async function fetchCodeLearnStats() {
+            const username = document.getElementById('cl-username').value.trim();
+            if (!username) return alert('Vui lòng nhập Username CodeLearn!');
+
+            const btn = document.getElementById('btn-fetch-cl');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            document.getElementById('cl-result').style.display = 'none';
+
+            try {
+                // Gọi API cào dữ liệu từ Backend Spring Boot
+                const response = await fetch(`http://localhost:8080/api/codelearn/stats/${username}`);
+                const data = await response.json();
+
+                if (response.ok && data.status === 'success') {
+                    document.getElementById('cl-result').style.display = 'block';
+                    document.getElementById('cl-msg').innerHTML = `<i class="fa-solid fa-check-circle"></i> Đồng bộ thành công Profile: <a href="${data.profileUrl}" target="_blank" style="color: #10b981;">${data.username}</a>`;
+                    
+                    const skillsContainer = document.getElementById('cl-skills-container');
+                    skillsContainer.innerHTML = '';
+
+                    for (const [skill, score] of Object.entries(data.skills)) {
+                        skillsContainer.innerHTML += `
+                            <div class="skill-item-card" style="padding: 15px;">
+                                <div class="skill-info">
+                                    <span class="skill-name" style="color: #10b981;">${skill}</span>
+                                    <span class="skill-level" style="color: white; font-weight: bold;">${score} Điểm</span>
+                                </div>
+                                <div class="progress-bar-bg"><div class="progress-fill" style="width: ${score}%; background: linear-gradient(90deg, #10b981, #06b6d4);"></div></div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Không thể kết nối đến Backend. Hãy chắc chắn Spring Boot đang chạy ở port 8080!');
+            } finally {
+                btn.innerHTML = 'Đồng bộ';
+            }
+        }
+    </script>
+</body>
+</html>
