@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bản Đồ Tình Yêu ❤️</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/833/833472.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Outfit:wght@300;400;600;800&family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <style>
+        #love-map {
+            height: 600px;
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            border: 2px solid rgba(255, 77, 77, 0.3);
+        }
+        .map-section {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .map-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .map-header h2 {
+            font-family: 'Pacifico', cursive;
+            font-size: 3rem;
+            color: #ff4d4d;
+            margin-bottom: 1rem;
+        }
+        .map-header p {
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+        /* Custom Heart Popup */
+        .leaflet-popup-content-wrapper {
+            background: rgba(15, 23, 42, 0.9);
+            color: white;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 77, 77, 0.3);
+        }
+        .leaflet-popup-tip {
+            background: rgba(15, 23, 42, 0.9);
+        }
+        .popup-content h3 {
+            margin: 0 0 5px;
+            color: #ff4d4d;
+            font-size: 1.2rem;
+        }
+        .popup-content p {
+            margin: 0;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        /* Marker Panel Styling */
+        .marker-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2000;
+            display: none;
+            width: 350px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 77, 77, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body class="love-page-body">
+    <!-- Global Widgets -->
+    <div class="dark-mode-toggle" onclick="toggleDarkMode()">
+        <i class="fa-solid fa-moon" id="dark-mode-icon"></i>
+    </div>
+
+    <div class="music-player">
+        <i class="fa-solid fa-play music-btn" id="play-pause" onclick="toggleMusic()"></i>
+        <span id="song-title">Perfect - Ed Sheeran ❤️</span>
+        <audio id="bg-music" loop>
+            <source src="https://github.com/hoangtran0410/Pretty-In-Love/blob/master/music/perfect.mp3?raw=true" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <div class="back-nav">
+        <a href="love.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Quay lại trang chủ</a>
+    </div>
+
+    <main class="page-content">
+        <section class="map-section">
+            <div class="map-header">
+                <h2>Bản Đồ Tình Yêu</h2>
+                <p>Nơi lưu giữ những dấu chân hạnh phúc của chúng mình tại Thủ đô ❤️</p>
+            </div>
+
+            <!-- Address Search Bar -->
+            <div class="search-container" style="margin-bottom: 2rem; position: relative; max-width: 600px; margin-left: auto; margin-right: auto;">
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="address-input" autocomplete="off" placeholder="Nhập địa chỉ (VD: 135 Thiên Hiền, Hồ Gươm...)" oninput="handleSearchInput(this.value)" style="flex: 1; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,77,77,0.3); color: white; padding: 12px 20px; border-radius: 30px; backdrop-filter: blur(10px);">
+                    <button onclick="searchAddress()" style="background: #ff4d4d; color: white; border: none; padding: 0 25px; border-radius: 30px; cursor: pointer; font-weight: 600; transition: 0.3s;"><i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm</button>
+                </div>
+                <!-- Suggestion Dropdown -->
+                <div id="search-suggestions" style="position: absolute; top: 100%; left: 0; right: 0; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 77, 77, 0.2); border-radius: 15px; margin-top: 5px; max-height: 250px; overflow-y: auto; z-index: 10000; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                </div>
+            </div>
+            
+            <div id="love-map"></div>
+
+            <!-- Add Location Panel -->
+            <div id="add-marker-panel" class="marker-panel">
+                <div class="ios-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="color: #ff4d4d; font-size: 1.2rem; margin: 0;">Thêm Địa Điểm</h3>
+                    <button class="ios-btn ios-save" style="background: #ff4d4d; color: white; border: none; padding: 5px 15px; border-radius: 10px; cursor: pointer;" onclick="addMarker()">Lưu</button>
+                </div>
+                <div class="ios-content">
+                    <p style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 1rem;">Tọa độ: <span id="current-coords">Click vào bản đồ...</span></p>
+                    <div class="ios-form">
+                        <div class="ios-input-group" style="margin-bottom: 10px;">
+                            <label style="display: block; font-size: 0.8rem; opacity: 0.7; margin-bottom: 5px;">Tên địa điểm</label>
+                            <input type="text" id="loc-name" placeholder="Ví dụ: Rạp chiếu phim" style="width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 8px; border-radius: 8px;">
+                        </div>
+                        <div class="ios-input-group">
+                            <label style="display: block; font-size: 0.8rem; opacity: 0.7; margin-bottom: 5px;">Lời nhắn / Caption</label>
+                            <input type="text" id="loc-desc" placeholder="Ghi lại kỉ niệm tại đây..." style="width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 8px; border-radius: 8px;">
+                        </div>
+                    </div>
+                    <button style="background: none; border: 1px solid rgba(255,255,255,0.2); color: white; margin-top: 15px; width: 100%; padding: 8px; border-radius: 8px; cursor: pointer;" onclick="closeMarkerPanel()">Hủy</button>
+                </div>
+            </div>
+
+            <div class="marker-list-container" style="margin-top: 3rem;">
+                <h3 style="margin-bottom: 1.5rem; color: #ff4d4d;">📍 Danh sách địa điểm kỉ niệm</h3>
+                <div id="saved-markers-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem;"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+        function toggleDarkMode() {
+            document.body.classList.toggle('light-mode');
+            const icon = document.getElementById('dark-mode-icon');
+            icon.className = document.body.classList.contains('light-mode') ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        }
+
+        let searchTimeout;
+        function handleSearchInput(query) {
+            clearTimeout(searchTimeout);
+            const suggestionsContainer = document.getElementById('search-suggestions');
+            
+            if (query.length < 3) {
+                suggestionsContainer.style.display = 'none';
+                return;
+            }
+
+            searchTimeout = setTimeout(async () => {
+                try {
+                    let searchQ = query;
+                    if (!searchQ.toLowerCase().includes('hà nội') && !searchQ.toLowerCase().includes('hanoi')) {
+                        searchQ += ', Hà Nội';
+                    }
+                    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQ)}&countrycodes=vn&limit=5&addressdetails=1`);
+                    const data = await response.json();
+                    
+                    if (data && data.length > 0) {
+                        suggestionsContainer.innerHTML = data.map(item => `
+                            <div class="suggestion-item" onclick="selectSuggestion('${item.display_name}', ${item.lat}, ${item.lon})" style="padding: 12px 20px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; transition: 0.3s;">
+                                <i class="fa-solid fa-location-dot" style="color: #ff4d4d; margin-right: 10px;"></i> ${item.display_name}
+                            </div>
+                        `).join('');
+                        suggestionsContainer.style.display = 'block';
+                    } else {
+                        suggestionsContainer.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Lỗi tìm kiếm:', error);
+                }
+            }, 300);
+        }
+
+        function selectSuggestion(name, lat, lon) {
+            document.getElementById('address-input').value = name;
+            document.getElementById('search-suggestions').style.display = 'none';
+            map.setView([lat, lon], 16);
+            
+            // Highlight location with a temporary circle or just pan
+            L.circle([lat, lon], { radius: 50, color: '#ff4d4d', fillOpacity: 0.2 }).addTo(map).fadeOut(2000);
+        }
+
+        // Add CSS for suggestion hover
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .suggestion-item:hover { background: rgba(255, 77, 77, 0.1) !important; color: #ff4d4d; }
+            .suggestion-item:last-child { border-bottom: none; }
+        `;
+        document.head.appendChild(style);
+
+        const audio = document.getElementById('bg-music');
+        function toggleMusic() {
+            if (audio.paused) { audio.play(); document.getElementById('play-pause').className = 'fa-solid fa-pause music-btn'; }
+            else { audio.pause(); document.getElementById('play-pause').className = 'fa-solid fa-play music-btn'; }
+        }
+
+        // --- Map Logic ---
+        const MAP_API = "http://localhost:8080/api/locations";
+        let selectedLatLng = null;
+        let savedMarkers = [];
+
+        async function loadMarkers() {
+            try {
+                const response = await fetch(MAP_API);
+                savedMarkers = await response.json();
+                renderMarkers();
+            } catch (error) {
+                console.warn("Backend chưa chạy, dùng dữ liệu mẫu:", error);
+                savedMarkers = [
+                    { id: 1, lat: 21.0285, lon: 105.8522, name: "Hồ Hoàn Kiếm", description: "Nơi lần đầu nắm tay đi dạo phố đi bộ ❤️" },
+                    { id: 2, lat: 21.045, lon: 105.838, name: "Hồ Tây", description: "Chiều hoàng hôn lãng mạn nhất từng thấy." }
+                ];
+                renderMarkers();
+            }
+        }
+
+        const map = L.map('love-map').setView([21.0285, 105.8542], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        const heartIcon = L.divIcon({
+            html: '<i class="fa-solid fa-location-dot" style="color: #ff4d4d; font-size: 30px; text-shadow: 0 0 10px rgba(255,77,77,0.5);"></i>',
+            className: 'custom-heart-icon',
+            iconSize: [30, 30],
+            iconAnchor: [15, 30],
+            popupAnchor: [0, -30]
+        });
+
+        let currentTempMarker = null;
+
+        // --- Geocoding (Search) Logic ---
+        async function searchAddress() {
+            const query = document.getElementById('address-input').value;
+            if (!query) return;
+
+            const button = document.querySelector('.search-container button');
+            button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+            try {
+                let searchQ = query;
+                if (!searchQ.toLowerCase().includes('hà nội') && !searchQ.toLowerCase().includes('hanoi')) {
+                    searchQ += ', Hà Nội';
+                }
+                // Restrict search to Vietnam for better accuracy
+                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQ)}&countrycodes=vn&limit=1`);
+                const data = await response.json();
+
+                if (data && data.length > 0) {
+                    const result = data[0];
+                    const lat = parseFloat(result.lat);
+                    const lon = parseFloat(result.lon);
+                    
+                    selectedLatLng = { lat, lng: lon };
+                    map.setView([lat, lon], 16);
+                    
+                    if (currentTempMarker) map.removeLayer(currentTempMarker);
+                    currentTempMarker = L.marker([lat, lon], {icon: heartIcon, opacity: 0.8}).addTo(map);
+                    
+                    document.getElementById('current-coords').innerText = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+                    document.getElementById('add-marker-panel').style.display = 'block';
+                    document.getElementById('loc-name').value = result.display_name.split(',')[0];
+                } else {
+                    alert('Không tìm thấy địa chỉ này. Hãy thử nhập chi tiết hơn nhé!');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Có lỗi xảy ra khi tìm kiếm. Vui lòng thử lại sau!');
+            } finally {
+                button.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm';
+            }
+        }
+
+        // Add "Enter" key support for search
+        document.getElementById('address-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') searchAddress();
+        });
+
+        function renderMarkers() {
+            map.eachLayer((layer) => { if (layer instanceof L.Marker) map.removeLayer(layer); });
+            
+            const list = document.getElementById('saved-markers-list');
+            list.innerHTML = '';
+
+            savedMarkers.forEach((loc) => {
+                const lat = loc.lat || (loc.coords && loc.coords[0]);
+                const lon = loc.lon || (loc.coords && loc.coords[1]);
+                const desc = loc.description || loc.desc || '';
+
+                L.marker([lat, lon], {icon: heartIcon})
+                    .addTo(map)
+                    .bindPopup(`<strong>${loc.name}</strong><br>${desc}`);
+
+                list.innerHTML += `
+                    <div class="stat-item" style="padding: 1rem; position: relative;">
+                        <strong style="display: block; color: #ff4d4d;">${loc.name}</strong>
+                        <span style="font-size: 0.8rem; opacity: 0.7;">${desc}</span>
+                        <i class="fa-solid fa-trash" style="position: absolute; top: 10px; right: 10px; cursor: pointer; font-size: 0.8rem; opacity: 0.4;" onclick="deleteMarker(${loc.id})"></i>
+                    </div>
+                `;
+            });
+        }
+
+        map.on('click', function(e) {
+            selectedLatLng = e.latlng;
+            document.getElementById('current-coords').innerText = `${selectedLatLng.lat.toFixed(4)}, ${selectedLatLng.lng.toFixed(4)}`;
+            
+            if (currentTempMarker) map.removeLayer(currentTempMarker);
+            currentTempMarker = L.marker(selectedLatLng, {icon: heartIcon, opacity: 0.5}).addTo(map);
+            
+            document.getElementById('add-marker-panel').style.display = 'block';
+        });
+
+        async function addMarker() {
+            const name = document.getElementById('loc-name').value;
+            const desc = document.getElementById('loc-desc').value;
+            if (!name || !desc) return alert('Vui lòng nhập đầy đủ tên và caption!');
+
+            const newLoc = {
+                name: name,
+                description: desc,
+                lat: selectedLatLng.lat,
+                lon: selectedLatLng.lng
+            };
+
+            try {
+                const response = await fetch(MAP_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newLoc)
+                });
+                if (response.ok) {
+                    await loadMarkers();
+                    closeMarkerPanel();
+                }
+            } catch (error) {
+                alert("Lỗi lưu địa điểm. Kiểm tra Backend đang chạy không?");
+            }
+        }
+
+        async function deleteMarker(id) {
+            if (confirm('Bạn có chắc muốn xóa địa điểm này?')) {
+                try {
+                    await fetch(`${MAP_API}/${id}`, { method: 'DELETE' });
+                    await loadMarkers();
+                } catch (error) {
+                    alert("Lỗi xóa địa điểm!");
+                }
+            }
+        }
+
+        function closeMarkerPanel() {
+            document.getElementById('add-marker-panel').style.display = 'none';
+            if (currentTempMarker) map.removeLayer(currentTempMarker);
+            document.getElementById('loc-name').value = '';
+            document.getElementById('loc-desc').value = '';
+        }
+
+        loadMarkers();
+        
+        // Fix for Leaflet gray tiles issue
+        setTimeout(() => { map.invalidateSize(); }, 500);
+        window.addEventListener('resize', () => { map.invalidateSize(); });
+
+    </script>
+</body>
+</html>

@@ -22,7 +22,6 @@ public class MilestoneController {
     @Autowired
     private MilestoneRepository milestoneRepository;
 
-    private final String UPLOAD_DIR = "uploads/";
 
     @GetMapping
     public List<Milestone> getAllMilestones() {
@@ -78,7 +77,11 @@ public class MilestoneController {
     private List<String> saveFiles(MultipartFile[] files) throws IOException {
         List<String> imageUrls = new ArrayList<>();
         if (files != null) {
-            Path uploadPath = Paths.get(UPLOAD_DIR);
+            Path uploadPath = Paths.get("uploads");
+            if (!Files.exists(uploadPath) && Files.exists(Paths.get("..", "uploads"))) {
+                uploadPath = Paths.get("..", "uploads");
+            }
+
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }

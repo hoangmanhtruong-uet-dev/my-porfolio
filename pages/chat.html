@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Chat Pro - Kết Nối Trái Tim ❤️</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/833/833472.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --chat-primary: #ff4d4d;
+            --chat-secondary: #f43f5e;
+            --chat-bg: #0b0118;
+            --chat-card: rgba(30, 41, 59, 0.4);
+            --chat-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body.chat-mode {
+            background: var(--chat-bg);
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Outfit', sans-serif;
+            color: white;
+        }
+
+        /* mesh background */
+        .mesh-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: #0b0118;
+            overflow: hidden;
+        }
+
+        .mesh-gradient {
+            position: absolute;
+            width: 150%; height: 150%;
+            top: -25%; left: -25%;
+            background-image: 
+                radial-gradient(at 10% 20%, rgba(255, 77, 77, 0.15) 0px, transparent 50%),
+                radial-gradient(at 90% 10%, rgba(168, 85, 247, 0.1) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(59, 130, 246, 0.05) 0px, transparent 50%);
+            filter: blur(80px);
+            animation: meshMove 20s infinite alternate linear;
+        }
+
+        @keyframes meshMove {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(10deg); }
+        }
+
+        .chat-layout {
+            display: grid;
+            grid-template-columns: 350px 1fr 300px;
+            height: 100vh;
+            padding: 20px;
+            gap: 20px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        /* Panels */
+        .glass-panel {
+            background: var(--chat-card);
+            backdrop-filter: blur(25px);
+            border-radius: 30px;
+            border: 1px solid var(--chat-border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Sidebar Left (Contacts/Search) */
+        .sidebar-left { padding: 30px; }
+        .search-bar {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--chat-border);
+            border-radius: 15px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        .search-bar input { background: none; border: none; color: white; outline: none; width: 100%; }
+
+        .contact-item {
+            padding: 15px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 10px;
+            border: 1px solid transparent;
+        }
+        .contact-item:hover, .contact-item.active {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--chat-border);
+        }
+        .avatar-circle {
+            width: 50px; height: 50px;
+            border-radius: 15px;
+            object-fit: cover;
+            border: 2px solid var(--chat-primary);
+        }
+
+        /* Main Chat Area */
+        .main-chat { position: relative; }
+        .chat-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--chat-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .messages-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Custom Scrollbar */
+        .messages-area::-webkit-scrollbar { width: 6px; }
+        .messages-area::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+
+        .msg {
+            max-width: 65%;
+            padding: 12px 18px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            position: relative;
+            animation: msgFade 0.4s ease-out;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes msgFade {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .msg.sent {
+            align-self: flex-end;
+            background: linear-gradient(135deg, var(--chat-primary), var(--chat-secondary));
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .msg.received {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--chat-border);
+            border-bottom-left-radius: 5px;
+        }
+
+        .msg img {
+            max-width: 100%;
+            border-radius: 15px;
+            margin-top: 5px;
+        }
+
+        .msg-time { font-size: 0.7rem; opacity: 0.5; margin-top: 5px; display: block; }
+
+        /* Input Bar */
+        .input-bar {
+            padding: 20px 30px;
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid var(--chat-border);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--chat-border);
+            border-radius: 20px;
+            padding: 12px 20px;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+        .chat-input:focus { border-color: var(--chat-primary); background: rgba(255, 255, 255, 0.08); }
+
+        .action-icon {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .action-icon:hover { color: var(--chat-primary); transform: scale(1.1); }
+
+        .btn-send {
+            background: var(--chat-primary);
+            color: white;
+            border: none;
+            width: 45px; height: 45px;
+            border-radius: 15px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(255, 77, 77, 0.2);
+        }
+        .btn-send:hover { transform: scale(1.1); box-shadow: 0 15px 30px rgba(255, 77, 77, 0.4); }
+
+        /* Right Panel (Info) */
+        .sidebar-right {
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .profile-img-large {
+            width: 120px; height: 120px;
+            border-radius: 30px;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 3px solid var(--chat-primary);
+            padding: 5px;
+        }
+
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 30px;
+        }
+        .media-item {
+            aspect-ratio: 1;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+        }
+        .media-item img { width: 100%; height: 100%; object-fit: cover; }
+
+        .emoji-picker {
+            position: absolute;
+            bottom: 80px;
+            left: 30px;
+            background: #1e293b;
+            border: 1px solid var(--chat-border);
+            border-radius: 20px;
+            padding: 15px;
+            display: none;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            z-index: 1000;
+        }
+        .emoji-item { font-size: 1.5rem; cursor: pointer; transition: 0.2s; }
+        .emoji-item:hover { transform: scale(1.2); }
+
+        @media (max-width: 1200px) {
+            .chat-layout { grid-template-columns: 1fr; }
+            .sidebar-left, .sidebar-right { display: none; }
+        }
+    </style>
+</head>
+<body class="chat-mode">
+    <div class="mesh-bg"><div class="mesh-gradient"></div></div>
+
+    <div class="chat-layout">
+        <!-- Sidebar Left -->
+        <aside class="glass-panel sidebar-left">
+            <div class="search-bar">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" placeholder="Tìm kiếm tin nhắn...">
+            </div>
+
+            <div class="contact-item active">
+                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=100&q=80" class="avatar-circle">
+                <div style="flex:1;">
+                    <h4 style="margin:0;" id="chat-partner-name">Nguyễn Thị Anh Thư</h4>
+                    <p style="margin:0; font-size:0.75rem; color:#10b981;">● Đang trực tuyến</p>
+                </div>
+            </div>
+            
+            <div style="margin-top:auto; padding-top: 20px; border-top: 1px solid var(--chat-border);">
+                <a href="love.html" style="color:#94a3b8; text-decoration:none; display:flex; align-items:center; gap:10px;">
+                    <i class="fa-solid fa-arrow-left"></i> Về bảng điều khiển
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Chat -->
+        <main class="glass-panel main-chat">
+            <header class="chat-header">
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=100&q=80" style="width:40px; height:40px; border-radius:10px;">
+                    <div>
+                        <h3 style="margin:0; font-size:1.1rem;">Anh Thư ❤️</h3>
+                        <span style="font-size:0.75rem; opacity:0.6;">Đang nhập tin nhắn...</span>
+                    </div>
+                </div>
+                <div style="display:flex; gap:20px;">
+                    <i class="fa-solid fa-phone action-icon"></i>
+                    <i class="fa-solid fa-video action-icon"></i>
+                    <i class="fa-solid fa-ellipsis-vertical action-icon"></i>
+                </div>
+            </header>
+
+            <div class="messages-area" id="chat-messages">
+                <!-- Messages populate here -->
+            </div>
+
+            <div class="emoji-picker" id="emoji-menu">
+                <span class="emoji-item" onclick="addEmoji('❤️')">❤️</span>
+                <span class="emoji-item" onclick="addEmoji('😍')">😍</span>
+                <span class="emoji-item" onclick="addEmoji('😘')">😘</span>
+                <span class="emoji-item" onclick="addEmoji('🔥')">🔥</span>
+                <span class="emoji-item" onclick="addEmoji('✨')">✨</span>
+                <span class="emoji-item" onclick="addEmoji('🌹')">🌹</span>
+                <span class="emoji-item" onclick="addEmoji('🍭')">🍭</span>
+                <span class="emoji-item" onclick="addEmoji('🎁')">🎁</span>
+                <span class="emoji-item" onclick="addEmoji('👑')">👑</span>
+                <span class="emoji-item" onclick="addEmoji('🌈')">🌈</span>
+            </div>
+
+            <footer class="input-bar">
+                <i class="fa-solid fa-plus action-icon" title="Đính kèm"></i>
+                <i class="fa-solid fa-face-smile action-icon" onclick="toggleEmoji()"></i>
+                <input type="text" id="msg-input" class="chat-input" placeholder="Viết gì đó cho Anh Thư..." onkeypress="handleKey(event)">
+                <button class="btn-send" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+            </footer>
+        </main>
+
+        <!-- Sidebar Right -->
+        <aside class="glass-panel sidebar-right">
+            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80" class="profile-img-large">
+            <h3 id="info-name">Nguyễn Thị Anh Thư</h3>
+            <p style="color:#94a3b8; font-size:0.9rem;">"Hạnh phúc là khi có anh bên cạnh" 🌸</p>
+            
+            <div style="margin-top:40px; text-align:left;">
+                <h4 style="font-size:0.8rem; text-transform:uppercase; color:#94a3b8; letter-spacing:1px;">Ảnh đã chia sẻ</h4>
+                <div class="media-grid">
+                    <div class="media-item"><img src="https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?auto=format&fit=crop&w=100&q=80"></div>
+                    <div class="media-item"><img src="https://images.unsplash.com/photo-1518199266791-bc3965883307?auto=format&fit=crop&w=100&q=80"></div>
+                    <div class="media-item"><img src="https://images.unsplash.com/photo-1516589174184-c685266e430c?auto=format&fit=crop&w=100&q=80"></div>
+                </div>
+            </div>
+
+            <div style="margin-top:40px; text-align:left;">
+                <h4 style="font-size:0.8rem; text-transform:uppercase; color:#94a3b8; letter-spacing:1px;">Tiện ích</h4>
+                <div style="display:flex; flex-direction:column; gap:10px; margin-top:15px;">
+                    <div style="display:flex; align-items:center; gap:10px; font-size:0.9rem; cursor:pointer;"><i class="fa-solid fa-bell"></i> Thông báo</div>
+                    <div style="display:flex; align-items:center; gap:10px; font-size:0.9rem; cursor:pointer;"><i class="fa-solid fa-shield-heart"></i> Bảo mật</div>
+                    <div style="display:flex; align-items:center; gap:10px; font-size:0.9rem; cursor:pointer; color:#ef4444;"><i class="fa-solid fa-trash"></i> Xóa lịch sử</div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        const API_URL = "http://localhost:8080/api/chat";
+        const chatArea = document.getElementById('chat-messages');
+        const msgInput = document.getElementById('msg-input');
+        
+        // Auto config names from localStorage
+        const loveConfig = JSON.parse(localStorage.getItem('inLoveConfig')) || {};
+        const MY_NAME = loveConfig.nameMale || "Hoàng Mạnh Trường";
+        const PARTNER_NAME = loveConfig.nameFemale || "Nguyễn Thị Anh Thư";
+
+        document.getElementById('chat-partner-name').innerText = PARTNER_NAME;
+        document.getElementById('info-name').innerText = PARTNER_NAME;
+
+        let messages = [];
+
+        async function fetchMessages() {
+            try {
+                const response = await fetch(API_URL);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.length !== messages.length) {
+                        messages = data;
+                        renderMessages();
+                    }
+                }
+            } catch (error) { console.log("Offline mode or API down"); }
+        }
+
+        function renderMessages() {
+            chatArea.innerHTML = messages.map(m => {
+                const isSent = m.sender === MY_NAME;
+                const time = new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                return `
+                    <div class="msg ${isSent ? 'sent' : 'received'}">
+                        <div class="msg-content">${m.text}</div>
+                        <span class="msg-time">${time} ${isSent ? '• Đã gửi' : ''}</span>
+                    </div>
+                `;
+            }).join('');
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const text = msgInput.value.trim();
+            if (!text) return;
+
+            const newMsg = { sender: MY_NAME, text: text, timestamp: new Date() };
+            
+            // Optimistic update
+            messages.push(newMsg);
+            renderMessages();
+            msgInput.value = '';
+
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newMsg)
+                });
+            } catch (error) { console.error("Error sending message"); }
+        }
+
+        function handleKey(e) { if (e.key === 'Enter') sendMessage(); }
+
+        function toggleEmoji() {
+            const menu = document.getElementById('emoji-menu');
+            menu.style.display = menu.style.display === 'grid' ? 'none' : 'grid';
+        }
+
+        function addEmoji(emoji) {
+            msgInput.value += emoji;
+            toggleEmoji();
+            msgInput.focus();
+        }
+
+        // Close emoji on click outside
+        window.onclick = function(event) {
+            if (!event.target.matches('.fa-face-smile') && !event.target.closest('.emoji-picker')) {
+                const menu = document.getElementById('emoji-menu');
+                if (menu) menu.style.display = 'none';
+            }
+        }
+
+        // Initial fetch and poll
+        fetchMessages();
+        setInterval(fetchMessages, 2000);
+    </script>
+</body>
+</html>

@@ -5,6 +5,8 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Configuration
@@ -16,19 +18,36 @@ public class WebConfig implements WebMvcConfigurer {
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Lấy đường dẫn tuyệt đối và chuẩn hóa dấu gạch chéo cho Windows
-        String uploadPath = Paths.get("uploads").toAbsolutePath().toString().replace("\\", "/");
+        // Tự động tìm thư mục uploads cho dù chạy từ root hay từ folder backend
+        Path path = Paths.get("uploads").toAbsolutePath();
         
-        // Cấu hình URL /uploads/** trỏ đến thư mục vật lý
-        String location = "file:" + uploadPath + "/";
+        // Nếu không thấy ở folder hiện tại, thử tìm ở folder cha (trường hợp chạy từ folder backend)
+        if (!Files.exists(path) && Files.exists(Paths.get("..", "uploads"))) {
+            path = Paths.get("..", "uploads").toAbsolutePath();
+        }
+
+        String location = path.toUri().toString();
+        if (!location.endsWith("/")) {
+            location += "/";
+        }
 
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations(location)
                 .setCachePeriod(0);
+        
+        System.out.println("DEBUG: Uploads folder path: " + path.toString());
+        System.out.println("DEBUG: Static resource location: " + location);
     }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+        // Cho phép Frontend truy cập API
+        registry.addMapping("/api/**")
+                .allowedOrigins("*") // Sau này có thể thay "*" bằng domain thật của frontend
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*");
+
+        // Cho phép truy cập ảnh
         registry.addMapping("/uploads/**")
                 .allowedOrigins("*")
                 .allowedMethods("GET");
