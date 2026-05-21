@@ -149,13 +149,25 @@ function endQuiz() {
     document.querySelector('.score-circle span').innerText = `/ 10`;
     
     // Save to student profile (LocalStorage only)
-    const profile = JSON.parse(localStorage.getItem('student_profile')) || { name: "Học sinh Mtruong", history: [], totalPoints: 0 };
-    profile.history.push({
-        examTitle: currentExam.title,
-        score: parseFloat(finalScore),
-        date: new Date().toISOString()
-    });
-    localStorage.setItem('student_profile', JSON.stringify(profile));
+    const student = JSON.parse(localStorage.getItem('current_student'));
+    if (student) {
+        if (!student.history) student.history = [];
+        student.history.push({
+            examTitle: currentExam.title,
+            score: parseFloat(finalScore),
+            date: new Date().toISOString()
+        });
+        localStorage.setItem('current_student', JSON.stringify(student));
+        
+        // Also update the general student_profile for backward compatibility if needed
+        const profile = JSON.parse(localStorage.getItem('student_profile')) || { name: student.fullName, history: [], totalPoints: 0 };
+        profile.history.push({
+            examTitle: currentExam.title,
+            score: parseFloat(finalScore),
+            date: new Date().toISOString()
+        });
+        localStorage.setItem('student_profile', JSON.stringify(profile));
+    }
 
     showReview();
 }
@@ -181,4 +193,19 @@ nextBtn.addEventListener('click', () => navigate(1));
 prevBtn.addEventListener('click', () => navigate(-1));
 submitBtn.addEventListener('click', endQuiz);
 
-init();
+document.addEventListener('DOMContentLoaded', () => {
+    const isStudent = localStorage.getItem('current_student') !== null;
+    const isAdmin = sessionStorage.getItem('isAdmin') === 'true';
+    
+    const authScreen = document.getElementById('auth-required-screen');
+    const mainContent = document.getElementById('quiz-main-content');
+    
+    if (isStudent || isAdmin) {
+        if (authScreen) authScreen.style.display = 'none';
+        if (mainContent) mainContent.style.display = 'block';
+        init();
+    } else {
+        if (authScreen) authScreen.style.display = 'flex';
+        if (mainContent) mainContent.style.display = 'none';
+    }
+});

@@ -847,8 +847,8 @@
         // Reuse existing modal logic but with new features
         window.openModal = function(id = null) {
             const modal = document.getElementById('classModal');
-            modal.style.display = 'block';
-            if (id) {
+            modal.classList.add('show');
+            if (id && typeof id !== 'object') {
                 const c = classes.find(item => item.id == id);
                 if (c) {
                     document.getElementById('modalTitle').innerText = "Chỉnh Sửa Lớp Học";
@@ -870,7 +870,9 @@
             }
         };
 
-        window.closeModal = () => document.getElementById('classModal').style.display = 'none';
+        window.closeModal = () => {
+            document.getElementById('classModal').classList.remove('show');
+        };
 
         window.editClass = (id) => openModal(id);
 
@@ -915,17 +917,19 @@
         };
 
         window.onclick = (e) => { if (e.target == document.getElementById('classModal')) closeModal(); };
-    </script>
-</body>
-</html>
-ush(classData);
-            }
 
-            localStorage.setItem('myClasses', JSON.stringify(classes));
-            loadClasses();
-            window.closeModal();
-        };
+        // --- Keyboard Support for PIN Pad ---
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('login-screen').style.display !== 'none') {
+                if (e.key >= '0' && e.key <= '9') {
+                    addPin(e.key);
+                } else if (e.key === 'Backspace') {
+                    clearLast();
+                } else if (e.key === 'Enter') {
+                    if (enteredPin.length === 4) submitPin();
+                }
+            }
+        });
     </script>
-</body>
 </body>
 </html>

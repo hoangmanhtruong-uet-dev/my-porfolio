@@ -1,43 +1,62 @@
 package com.love.portfolio.service;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class AIService {
 
+    @Value("${gemini.api.key}")
+    private String apiKey;
+
+    private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=";
+
     public String getAIResponse(String userPrompt) {
-        String input = userPrompt.toLowerCase();
+        RestTemplate restTemplate = new RestTemplate();
+        String url = GEMINI_API_URL + apiKey;
 
-        // Logic trả lời dựa trên từ khóa (Smart Keyword Engine)
-        if (input.contains("học phí") || input.contains("giá") || input.contains("bao nhiêu tiền")) {
-            return "Chào bạn! Học phí các lớp Gia sư của anh Trường thường dao động từ 200k - 350k/buổi (2 giờ). Đặc biệt, nếu bạn đăng ký theo nhóm 2-3 người sẽ được giảm giá 20% đấy!";
-        }
-        
-        if (input.contains("địa chỉ") || input.contains("ở đâu") || input.contains("hà nội")) {
-            return "Anh Trường dạy trực tiếp tại khu vực Cầu Giấy và Nam Từ Liêm (Hà Nội). Nếu bạn ở xa, anh có các lớp Online chất lượng cao qua Zoom/Google Meet với bảng điện tử cực kỳ trực quan.";
-        }
+        String systemPrompt = "Bạn là trợ lý AI thông minh của Hoàng Mạnh Trường (Mtruong_dev). " +
+                "Bạn có kiến thức sâu rộng về Hóa học, Lập trình (Java, Spring Boot, AI, Deep Learning) và các dịch vụ Gia sư của anh Trường. " +
+                "Hãy trả lời người dùng một cách thân thiện, chuyên nghiệp bằng tiếng Việt. " +
+                "Thông tin thêm: Học phí gia sư khoảng 200k-350k/buổi. Anh Trường học tại UET - ĐHQGHN.";
 
-        if (input.contains("hóa") || input.contains("hóa học")) {
-            return "Về môn Hóa thì bạn tìm đúng người rồi! Anh Trường đạt 10 điểm Hóa THPTQG và Giải Nhì HSG Tỉnh. Anh chuyên trị các ca mất gốc, giúp học sinh bứt phá lên 8+, 9+ bằng phương pháp 'Dồn chất' và 'Bảo toàn' cực hay.";
-        }
+        Map<String, Object> requestBody = Map.of(
+            "contents", List.of(
+                Map.of("parts", List.of(
+                    Map.of("text", systemPrompt + "\n\nUser: " + userPrompt)
+                ))
+            )
+        );
 
-        if (input.contains("lịch học") || input.contains("rảnh") || input.contains("đăng ký")) {
-            return "Hiện tại anh Trường còn trống một vài buổi tối trong tuần. Bạn có thể xem chi tiết tại mục 'Lịch rảnh' trên trang Hồ sơ Gia sư hoặc để lại số điện thoại, anh sẽ gọi lại tư vấn ngay!";
-        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
-        if (input.contains("toán") || input.contains("lý")) {
-            return "Ngoài môn Hóa, anh Trường cũng nhận dạy kèm Toán và Lý cấp 2, cấp 3. Anh tập trung vào tư duy giải nhanh bằng Casio và hiểu bản chất hiện tượng để học sinh không bị học vẹt.";
-        }
+        try {
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                url, HttpMethod.POST, entity, 
+                new org.springframework.core.ParameterizedTypeReference<Map<String, Object>>() {}
+            );
 
-        if (input.contains("dự án") || input.contains("lập trình") || input.contains("project")) {
-            return "Anh Trường là sinh viên UET nên rất đam mê lập trình. Các dự án của anh ấy bao gồm Hệ thống quản lý lớp học, Website đấu giá, và chính trang Web bạn đang xem đây! Bạn có thể xem chi tiết ở mục 'Dự án'.";
+            Map<String, Object> body = response.getBody();
+            if (body != null && body.containsKey("candidates")) {
+                List<?> candidates = (List<?>) body.get("candidates");
+                if (!candidates.isEmpty()) {
+                    Map<?, ?> candidate = (Map<?, ?>) candidates.get(0);
+                    Map<?, ?> content = (Map<?, ?>) candidate.get("content");
+                    List<?> parts = (List<?>) content.get("parts");
+                    Map<?, ?> part = (Map<?, ?>) parts.get(0);
+                    return (String) part.get("text");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Xin lỗi, mình đang gặp chút trục trặc kỹ thuật. Hãy nhắn lại cho mình sau vài giây nhé!";
         }
-
-        if (input.contains("hello") || input.contains("chào") || input.contains("hi")) {
-            return "Chào bạn! Mình là trợ lý ảo của anh Trường. Bạn cần mình tư vấn về học tập, lịch học hay muốn tìm hiểu thêm về các dự án lập trình của anh Trường?";
-        }
-
-        // Câu trả lời mặc định nếu không khớp từ khóa
-        return "Cảm ơn bạn đã nhắn tin! Câu hỏi này mình sẽ chuyển trực tiếp cho anh Trường. Bạn vui lòng để lại số điện thoại hoặc nhắn tin qua Facebook 'Mtruongdayyy' để anh phản hồi nhanh nhất nhé.";
+        return "Mình chưa hiểu ý bạn lắm, bạn có thể nói rõ hơn không?";
     }
 }

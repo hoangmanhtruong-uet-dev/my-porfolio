@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -226,26 +226,271 @@
         }
         .loading-ai i { animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Image Upload Styles */
+        .image-upload-wrapper {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .image-preview-container {
+            display: none;
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 15px;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid var(--primary-color);
+        }
+        .image-preview-container img {
+            width: 100%;
+            display: block;
+        }
+        .remove-preview-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .upload-btns-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .btn-upload-ai {
+            background: rgba(255,255,255,0.05);
+            border: 1px dashed rgba(255,255,255,0.3);
+            color: #cbd5e1;
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        body {
+            background: #050810;
+            overflow-x: hidden;
+        }
+
+        /* Mesh Gradient Background */
+        .mesh-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background: 
+                radial-gradient(at 0% 0%, rgba(168, 85, 247, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(15, 23, 42, 1) 0px, transparent 100%);
+        }
+
+        .lab-container {
+            padding-top: 150px;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding-bottom: 80px;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .lab-header {
+            text-align: center;
+            margin-bottom: 70px;
+        }
+
+        .section-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            letter-spacing: -1.5px;
+        }
+
+        .lab-section {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 40px;
+            padding: 50px;
+            margin-bottom: 60px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            transition: transform 0.4s ease;
+        }
+
+        .lab-section:hover {
+            border-color: rgba(168, 85, 247, 0.2);
+        }
+
+        /* Input Group Upgrade */
+        .balancer-input-group {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .balancer-input {
+            flex: 1;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 20px 30px;
+            border-radius: 20px;
+            color: white;
+            font-size: 1.3rem;
+            font-family: 'Outfit', sans-serif;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .balancer-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.1);
+            background: rgba(0,0,0,0.3);
+        }
+
+        .btn-primary {
+            padding: 15px 40px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: 0.4s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(168, 85, 247, 0.4);
+        }
+
+        /* Result Panel Upgrade */
+        .ai-result-panel {
+            display: none;
+            margin-top: 40px;
+            padding: 40px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 30px;
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            animation: slideInUp 0.5s ease-out;
+            position: relative;
+        }
+
+        .ai-badge {
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            display: inline-block;
+            box-shadow: 0 10px 20px rgba(168, 85, 247, 0.2);
+        }
+
+        .loading-ai {
+            display: none;
+            align-items: center;
+            gap: 15px;
+            color: #d8b4fe;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-top: 25px;
+        }
+
+        /* Research Items */
+        .research-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .research-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 25px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .research-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(168, 85, 247, 0.3);
+            transform: translateY(-8px);
+        }
+
+        .research-item h4 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
     </style>
 </head>
 <body>
+    <div class="mesh-bg"></div>
     <nav class="navbar-unified">
         <a href="../index.html" class="nav-logo">
             <i class="fa-solid fa-circle-user"></i> Mtruong<span>_dev</span>
         </a>
         <ul class="nav-links-unified">
             <li><a href="../index.html">Trang Chủ</a></li>
+            <li>
+                <a href="about.html">Cá Nhân ▾</a>
+                <ul class="nav-dropdown">
+                    <li><a href="about.html">Về Tôi</a></li>
+                    <li><a href="education.html">Học Vấn</a></li>
+                    <li><a href="skills.html">Kỹ Năng</a></li>
+                    <li><a href="experience.html">Kinh Nghiệm</a></li>
+                </ul>
+            </li>
             <li><a href="giasu.html">Gia Sư</a></li>
-            <li><a href="chemlab.html">Phòng Lab AI</a></li>
+            <li><a href="research_hub.html">Nghiên Cứu</a></li>
             <li><a href="quiz.html">Thi Thử</a></li>
             <li><a href="student_portal.html">Cổng HS</a></li>
             <li><a href="blog.html">Kiến Thức</a></li>
+            <li>
+                <a href="manage.html">Quản Trị ▾</a>
+                <ul class="nav-dropdown">
+                    <li><a href="manage.html">Quản lý Lớp học</a></li>
+                    <li><a href="manage_quiz.html">Quản lý Đề thi</a></li>
+                    <li><a href="manage_projects.html">Quản lý Dự án</a></li>
+                </ul>
+            </li>
         </ul>
-        <div style="display: flex; gap: 15px; align-items: center;">
+        <div id="auth-controls" class="nav-auth">
             <button class="theme-toggle" title="Chuyển chế độ Sáng/Tối">
                 <i class="fa-solid fa-moon"></i>
             </button>
-            <a href="manage_quiz.html" class="btn btn-primary" style="padding: 8px 20px; font-size: 0.85rem; border-radius: 50px;">Admin</a>
+            <div id="guest-links">
+                <button onclick="window.promptAdmin()" class="btn-premium-nav" id="admin-login-label">Đăng nhập Admin</button>
+            </div>
+            <div id="user-links" style="display: none; gap: 10px; align-items: center;">
+                <span id="nav-user-name" class="user-badge"></span>
+                <button onclick="logout()" class="logout-btn">Thoát</button>
+            </div>
         </div>
     </nav>
 
@@ -272,11 +517,24 @@
             <h2 style="margin-bottom: 30px;"><i class="fa-solid fa-equals"></i> Cân bằng phương trình tự động</h2>
             <div class="balancer-container">
                 <div class="balancer-input-group">
-                    <input type="text" id="equation-input" class="balancer-input" placeholder="Ví dụ: Fe + HCl">
+                    <input type="text" id="equation-input" class="balancer-input" placeholder="Ví dụ: Fe + HCl hoặc mô tả bài tập...">
                     <button class="btn-orange" onclick="balanceEquation()" style="white-space: nowrap;">Cân bằng nhanh</button>
                     <button class="btn-primary" onclick="solveWithAI()" style="white-space: nowrap; background: linear-gradient(135deg, #3b82f6, #a855f7); border:none;">
                         <i class="fa-solid fa-wand-magic-sparkles"></i> Giải bằng AI
                     </button>
+                </div>
+
+                <div class="image-upload-wrapper">
+                    <div id="image-preview-container" class="image-preview-container">
+                        <button class="remove-preview-btn" onclick="clearImage()"><i class="fa-solid fa-xmark"></i></button>
+                        <img id="image-preview" src="" alt="Preview">
+                    </div>
+                    <div class="upload-btns-group">
+                        <label for="image-input" class="btn-upload-ai">
+                            <i class="fa-solid fa-camera"></i> Tải ảnh/Chụp đề bài
+                        </label>
+                        <input type="file" id="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                    </div>
                 </div>
                 
                 <div class="loading-ai" id="ai-loading">
@@ -298,30 +556,27 @@
             </div>
         </section>
 
-        <!-- Molarity Calculator -->
+        <!-- Chemistry Research Center -->
         <section class="lab-section reveal">
-            <h2 style="margin-bottom: 30px;"><i class="fa-solid fa-calculator"></i> Máy tính nồng độ dung dịch (C<sub style="color:inherit">M</sub>)</h2>
-            <p style="color: #94a3b8; margin-bottom: 30px;">Công thức: C<sub style="color:inherit">M</sub> = n / V. Nhập 2 giá trị bất kỳ để tính giá trị còn lại.</p>
+            <h2 style="margin-bottom: 30px;"><i class="fa-solid fa-microscope"></i> Trung tâm Nghiên cứu Hóa học AI</h2>
+            <p id="research-desc" style="color: #94a3b8; margin-bottom: 30px;">Nhập tên chất hoặc chủ đề hóa học để nhận báo cáo nghiên cứu chuyên sâu từ AI.</p>
             
-            <div class="calc-grid">
-                <div class="calc-input-group">
-                    <label>Số mol (n) - mol</label>
-                    <input type="number" id="calc-n" placeholder="0.0" oninput="calculateMolarity()">
-                </div>
-                <div class="calc-input-group">
-                    <label>Thể tích (V) - lít</label>
-                    <input type="number" id="calc-v" placeholder="0.0" oninput="calculateMolarity()">
-                </div>
-                <div class="calc-input-group">
-                    <label>Nồng độ (C<sub>M</sub>) - M</label>
-                    <input type="number" id="calc-cm" placeholder="0.0" oninput="calculateMolarity()">
-                </div>
+            <div class="balancer-input-group">
+                <input type="text" id="research-input" class="balancer-input" placeholder="Ví dụ: Graphene, Axit Sunfuric...">
+                <button class="btn-primary" id="btn-research" onclick="startResearch()" style="background: linear-gradient(135deg, #f59e0b, #ef4444); border:none;">
+                    <i class="fa-solid fa-flask-vial"></i> Bắt đầu Nghiên cứu
+                </button>
             </div>
 
-            <div class="calc-result-box">
-                <span style="color: #a78bfa; font-size: 0.9rem; font-weight: 600; text-transform: uppercase;">Kết quả tính toán</span>
-                <span id="calc-status" class="calc-result-val">Đang chờ nhập liệu...</span>
-                <button class="btn btn-outline" style="margin-top: 20px; font-size: 0.8rem;" onclick="resetCalc()">Xóa dữ liệu</button>
+            <div id="research-loading" class="loading-ai" style="display: none;">
+                <i class="fa-solid fa-microscope fa-spin"></i> Đang tổng hợp dữ liệu nghiên cứu...
+            </div>
+
+            <div id="research-result" class="ai-result-panel" style="border-color: rgba(245, 158, 11, 0.3);">
+                <div class="ai-badge" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">Research Expert</div>
+                <div id="research-content" class="research-grid">
+                    <!-- Research content will be injected here -->
+                </div>
             </div>
         </section>
 
@@ -482,33 +737,41 @@
             { n: 108, s: "Hs", name: "Hassium", cat: "transition-metal", weight: 269, x: 8, y: 7 }
         ];
 
-        function calculateMolarity() {
-            const n = parseFloat(document.getElementById('calc-n').value);
-            const v = parseFloat(document.getElementById('calc-v').value);
-            const cm = parseFloat(document.getElementById('calc-cm').value);
-            const status = document.getElementById('calc-status');
+        async function startResearch() {
+            const topic = document.getElementById('research-input').value.trim();
+            if (!topic) return;
 
-            if (!isNaN(n) && !isNaN(v) && isNaN(cm)) {
-                if (v === 0) { status.innerText = "V phải > 0"; return; }
-                const res = (n / v).toFixed(3);
-                status.innerText = `C_M = ${res} M`;
-            } else if (!isNaN(cm) && !isNaN(v) && isNaN(n)) {
-                const res = (cm * v).toFixed(3);
-                status.innerText = `n = ${res} mol`;
-            } else if (!isNaN(cm) && !isNaN(n) && isNaN(v)) {
-                if (cm === 0) { status.innerText = "C_M phải > 0"; return; }
-                const res = (n / cm).toFixed(3);
-                status.innerText = `V = ${res} lít`;
-            } else {
-                status.innerText = "Nhập 2 ô để tính ô còn lại";
+            const loading = document.getElementById('research-loading');
+            const resultPanel = document.getElementById('research-result');
+            const resultContent = document.getElementById('research-content');
+
+            loading.style.display = 'flex';
+            resultPanel.style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_CONFIG.BASE_URL}/api/chemistry/research`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic: topic, type: 'chemistry' })
+                });
+                const data = await response.json();
+                
+                loading.style.display = 'none';
+                resultPanel.style.display = 'block';
+                
+                resultContent.innerHTML = `
+                    <div style="grid-column: 1 / -1; margin-bottom: 20px;">
+                        <h3 style="color: white; font-size: 1.5rem; border-bottom: 2px solid var(--primary-color); display: inline-block; padding-bottom: 5px;">${topic}</h3>
+                    </div>
+                    <div class="research-item"><h4 style="color: #f59e0b;"><i class="fa-solid fa-circle-info"></i> Tổng quan</h4><p>${data.overview}</p></div>
+                    <div class="research-item"><h4 style="color: #60a5fa;"><i class="fa-solid fa-atom"></i> Tính chất</h4><p>${data.properties}</p></div>
+                    <div class="research-item"><h4 style="color: #4ade80;"><i class="fa-solid fa-industry"></i> Ứng dụng</h4><p>${data.applications}</p></div>
+                    <div class="research-item"><h4 style="color: #f87171;"><i class="fa-solid fa-shield-halved"></i> An toàn</h4><p>${data.safety}</p></div>
+                `;
+            } catch (error) {
+                loading.style.display = 'none';
+                alert("Lỗi kết nối AI Nghiên cứu.");
             }
-        }
-
-        function resetCalc() {
-            document.getElementById('calc-n').value = '';
-            document.getElementById('calc-v').value = '';
-            document.getElementById('calc-cm').value = '';
-            document.getElementById('calc-status').innerText = "Đang chờ nhập liệu...";
         }
 
         function initTable() {
@@ -606,9 +869,33 @@
             resultBox.innerText = result;
         }
 
+        function previewImage(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('image-preview').src = e.target.result;
+                    document.getElementById('image-preview-container').style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function clearImage() {
+            document.getElementById('image-input').value = '';
+            document.getElementById('image-preview-container').style.display = 'none';
+            document.getElementById('image-preview').src = '';
+        }
+
         async function solveWithAI() {
-            const input = document.getElementById('equation-input').value.trim();
-            if (!input) return;
+            const textInput = document.getElementById('equation-input').value.trim();
+            const imageInput = document.getElementById('image-input');
+            const hasImage = imageInput.files && imageInput.files[0];
+
+            if (!textInput && !hasImage) {
+                alert("Vui lòng nhập văn bản hoặc tải ảnh đề bài!");
+                return;
+            }
 
             const loading = document.getElementById('ai-loading');
             const resultBox = document.getElementById('balancer-result');
@@ -621,22 +908,32 @@
             loading.style.display = 'flex';
 
             try {
-                const response = await fetch('http://localhost:8080/api/chemistry/solve', {
+                const formData = new FormData();
+                if (textInput) formData.append('prompt', textInput);
+                if (hasImage) formData.append('image', imageInput.files[0]);
+
+                const response = await fetch(`${API_CONFIG.BASE_URL}/api/chemistry/solve-image`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: "Solve and balance: " + input })
+                    body: formData
                 });
                 
                 const data = await response.json();
                 
                 loading.style.display = 'none';
                 aiPanel.style.display = 'block';
-                aiEq.innerText = data.balanced;
+                aiEq.innerText = data.balanced || "Lời giải AI";
                 aiDesc.innerHTML = `<i class="fa-solid fa-lightbulb" style="color: #fbbf24; margin-right: 8px;"></i> ${data.explanation}`;
             } catch (error) {
+                console.error("AI Error Details:", error);
                 loading.style.display = 'none';
                 resultBox.style.display = 'flex';
-                resultBox.innerText = "Lỗi kết nối Server AI.";
+                resultBox.innerHTML = `<div style="color: #ef4444;">
+                    Lỗi kết nối Server AI!<br>
+                    <small style="font-size: 0.7rem; color: #94a3b8;">
+                        URL: ${API_CONFIG.BASE_URL}/api/chemistry/solve-image<br>
+                        Chi tiết: ${error.message}
+                    </small>
+                </div>`;
             }
         }
 
@@ -650,7 +947,7 @@
             resultText.innerText = "Mtruong AI đang tìm con đường tối ưu...";
 
             try {
-                const response = await fetch('http://localhost:8080/api/chemistry/solve', {
+                const response = await fetch(`${API_CONFIG.BASE_URL}/api/chemistry/solve`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ prompt: "Provide a reaction chain or synthesis steps for: " + input })
@@ -672,7 +969,7 @@
             resultText.innerText = "Mtruong AI đang suy nghĩ...";
 
             try {
-                const response = await fetch('http://localhost:8080/api/chemistry/solve', {
+                const response = await fetch(`${API_CONFIG.BASE_URL}/api/chemistry/solve`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ prompt: "Answer this chemistry question briefly: " + input })

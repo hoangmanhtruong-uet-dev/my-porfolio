@@ -28,31 +28,42 @@
                     <li><a href="experience.html">Kinh Nghiệm</a></li>
                 </ul>
             </li>
-            <li><a href="giasu.html">Gia Sư</a></li>
-            <li><a href="chemlab.html">Phòng Lab AI</a></li>
-            <li><a href="quiz.html">Thi Thử</a></li>
-            <li><a href="student_portal.html">Cổng HS</a></li>
-            <li><a href="blog.html">Kiến Thức</a></li>
             <li>
-                <a href="manage.html">Quản Trị ▾</a>
+                <a href="teaching.html">Giảng Dạy ▾</a>
                 <ul class="nav-dropdown">
-                    <li><a href="manage.html">Quản lý Lớp học</a></li>
-                    <li><a href="manage_quiz.html">Quản lý Đề thi</a></li>
-                    <li><a href="manage_projects.html">Quản lý Dự án</a></li>
+                    <li><a href="giasu.html">Gia Sư AI</a></li>
+                    <li><a href="quiz.html">Thi Thử Online</a></li>
+                    <li><a href="student_portal.html">Cổng Học Sinh</a></li>
+                    <li>
+                        <a href="manage.html">Quản Trị ▸</a>
+                        <ul class="nav-dropdown">
+                            <li><a href="manage.html">Quản lý Lớp học</a></li>
+                            <li><a href="manage_quiz.html">Quản lý Đề thi</a></li>
+                            <li><a href="manage_projects.html">Quản lý Dự án</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </li>
+            <li><a href="research_hub.html">Nghiên Cứu</a></li>
+            <li><a href="blog.html">Kiến Thức</a></li>
         </ul>
-        <div style="display: flex; gap: 15px; align-items: center;">
+        <div id="auth-controls" class="nav-auth">
             <button class="theme-toggle" title="Chuyển chế độ Sáng/Tối">
                 <i class="fa-solid fa-moon"></i>
             </button>
-            <a href="manage_quiz.html" class="btn btn-primary" style="padding: 8px 20px; font-size: 0.85rem; border-radius: 50px;">Admin</a>
+            <div id="guest-links">
+                <button onclick="window.promptAdmin()" class="btn-premium-nav" id="admin-login-label">Đăng nhập Admin</button>
+            </div>
+            <div id="user-links" style="display: none; gap: 10px; align-items: center;">
+                <span id="nav-user-name" class="user-badge"></span>
+                <button onclick="logout()" class="logout-btn">Thoát</button>
+            </div>
         </div>
     </nav>
     <main class="page-content" style="padding-top: 100px;">
         <section class="about reveal">
             <h2 class="page-title">Về Tôi</h2>
-            <div class="about-grid">
+            <div class="about-grid-triple">
                 <div class="about-left">
                     <div class="about-text glass-card">
                         <h3 class="mb-3"><i class="fa-solid fa-address-card"></i> Khái Quát</h3>
@@ -83,56 +94,62 @@
                             </div>
                         </div>
                     </div>
-                    <div class="personal-subpages mt-5">
-                        <h3 class="mb-4"><i class="fa-solid fa-compass"></i> Khám Phá Thêm</h3>
-                        <div class="explore-grid">
-                            <a href="love.html" class="explore-card love-card">
-                                <div class="explore-icon"><i class="fa-solid fa-heart"></i></div>
-                                <div class="explore-info">
-                                    <h4>Tình Yêu</h4>
-                                    <span>Xem khoảnh khắc & Locket</span>
-                                </div>
-                                <i class="fa-solid fa-chevron-right arrow-icon"></i>
-                            </a>
-                            <a href="education.html" class="explore-card edu-card">
-                                <div class="explore-icon"><i class="fa-solid fa-graduation-cap"></i></div>
-                                <div class="explore-info">
-                                    <h4>Học Vấn</h4>
-                                    <span>Hành trình & Bảng điểm</span>
-                                </div>
-                                <i class="fa-solid fa-chevron-right arrow-icon"></i>
-                            </a>
-                            <a href="experience.html" class="explore-card exp-card">
-                                <div class="explore-icon"><i class="fa-solid fa-briefcase"></i></div>
-                                <div class="explore-info">
-                                    <h4>Kinh Nghiệm</h4>
-                                    <span>Dự án & Quá trình làm việc</span>
-                                </div>
-                                <i class="fa-solid fa-chevron-right arrow-icon"></i>
-                            </a>
-                        </div>
-                    </div>
                 </div>
-                <div class="about-right">
+
+                <div class="about-mid">
                     <div class="timeline glass-card">
-                        <h3 class="mb-3"><i class="fa-solid fa-graduation-cap"></i> Hành trình học thuật & Phát triển</h3>
+                        <h3 class="mb-3"><i class="fa-solid fa-graduation-cap"></i> Hành trình</h3>
                         <div class="timeline-container">
                             <div class="timeline-item">
                                 <div class="timeline-dot"></div>
                                 <div class="timeline-date">Hiện tại</div>
                                 <div class="timeline-content">
-                                    <h4>Sinh viên UET & Lập trình viên</h4>
-                                    <p>Tập trung học thuật, luyện thi thuật toán trên LeetCode/CodeLearn. Tham gia phát triển các dự án Java, MySQL.</p>
+                                    <h4>Sinh viên UET</h4>
+                                    <p>Tập trung học thuật, Java, MySQL.</p>
                                 </div>
                             </div>
                             <div class="timeline-item">
                                 <div class="timeline-dot"></div>
                                 <div class="timeline-date">Trước đó</div>
                                 <div class="timeline-content">
-                                    <h4>Kỳ thi THPT Quốc Gia & ĐGNL</h4>
-                                    <p>Đạt 27.75 điểm Khối A00 (Hóa 10, Lý 9.25, Toán 8.5). Đạt 96 điểm kỳ thi ĐGNL (HSA). Giành Giải Nhì HSG Tỉnh môn Hóa học.</p>
+                                    <h4>THPT & ĐGNL</h4>
+                                    <p>Đạt 27.75 điểm Khối A00. Giải Nhì HSG Tỉnh.</p>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="about-right-sidebar">
+                    <div class="personal-subpages">
+                        <h4 class="sidebar-title"><i class="fa-solid fa-compass"></i> Khám Phá</h4>
+                        <div class="explore-grid mini-grid">
+                            <!-- Love Card -->
+                            <a href="love.html" class="explore-card love-card mini-card">
+                                <div class="explore-icon mini-icon"><i class="fa-solid fa-heart"></i></div>
+                                <div class="explore-info">
+                                    <h4>Tình Yêu</h4>
+                                    <span class="badge badge-love mini-badge">Live</span>
+                                </div>
+                            </a>
+
+                            <!-- Education Card -->
+                            <a href="education.html" class="explore-card edu-card mini-card">
+                                <div class="explore-icon mini-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                                <div class="explore-info">
+                                    <h4>Học Vấn</h4>
+                                    <span class="badge badge-edu mini-badge">UET</span>
+                                </div>
+                            </a>
+
+                            <!-- Experience Card -->
+                            <a href="experience.html" class="explore-card exp-card mini-card">
+                                <div class="explore-icon mini-icon"><i class="fa-solid fa-briefcase"></i></div>
+                                <div class="explore-info">
+                                    <h4>Kinh Nghiệm</h4>
+                                    <span class="badge badge-exp mini-badge">Java</span>
+                                </div>
+                            </a>
                         </div>
                     </div>
                 </div>

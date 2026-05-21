@@ -29,24 +29,36 @@
                     <li><a href="pages/experience.html">Kinh Nghiệm</a></li>
                 </ul>
             </li>
-            <li><a href="pages/giasu.html">Gia Sư</a></li>
-            <li><a href="pages/chemlab.html">Phòng Lab AI</a></li>
-            <li><a href="pages/quiz.html">Thi Thử</a></li>
-            <li><a href="pages/blog.html">Kiến Thức</a></li>
             <li>
-                <a href="pages/manage.html">Quản Trị ▾</a>
+                <a href="pages/teaching.html">Giảng Dạy ▾</a>
                 <ul class="nav-dropdown">
-                    <li><a href="pages/manage.html">Quản lý Lớp học</a></li>
-                    <li><a href="pages/manage_quiz.html">Quản lý Đề thi</a></li>
-                    <li><a href="pages/manage_projects.html">Quản lý Dự án</a></li>
+                    <li><a href="pages/giasu.html">Gia Sư AI</a></li>
+                    <li><a href="pages/quiz.html">Thi Thử Online</a></li>
+                    <li><a href="pages/student_portal.html">Cổng Học Sinh</a></li>
+                    <li>
+                        <a href="pages/manage.html">Quản Trị ▸</a>
+                        <ul class="nav-dropdown">
+                            <li><a href="pages/manage.html">Quản lý Lớp học</a></li>
+                            <li><a href="pages/manage_quiz.html">Quản lý Đề thi</a></li>
+                            <li><a href="pages/manage_projects.html">Quản lý Dự án</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </li>
+            <li><a href="pages/research_hub.html">Nghiên Cứu</a></li>
+            <li><a href="pages/blog.html">Kiến Thức</a></li>
         </ul>
-        <div style="display: flex; gap: 15px; align-items: center;">
+        <div id="auth-controls" class="nav-auth">
             <button class="theme-toggle" title="Chuyển chế độ Sáng/Tối">
                 <i class="fa-solid fa-moon"></i>
             </button>
-            <a href="pages/manage_quiz.html" class="btn btn-primary" style="padding: 8px 20px; font-size: 0.85rem; border-radius: 50px;">Admin</a>
+            <div id="guest-links">
+                <button onclick="window.promptAdmin()" class="btn-premium-nav" id="admin-login-label">Đăng nhập Admin</button>
+            </div>
+            <div id="user-links" style="display: none; gap: 10px; align-items: center;">
+                <span id="nav-user-name" class="user-badge"></span>
+                <button onclick="logout()" class="logout-btn">Thoát</button>
+            </div>
         </div>
     </nav>
     
@@ -57,20 +69,22 @@
 
     <!-- Hero Section -->
     <section id="home" class="hero reveal">
-        <div class="hero-content reveal-left">
-            <span class="greeting">Xin chào, tôi là</span>
-            <h1 class="name">Hoàng Mạnh Trường</h1>
-            <p class="title">I'm a <span id="typing-text"></span><span class="typing-cursor">|</span></p>
-            <p class="description">
-                Sinh viên tại ĐH Công nghệ - ĐHQGHN (UET). Đam mê xây dựng các ứng dụng mạng, hệ thống quản lý và chia sẻ kiến thức thông qua việc giảng dạy.
-            </p>
-            <div class="hero-cta">
-                <a href="pages/projects.html" class="btn btn-primary">Xem Dự Án</a>
+        <div class="container">
+            <div class="hero-content reveal-left">
+                <span class="greeting">Xin chào, tôi là</span>
+                <h1 class="name">Hoàng Mạnh Trường</h1>
+                <p class="title">I'm a <span id="typing-text"></span><span class="typing-cursor">|</span></p>
+                <p class="description">
+                    Sinh viên tại ĐH Công nghệ - ĐHQGHN (UET). Đam mê xây dựng các ứng dụng mạng, hệ thống quản lý và chia sẻ kiến thức thông qua việc giảng dạy.
+                </p>
+                <div class="hero-cta">
+                    <a href="pages/projects.html" class="btn btn-primary">Xem Dự Án</a>
+                </div>
             </div>
-        </div>
-        <div class="hero-image reveal-right">
-            <div class="image-wrapper">
-                <img src="https://images.unsplash.com/photo-1549692520-acc6669e2f0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Hoàng Mạnh Trường">
+            <div class="hero-image reveal-right">
+                <div class="image-wrapper">
+                    <img src="https://images.unsplash.com/photo-1549692520-acc6669e2f0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Hoàng Mạnh Trường">
+                </div>
             </div>
         </div>
     </section>
@@ -92,40 +106,6 @@
         </div>
     </section>
 
-    <!-- Video Testimonials Section -->
-    <section class="testimonials reveal" style="background: rgba(15, 23, 42, 0.4); padding: 80px 0;">
-        <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
-            <div class="section-header" style="text-align: center; margin-bottom: 50px;">
-                <h2 class="section-title">Học sinh nói gì về anh Trường?</h2>
-                <p style="color: #94a3b8;">Những chia sẻ thật lòng từ những "chiến thần" đã cùng anh chinh phục 9+ môn Hóa.</p>
-            </div>
-
-            <div class="video-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
-                <!-- Video Card 1 -->
-                <div class="glass-card-dark" style="overflow: hidden; border-radius: 20px;">
-                    <div style="aspect-ratio: 16/9; background: #000; position: relative; display: flex; align-items: center; justify-content: center;">
-                        <i class="fa-solid fa-play" style="font-size: 3rem; color: var(--primary-color); cursor: pointer;"></i>
-                        <div style="position: absolute; bottom: 10px; left: 10px; font-size: 0.8rem; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 5px;">02:15</div>
-                    </div>
-                    <div style="padding: 20px;">
-                        <h4 style="margin: 0;">Nguyễn Thu Hà</h4>
-                        <p style="font-size: 0.85rem; color: #94a3b8;">Đỗ ĐH Y Hà Nội - 9.75 Hóa</p>
-                    </div>
-                </div>
-                <!-- Video Card 2 -->
-                <div class="glass-card-dark" style="overflow: hidden; border-radius: 20px;">
-                    <div style="aspect-ratio: 16/9; background: #000; position: relative; display: flex; align-items: center; justify-content: center;">
-                        <i class="fa-solid fa-play" style="font-size: 3rem; color: var(--primary-color); cursor: pointer;"></i>
-                        <div style="position: absolute; bottom: 10px; left: 10px; font-size: 0.8rem; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 5px;">01:45</div>
-                    </div>
-                    <div style="padding: 20px;">
-                        <h4 style="margin: 0;">Trần Minh Đức</h4>
-                        <p style="font-size: 0.85rem; color: #94a3b8;">Đỗ ĐH Bách Khoa - 9.5 Hóa</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- Trang chủ chỉ hiển thị Hero Section. Các phần khác đã được chuyển sang trang riêng. -->
 

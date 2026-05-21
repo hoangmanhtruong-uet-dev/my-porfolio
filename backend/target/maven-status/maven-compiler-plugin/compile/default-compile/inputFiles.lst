@@ -1,3 +1,4 @@
+C:\JavaProjects\My_project\Website_canhan\backend\src\main\java\com\love\portfolio\repository\StudentRepository.java
 C:\JavaProjects\My_project\Website_canhan\backend\src\main\java\com\love\portfolio\model\Certificate.java
 C:\JavaProjects\My_project\Website_canhan\backend\src\main\java\com\love\portfolio\repository\LocketMomentRepository.java
 C:\JavaProjects\My_project\Website_canhan\backend\src\main\java\com\love\portfolio\service\ChemistryAIService.java
@@ -5,6 +6,7 @@ C:\JavaProjects\My_project\Website_canhan\backend\src\main\java\com\love\portfol
 C:\JavaProjects\My_project\Website_canhan\backend\src\main\java\com\love\portfolio\PortfolioApplication.java
 C:\JavaProjects\My_project\Website_canhan\backend\src\main\java\com\love\portfolio\repository\ReviewRepository.java
 C:\JavaProjects\My_project\Website_canhan\backend\src\main\java\com\love\portfolio\repository\LoveLocationRepository.java
+C:\JavaProjects\My_project\Website_canhan\backend\src\main\java\com\love\portfolio\model\Student.java
 C:\JavaProjects\My_project\Website_canhan\backend\src\main\java\com\love\portfolio\model\LocketMoment.java
 C:\JavaProjects\My_project\Website_canhan\backend\src\main\java\com\love\portfolio\controller\MapController.java
 C:\JavaProjects\My_project\Website_canhan\backend\src\main\java\com\love\portfolio\repository\ChatMessageRepository.java
@@ -21,6 +23,7 @@ C:\JavaProjects\My_project\Website_canhan\backend\src\main\java\com\love\portfol
 C:\JavaProjects\My_project\Website_canhan\backend\src\main\java\com\love\portfolio\controller\CodeLearnController.java
 C:\JavaProjects\My_project\Website_canhan\backend\src\main\java\com\love\portfolio\controller\ChatController.java
 C:\JavaProjects\My_project\Website_canhan\backend\src\main\java\com\love\portfolio\controller\ChemistryAIController.java
+C:\JavaProjects\My_project\Website_canhan\backend\src\main\java\com\love\portfolio\controller\StudentController.java
 C:\JavaProjects\My_project\Website_canhan\backend\src\main\java\com\love\portfolio\controller\MilestoneController.java
 C:\JavaProjects\My_project\Website_canhan\backend\src\main\java\com\love\portfolio\service\AIService.java
 C:\JavaProjects\My_project\Website_canhan\backend\src\main\java\com\love\portfolio\config\WebConfig.java

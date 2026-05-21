@@ -26,20 +26,26 @@ public class CodeLearnController {
                     .timeout(10000)
                     .get();
 
-            // Nếu web CodeLearn render SSR (Server-side rendering), ta có thể bóc tách điểm.
-            // Nếu là React SPA, Jsoup sẽ không thấy dữ liệu.
-            // Đoạn này là ví dụ mẫu để bạn thấy luồng đi của Web Scraping:
-            
             response.put("status", "success");
             response.put("username", username);
             response.put("profileUrl", url);
             
-            // Giả lập điểm số lấy được sau khi phân tích HTML (Parsing)
+            // --- Bắt đầu phần Web Scraping thực tế ---
+            // Bạn cần kiểm tra cấu trúc HTML của trang profile CodeLearn để tìm các selector chính xác.
+            // Ví dụ: tìm các thẻ div, span, a có class hoặc id chứa thông tin kỹ năng và điểm số.
             Map<String, Integer> skills = new HashMap<>();
-            skills.put("Java", 85);
-            skills.put("C++", 70);
-            skills.put("Python", 60);
-            skills.put("SQL", 90);
+            
+            // Ví dụ: Giả sử có một cấu trúc như <div class="skill-item"><span class="skill-name">Java</span><span class="skill-score">85</span></div>
+            Elements skillElements = doc.select(".skill-item"); // Thay thế bằng CSS selector thực tế
+            for (org.jsoup.nodes.Element skillElement : skillElements) {
+                String skillName = skillElement.select(".skill-name").text(); // Thay thế bằng CSS selector thực tế
+                String skillScoreStr = skillElement.select(".skill-score").text(); // Thay thế bằng CSS selector thực tế
+                try {
+                    int skillScore = Integer.parseInt(skillScoreStr);
+                    skills.put(skillName, skillScore);
+                } catch (NumberFormatException ignored) { /* Bỏ qua nếu không phải số */ }
+            }
+            // --- Kết thúc phần Web Scraping thực tế ---
             
             response.put("skills", skills);
             response.put("message", "API Cào dữ liệu đã sẵn sàng! Cần cập nhật CSS Selector thực tế từ HTML của CodeLearn.");

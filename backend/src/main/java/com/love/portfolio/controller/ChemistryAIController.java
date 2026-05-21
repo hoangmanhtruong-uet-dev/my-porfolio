@@ -14,14 +14,33 @@ public class ChemistryAIController {
     private ChemistryAIService chemistryAIService;
 
     @PostMapping("/solve")
-    public String solveEquation(@RequestBody Map<String, String> request) {
+    public Object solveEquation(@RequestBody Map<String, String> request) {
         String prompt = request.get("prompt");
         return chemistryAIService.solveChemistry(prompt);
+    }
+
+    @PostMapping("/solve-image")
+    public Object solveWithImage(@RequestParam(value = "image", required = false) org.springframework.web.multipart.MultipartFile image,
+                                 @RequestParam(value = "prompt", required = false) String prompt) {
+        System.out.println("DEBUG: YÊU CẦU GIẢI BÀI TẬP ĐÃ TỚI SERVER!");
+        try {
+            byte[] bytes = (image != null) ? image.getBytes() : null;
+            return chemistryAIService.solveChemistryWithImage(bytes, prompt);
+        } catch (Exception e) {
+            return Map.of("balanced", "Lỗi tải ảnh", "explanation", "Không thể đọc dữ liệu ảnh.");
+        }
     }
 
     @PostMapping("/generate-quiz")
     public String generateQuiz(@RequestBody Map<String, String> request) {
         String topic = request.get("topic");
         return chemistryAIService.generateQuiz(topic);
+    }
+
+    @PostMapping("/research")
+    public Object research(@RequestBody Map<String, String> request) {
+        String topic = request.get("topic");
+        String type = request.getOrDefault("type", "chemistry");
+        return chemistryAIService.researchTopic(topic, type);
     }
 }

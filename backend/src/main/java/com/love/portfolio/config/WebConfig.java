@@ -43,9 +43,10 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         // Cho phép Frontend truy cập API
         registry.addMapping("/api/**")
-                .allowedOrigins("*") // Sau này có thể thay "*" bằng domain thật của frontend
+                .allowedOriginPatterns("*") // Dùng allowedOriginPatterns cho linh hoạt hơn
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*");
+                .allowedHeaders("*")
+                .exposedHeaders("Access-Control-Allow-Origin");
 
         // Cho phép truy cập ảnh
         registry.addMapping("/uploads/**")

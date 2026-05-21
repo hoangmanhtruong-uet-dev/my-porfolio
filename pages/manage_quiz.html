@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -232,11 +232,17 @@
             <li><a href="student_portal.html">Cổng HS</a></li>
             <li><a href="blog.html">Kiến Thức</a></li>
         </ul>
-        <div style="display: flex; gap: 15px; align-items: center;">
+        <div id="auth-controls" class="nav-auth">
             <button class="theme-toggle" title="Chuyển chế độ Sáng/Tối">
                 <i class="fa-solid fa-moon"></i>
             </button>
-            <a href="manage_quiz.html" class="btn btn-primary" style="padding: 8px 20px; font-size: 0.85rem; border-radius: 50px;">Admin</a>
+            <div id="guest-links">
+                <button onclick="window.promptAdmin()" class="btn-premium-nav" id="admin-login-label">Đăng nhập Admin</button>
+            </div>
+            <div id="user-links" style="display: none; gap: 10px; align-items: center;">
+                <span id="nav-user-name" class="user-badge"></span>
+                <button onclick="logout()" class="logout-btn">Thoát</button>
+            </div>
         </div>
     </nav>
 
@@ -359,12 +365,22 @@
         function checkPass() {
             const pass = document.getElementById('admin-pass').value;
             if (pass === DEFAULT_PASS) {
+                sessionStorage.setItem('isAdmin', 'true');
                 document.getElementById('login-overlay').style.display = 'none';
+                updateNavbarAuth();
                 init();
             } else {
                 alert("Mật mã không đúng!");
             }
         }
+
+        window.onload = () => {
+            const isAdmin = sessionStorage.getItem('isAdmin') === 'true';
+            if (isAdmin) {
+                document.getElementById('login-overlay').style.display = 'none';
+                init();
+            }
+        };
 
         function init() {
             const defaultExams = [
@@ -598,7 +614,7 @@
             btn.disabled = true;
 
             try {
-                const response = await fetch('http://localhost:8080/api/chemistry/generate-quiz', {
+                const response = await fetch(`${API_CONFIG.BASE_URL}/api/chemistry/generate-quiz`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ topic: topic })

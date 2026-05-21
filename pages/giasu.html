@@ -19,17 +19,45 @@
         </a>
         <ul class="nav-links-unified">
             <li><a href="../index.html">Trang Chủ</a></li>
-            <li><a href="giasu.html">Gia Sư</a></li>
-            <li><a href="chemlab.html">Phòng Lab AI</a></li>
-            <li><a href="quiz.html">Thi Thử</a></li>
-            <li><a href="student_portal.html">Cổng HS</a></li>
+            <li>
+                <a href="about.html">Cá Nhân ▾</a>
+                <ul class="nav-dropdown">
+                    <li><a href="about.html">Về Tôi</a></li>
+                    <li><a href="education.html">Học Vấn</a></li>
+                    <li><a href="skills.html">Kỹ Năng</a></li>
+                    <li><a href="experience.html">Kinh Nghiệm</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="giasu.html">Giảng Dạy ▾</a>
+                <ul class="nav-dropdown">
+                    <li><a href="giasu.html">Gia Sư AI</a></li>
+                    <li><a href="quiz.html">Thi Thử Online</a></li>
+                    <li><a href="student_portal.html">Cổng Học Sinh</a></li>
+                </ul>
+            </li>
+            <li><a href="research_hub.html">Nghiên Cứu</a></li>
             <li><a href="blog.html">Kiến Thức</a></li>
+            <li>
+                <a href="manage.html">Quản Trị ▾</a>
+                <ul class="nav-dropdown">
+                    <li><a href="manage.html">Quản lý Lớp học</a></li>
+                    <li><a href="manage_quiz.html">Quản lý Đề thi</a></li>
+                    <li><a href="manage_projects.html">Quản lý Dự án</a></li>
+                </ul>
+            </li>
         </ul>
-        <div style="display: flex; gap: 15px; align-items: center;">
+        <div id="auth-controls" class="nav-auth">
             <button class="theme-toggle" title="Chuyển chế độ Sáng/Tối">
                 <i class="fa-solid fa-moon"></i>
             </button>
-            <a href="manage_quiz.html" class="btn btn-primary" style="padding: 8px 20px; font-size: 0.85rem; border-radius: 50px;">Admin</a>
+            <div id="guest-links">
+                <button onclick="window.promptAdmin()" class="btn-premium-nav" id="admin-login-label">Đăng nhập Admin</button>
+            </div>
+            <div id="user-links" style="display: none; gap: 10px; align-items: center;">
+                <span id="nav-user-name" class="user-badge"></span>
+                <button onclick="logout()" class="logout-btn">Thoát</button>
+            </div>
         </div>
     </nav>
     <main class="page-content" style="padding-top: 100px;">
