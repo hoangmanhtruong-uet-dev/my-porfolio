@@ -51,7 +51,7 @@ const API_CONFIG = {
                window.location.hostname === 'localhost' || 
                window.location.protocol === 'file:') 
         ? 'http://localhost:8080'
-        : 'https://my-portfolio-api.onrender.com', // Thay bằng URL Render thực tế của bạn
+        : 'https://my-porfolio-1.onrender.com', // Thay bằng URL Render thực tế của bạn
 };
 
 document.addEventListener('DOMContentLoaded', () => {
