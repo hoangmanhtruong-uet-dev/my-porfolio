@@ -145,6 +145,7 @@
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="../assets/js/common.js"></script>
     <script>
         function toggleDarkMode() {
             document.body.classList.toggle('light-mode');
@@ -211,7 +212,7 @@
         }
 
         // --- Map Logic ---
-        const MAP_API = "http://localhost:8080/api/locations";
+        const MAP_API = `${API_CONFIG.BASE_URL}/api/locations`;
         let selectedLatLng = null;
         let savedMarkers = [];
 

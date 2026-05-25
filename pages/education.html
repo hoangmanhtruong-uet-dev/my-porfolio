@@ -202,6 +202,7 @@ public class MilestoneController {
     </footer>
 
     <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/common.js"></script>
     <script>
         // --- GitHub Graph Generation ---
         const graph = document.getElementById('github-graph');
@@ -249,7 +250,7 @@ public class MilestoneController {
             content.style.opacity = '0.5';
 
             try {
-                const response = await fetch(`http://localhost:8080/api/hackerrank/stats/${username}`);
+                const response = await fetch(`${API_CONFIG.BASE_URL}/api/hackerrank/stats/${username}`);
                 const data = await response.json();
 
                 if (data.status === 'success') {

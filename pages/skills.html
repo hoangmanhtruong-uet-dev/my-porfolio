@@ -683,6 +683,7 @@
         <p>&copy; 2026 Hoàng Mạnh Trường. Designed and Built with ❤️</p>
     </footer>
 
+    <script src="../assets/js/common.js"></script>
     <script>
         async function fetchCodeLearnStats() {
             const username = document.getElementById('cl-username').value.trim();
@@ -694,7 +695,7 @@
 
             try {
                 // Gọi API cào dữ liệu từ Backend Spring Boot
-                const response = await fetch(`http://localhost:8080/api/codelearn/stats/${username}`);
+                const response = await fetch(`${API_CONFIG.BASE_URL}/api/codelearn/stats/${username}`);
                 const data = await response.json();
 
                 if (response.ok && data.status === 'success') {
@@ -735,7 +736,7 @@
             document.getElementById('hr-result').style.display = 'none';
 
             try {
-                const response = await fetch(`http://localhost:8080/api/hackerrank/stats/${username}`);
+                const response = await fetch(`${API_CONFIG.BASE_URL}/api/hackerrank/stats/${username}`);
                 const data = await response.json();
 
                 if (response.ok && data.status === 'success') {

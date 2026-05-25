@@ -391,6 +391,7 @@
         </div>
     </div>
 
+    <script src="../assets/js/common.js"></script>
     <script>
         let currentDetailId = null;
         let milestones = JSON.parse(localStorage.getItem('loveTimeline')) || [
@@ -399,7 +400,8 @@
             { id: 3, date: "01 Tháng 3, 2025", title: "Chuyến đi đầu tiên", desc: "Cùng nhau xách ba lô lên và đi khám phá những vùng đất mới.\nNhững nụ cười, những tấm ảnh và hàng ngàn kỉ niệm được lưu giữ.", images: ["https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=80"] }
         ];
 
-        const API_URL = "http://localhost:8080/api/milestones";
+        const API_URL = `${API_CONFIG.BASE_URL}/api/milestones`;
+        const assetUrl = (path) => path.startsWith('http') ? path : `${API_CONFIG.BASE_URL}${path}`;
 
         function parseDateString(dateStr) {
             if (!dateStr) return new Date(0);
@@ -445,7 +447,7 @@
                             <i class="fa-solid fa-trash delete-milestone" title="Xóa" onclick="deleteMilestone(event, ${m.id})"></i>
                             <i class="fa-solid fa-pen-to-square edit-milestone" title="Sửa" onclick="editMilestone(event, ${m.id})"></i>
                             <div class="m-img-wrapper" onclick="openDetail(${m.id})">
-                                <img src="${m.images && m.images.length > 0 ? (m.images[0].startsWith('http') ? m.images[0] : 'http://localhost:8080' + m.images[0]) : 'https://via.placeholder.com/800x400?text=Kỉ+Niệm'}" class="m-thumbnail">
+                                <img src="${m.images && m.images.length > 0 ? assetUrl(m.images[0]) : 'https://via.placeholder.com/800x400?text=Kỉ+Niệm'}" class="m-thumbnail">
                                 ${m.images && m.images.length > 1 ? `<div style="position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.6); padding: 4px 8px; border-radius: 10px; font-size: 0.7rem; color: white;"><i class="fa-solid fa-images"></i> ${m.images.length}</div>` : ''}
                             </div>
                             <div class="m-content-preview" onclick="openDetail(${m.id})">
@@ -502,7 +504,7 @@
             const slider = document.getElementById('detail-slider');
             if (m.images && m.images.length > 0) {
                 slider.innerHTML = m.images.map((img, i) => `
-                    <img src="${img.startsWith('http') ? img : 'http://localhost:8080' + img}" class="detail-slide ${i === 0 ? 'active' : ''}">
+                    <img src="${assetUrl(img)}" class="detail-slide ${i === 0 ? 'active' : ''}">
                 `).join('');
                 
                 if (m.images.length > 1) {

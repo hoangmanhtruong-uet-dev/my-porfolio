@@ -1,5 +1,7 @@
-# Java/Spring Boot
+# Java/Spring Boot — không commit thư mục build
 target/
+backend/target/
+**/target/
 *.class
 *.jar
 *.war
@@ -17,8 +19,10 @@ mvnw.cmd
 *.swo
 *.DS_Store
 
-# Local Config
-backend/src/main/resources/application.properties
+# Local Config & secrets (chỉ commit file .example)
+# **/application.properties
+!**/application.properties.example
+**/ca.pem
 uploads/
 backend/uploads/
 

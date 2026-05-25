@@ -454,7 +454,7 @@
         async function fetchStats() {
             try {
                 // CodeLearn Sync
-                const clResponse = await fetch('http://localhost:8080/api/codelearn/stats');
+                const clResponse = await fetch(`${API_CONFIG.BASE_URL}/api/codelearn/stats`);
                 if (clResponse.ok) {
                     const data = await clResponse.json();
                     document.getElementById('codelearn-level').innerText = data.level || '34';
