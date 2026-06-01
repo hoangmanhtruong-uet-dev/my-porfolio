@@ -1,0 +1,189 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trung Tâm Giảng Dạy - Hoàng Mạnh Trường</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/common.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: #050810;
+            overflow-x: hidden;
+        }
+        .teaching-hero {
+            padding: 150px 2rem 80px;
+            text-align: center;
+            position: relative;
+        }
+        .teaching-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .teaching-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 3rem 2rem;
+            border-radius: 30px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+        .teaching-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary-color);
+            background: rgba(168, 85, 247, 0.05);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+        }
+        .card-icon {
+            font-size: 3.5rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+        .teaching-card h3 {
+            font-size: 1.8rem;
+            color: #fff;
+            margin-bottom: 1rem;
+        }
+        .teaching-card p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+        .btn-enter {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+        .teaching-card:hover .btn-enter {
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar-unified">
+        <a href="../index.html" class="nav-logo">
+            <i class="fa-solid fa-circle-user"></i> Mtruong<span>_dev</span>
+        </a>
+        <ul class="nav-links-unified">
+            <li><a href="../index.html">Trang Chủ</a></li>
+            <li>
+                <a href="about.html">Cá Nhân ▾</a>
+                <ul class="nav-dropdown">
+                    <li><a href="about.html">Về Tôi</a></li>
+                    <li><a href="education.html">Học Vấn</a></li>
+                    <li><a href="skills.html">Kỹ Năng</a></li>
+                    <li><a href="experience.html">Kinh Nghiệm</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="teaching.html">Giảng Dạy ▾</a>
+                <ul class="nav-dropdown">
+                    <li><a href="giasu.html">Gia Sư AI</a></li>
+                    <li><a href="quiz.html">Thi Thử Online</a></li>
+                    <li><a href="student_portal.html">Cổng Học Sinh</a></li>
+                    <li>
+                        <a href="manage.html">Quản Trị ▸</a>
+                        <ul class="nav-dropdown">
+                            <li><a href="manage.html">Quản lý Lớp học</a></li>
+                            <li><a href="manage_quiz.html">Quản lý Đề thi</a></li>
+                            <li><a href="manage_projects.html">Quản lý Dự án</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li><a href="research_hub.html">Nghiên Cứu</a></li>
+            <li><a href="blog.html">Kiến Thức</a></li>
+            <li><a href="muctieu.html">Mục Tiêu</a></li>
+            <li><a href="cns.html">Bài Tập CNS</a></li>
+        </ul>
+        <div id="auth-controls" class="nav-auth">
+            <button class="theme-toggle" title="Chuyển chế độ Sáng/Tối">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+            <div id="guest-links">
+                <button onclick="window.promptAdmin()" class="btn-premium-nav" id="admin-login-label">Đăng nhập Admin</button>
+            </div>
+            <div id="user-links" style="display: none; gap: 10px; align-items: center;">
+                <span id="nav-user-name" class="user-badge"></span>
+                <button onclick="logout()" class="logout-btn">Thoát</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="page-content">
+        <section class="teaching-hero">
+            <h1 class="page-title">Hệ Sinh Thái Giảng Dạy</h1>
+            <p class="subtitle-center">Ứng dụng AI và Công nghệ vào giáo dục, hỗ trợ học tập và quản lý lớp học hiệu quả.</p>
+        </section>
+
+        <section class="teaching-grid">
+            <a href="giasu.html" class="teaching-card reveal delay-100">
+                <i class="fa-solid fa-robot card-icon"></i>
+                <h3>Gia Sư AI</h3>
+                <p>Hệ thống hỗ trợ giải bài tập và giải đáp thắc mắc thông minh dựa trên mô hình ngôn ngữ lớn.</p>
+                <span class="btn-enter">Khám phá ngay <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+
+            <a href="quiz.html" class="teaching-card reveal delay-200">
+                <i class="fa-solid fa-pen-to-square card-icon"></i>
+                <h3>Thi Thử Online</h3>
+                <p>Ngân hàng đề thi đa dạng, chấm điểm tự động và phân tích kết quả chi tiết cho học sinh.</p>
+                <span class="btn-enter">Bắt đầu thi <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+
+            <a href="student_portal.html" class="teaching-card reveal delay-300">
+                <i class="fa-solid fa-graduation-cap card-icon"></i>
+                <h3>Cổng Học Sinh</h3>
+                <p>Khu vực dành riêng cho học sinh quản lý lộ trình học tập, tài liệu và tương tác với giảng viên.</p>
+                <span class="btn-enter">Truy cập cổng <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+
+            <a href="manage.html" class="teaching-card reveal delay-400">
+                <i class="fa-solid fa-user-shield card-icon"></i>
+                <h3>Quản Trị</h3>
+                <p>Khu vực dành cho giảng viên quản lý lớp học, đề thi và các dự án nghiên cứu.</p>
+                <span class="btn-enter">Vào quản trị <i class="fa-solid fa-arrow-right"></i></span>
+            </a>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Hoàng Mạnh Trường. Designed and Built with ❤️</p>
+    </footer>
+
+    <script src="../assets/js/common.js"></script>
+    <script>
+        // Init reveals
+        const reveals = document.querySelectorAll('.reveal');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
+        reveals.forEach(r => observer.observe(r));
+    </script>
+</body>
+</html>

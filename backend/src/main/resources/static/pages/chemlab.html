@@ -1,0 +1,990 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng Lab Hóa Học - Mtruong_dev</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/common.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --periodic-bg: #0f172a;
+            --element-bg: rgba(30, 41, 59, 0.7);
+            --alkali-metals: #f87171;
+            --alkaline-earth: #fb923c;
+            --transition-metals: #facc15;
+            --post-transition: #4ade80;
+            --metalloids: #2dd4bf;
+            --nonmetals: #60a5fa;
+            --noble-gases: #c084fc;
+            --lanthanides: #fb7185;
+            --actinides: #fda4af;
+        }
+
+        .lab-container {
+            padding-top: 150px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-bottom: 80px;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .lab-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .lab-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 40px;
+            margin-bottom: 50px;
+            box-shadow: var(--card-shadow);
+        }
+
+
+        /* Periodic Table Grid */
+        .periodic-table {
+            display: grid;
+            grid-template-columns: repeat(18, 1fr);
+            gap: 5px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+            padding: 20px;
+        }
+
+        .element {
+            aspect-ratio: 1;
+            background: var(--element-bg);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            padding: 5px;
+        }
+
+        .element:hover {
+            transform: scale(1.2);
+            z-index: 10;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            border-color: white;
+        }
+
+        .element .number { font-size: 0.6rem; position: absolute; top: 4px; left: 4px; opacity: 0.7; }
+        .element .symbol { font-size: 1.2rem; font-weight: 800; }
+        .element .name { font-size: 0.5rem; text-align: center; opacity: 0.8; }
+
+        /* Color Categories */
+        .alkali-metal { border-bottom: 3px solid var(--alkali-metals); }
+        .alkaline-earth { border-bottom: 3px solid var(--alkaline-earth); }
+        .transition-metal { border-bottom: 3px solid var(--transition-metals); }
+        .noble-gas { border-bottom: 3px solid var(--noble-gases); }
+        .nonmetal { border-bottom: 3px solid var(--nonmetals); }
+
+        /* Info Card */
+        .element-info-card {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            background: #1e293b;
+            border: 2px solid var(--primary-color);
+            border-radius: 20px;
+            padding: 30px;
+            z-index: 1000;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -40%); } }
+
+        /* Equation Balancer */
+        .balancer-input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .balancer-input {
+            flex: 1;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 15px 25px;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.2rem;
+            outline: none;
+        }
+
+        .balancer-result {
+            background: rgba(0,0,0,0.3);
+            padding: 25px;
+            border-radius: 20px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #4ade80;
+        }
+
+        .sub { vertical-align: sub; font-size: 0.7em; }
+
+        /* Calculator Styles */
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .calc-input-group {
+            background: rgba(255,255,255,0.03);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .calc-input-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+        .calc-input-group input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            outline: none;
+            padding: 5px 0;
+        }
+        .calc-input-group input:focus { border-color: var(--primary-color); }
+        
+        .calc-result-box {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(217, 70, 239, 0.2));
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .calc-result-val {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
+            display: block;
+        }
+
+        /* AI Result Styles */
+        .ai-result-panel {
+            display: none;
+            margin-top: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(168, 85, 247, 0.15));
+            border-radius: 24px;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            animation: slideInUp 0.4s ease-out;
+        }
+        @keyframes slideInUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .ai-badge {
+            background: linear-gradient(135deg, #3b82f6, #a855f7);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+        .loading-ai {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            color: #a855f7;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+        .loading-ai i { animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Image Upload Styles */
+        .image-upload-wrapper {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .image-preview-container {
+            display: none;
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 15px;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid var(--primary-color);
+        }
+        .image-preview-container img {
+            width: 100%;
+            display: block;
+        }
+        .remove-preview-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .upload-btns-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .btn-upload-ai {
+            background: rgba(255,255,255,0.05);
+            border: 1px dashed rgba(255,255,255,0.3);
+            color: #cbd5e1;
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        body {
+            background: #050810;
+            overflow-x: hidden;
+        }
+
+        /* Mesh Gradient Background */
+        .mesh-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            background: 
+                radial-gradient(at 0% 0%, rgba(168, 85, 247, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(15, 23, 42, 1) 0px, transparent 100%);
+        }
+
+        .lab-container {
+            padding-top: 150px;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding-bottom: 80px;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .lab-header {
+            text-align: center;
+            margin-bottom: 70px;
+        }
+
+        .section-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            letter-spacing: -1.5px;
+        }
+
+        .lab-section {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 40px;
+            padding: 50px;
+            margin-bottom: 60px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            transition: transform 0.4s ease;
+        }
+
+        .lab-section:hover {
+            border-color: rgba(168, 85, 247, 0.2);
+        }
+
+        /* Input Group Upgrade */
+        .balancer-input-group {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .balancer-input {
+            flex: 1;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 20px 30px;
+            border-radius: 20px;
+            color: white;
+            font-size: 1.3rem;
+            font-family: 'Outfit', sans-serif;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .balancer-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.1);
+            background: rgba(0,0,0,0.3);
+        }
+
+        .btn-primary {
+            padding: 15px 40px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: 0.4s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(168, 85, 247, 0.4);
+        }
+
+        /* Result Panel Upgrade */
+        .ai-result-panel {
+            display: none;
+            margin-top: 40px;
+            padding: 40px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 30px;
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            animation: slideInUp 0.5s ease-out;
+            position: relative;
+        }
+
+        .ai-badge {
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            display: inline-block;
+            box-shadow: 0 10px 20px rgba(168, 85, 247, 0.2);
+        }
+
+        .loading-ai {
+            display: none;
+            align-items: center;
+            gap: 15px;
+            color: #d8b4fe;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-top: 25px;
+        }
+
+        /* Research Items */
+        .research-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .research-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 25px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .research-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(168, 85, 247, 0.3);
+            transform: translateY(-8px);
+        }
+
+        .research-item h4 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="mesh-bg"></div>
+    <nav class="navbar-unified">
+        <a href="../index.html" class="nav-logo">
+            <i class="fa-solid fa-circle-user"></i> Mtruong<span>_dev</span>
+        </a>
+        <ul class="nav-links-unified">
+            <li><a href="../index.html">Trang Chủ</a></li>
+            <li>
+                <a href="about.html">Cá Nhân ▾</a>
+                <ul class="nav-dropdown">
+                    <li><a href="about.html">Về Tôi</a></li>
+                    <li><a href="education.html">Học Vấn</a></li>
+                    <li><a href="skills.html">Kỹ Năng</a></li>
+                    <li><a href="experience.html">Kinh Nghiệm</a></li>
+                </ul>
+            </li>
+            <li><a href="giasu.html">Gia Sư</a></li>
+            <li><a href="research_hub.html">Nghiên Cứu</a></li>
+            <li><a href="quiz.html">Thi Thử</a></li>
+            <li><a href="student_portal.html">Cổng HS</a></li>
+            <li><a href="blog.html">Kiến Thức</a></li>
+            <li><a href="muctieu.html">Mục Tiêu</a></li>
+            <li><a href="cns.html">Bài Tập CNS</a></li>
+            <li>
+                <a href="manage.html">Quản Trị ▾</a>
+                <ul class="nav-dropdown">
+                    <li><a href="manage.html">Quản lý Lớp học</a></li>
+                    <li><a href="manage_quiz.html">Quản lý Đề thi</a></li>
+                    <li><a href="manage_projects.html">Quản lý Dự án</a></li>
+                </ul>
+            </li>
+        </ul>
+        <div id="auth-controls" class="nav-auth">
+            <button class="theme-toggle" title="Chuyển chế độ Sáng/Tối">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+            <div id="guest-links">
+                <button onclick="window.promptAdmin()" class="btn-premium-nav" id="admin-login-label">Đăng nhập Admin</button>
+            </div>
+            <div id="user-links" style="display: none; gap: 10px; align-items: center;">
+                <span id="nav-user-name" class="user-badge"></span>
+                <button onclick="logout()" class="logout-btn">Thoát</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="lab-container">
+        <div class="lab-header reveal">
+            <h1 class="section-title">Interactive Chemistry Lab</h1>
+            <p style="color: #94a3b8;">Khám phá thế giới nguyên tố và chinh phục các phương trình hóa học cùng anh Trường.</p>
+        </div>
+
+        <!-- Periodic Table -->
+        <section class="lab-section reveal">
+
+            <h2 style="margin-bottom: 30px;"><i class="fa-solid fa-table-cells"></i> Bảng tuần hoàn tương tác</h2>
+            <div class="periodic-table" id="periodic-table">
+                <!-- Elements will be generated by JS -->
+            </div>
+            <div style="text-align: center; color: #64748b; font-size: 0.9rem;">
+                <i class="fa-solid fa-circle-info"></i> Nhấn vào nguyên tố để xem thông tin chi tiết.
+            </div>
+        </section>
+
+        <!-- Equation Balancer -->
+        <section class="lab-section reveal">
+            <h2 style="margin-bottom: 30px;"><i class="fa-solid fa-equals"></i> Cân bằng phương trình tự động</h2>
+            <div class="balancer-container">
+                <div class="balancer-input-group">
+                    <input type="text" id="equation-input" class="balancer-input" placeholder="Ví dụ: Fe + HCl hoặc mô tả bài tập...">
+                    <button class="btn-orange" onclick="balanceEquation()" style="white-space: nowrap;">Cân bằng nhanh</button>
+                    <button class="btn-primary" onclick="solveWithAI()" style="white-space: nowrap; background: linear-gradient(135deg, #3b82f6, #a855f7); border:none;">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Giải bằng AI
+                    </button>
+                </div>
+
+                <div class="image-upload-wrapper">
+                    <div id="image-preview-container" class="image-preview-container">
+                        <button class="remove-preview-btn" onclick="clearImage()"><i class="fa-solid fa-xmark"></i></button>
+                        <img id="image-preview" src="" alt="Preview">
+                    </div>
+                    <div class="upload-btns-group">
+                        <label for="image-input" class="btn-upload-ai">
+                            <i class="fa-solid fa-camera"></i> Tải ảnh/Chụp đề bài
+                        </label>
+                        <input type="file" id="image-input" accept="image/*" style="display: none;" onchange="previewImage(this)">
+                    </div>
+                </div>
+                
+                <div class="loading-ai" id="ai-loading">
+                    <i class="fa-solid fa-atom"></i> Mtruong AI đang giải phương trình...
+                </div>
+
+                <div id="balancer-result" class="balancer-result">
+                    Kết quả cân bằng nhanh sẽ hiện ở đây...
+                </div>
+
+                <div id="ai-result-panel" class="ai-result-panel">
+                    <div class="ai-badge">Mtruong AI Expert</div>
+                    <div id="ai-equation" style="font-size: 1.8rem; font-weight: 800; color: white; margin-bottom: 15px;"></div>
+                    <div id="ai-desc" style="color: #cbd5e1; line-height: 1.6; font-size: 0.95rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;"></div>
+                </div>
+                <div style="margin-top: 20px; font-size: 0.85rem; color: #94a3b8;">
+                    <p><strong>Mẹo:</strong> Nhập các chất cách nhau bởi dấu +, sản phẩm cách nhau bởi -> hoặc =. Viết hoa nguyên tố chuẩn (VD: Fe, H, O).</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chemistry Research Center -->
+        <section class="lab-section reveal">
+            <h2 style="margin-bottom: 30px;"><i class="fa-solid fa-microscope"></i> Trung tâm Nghiên cứu Hóa học AI</h2>
+            <p id="research-desc" style="color: #94a3b8; margin-bottom: 30px;">Nhập tên chất hoặc chủ đề hóa học để nhận báo cáo nghiên cứu chuyên sâu từ AI.</p>
+            
+            <div class="balancer-input-group">
+                <input type="text" id="research-input" class="balancer-input" placeholder="Ví dụ: Graphene, Axit Sunfuric...">
+                <button class="btn-primary" id="btn-research" onclick="startResearch()" style="background: linear-gradient(135deg, #f59e0b, #ef4444); border:none;">
+                    <i class="fa-solid fa-flask-vial"></i> Bắt đầu Nghiên cứu
+                </button>
+            </div>
+
+            <div id="research-loading" class="loading-ai" style="display: none;">
+                <i class="fa-solid fa-microscope fa-spin"></i> Đang tổng hợp dữ liệu nghiên cứu...
+            </div>
+
+            <div id="research-result" class="ai-result-panel" style="border-color: rgba(245, 158, 11, 0.3);">
+                <div class="ai-badge" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">Research Expert</div>
+                <div id="research-content" class="research-grid">
+                    <!-- Research content will be injected here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Synthesis Path -->
+        <section class="lab-section reveal">
+            <h2 style="margin-bottom: 30px;"><i class="fa-solid fa-vial-circle-check"></i> Sơ đồ điều chế & Chuỗi phản ứng</h2>
+            <p style="color: #94a3b8; margin-bottom: 30px;">Nhập chất đầu và chất cuối để AI tìm ra con đường ngắn nhất. (Ví dụ: Từ Fe điều chế FeCl3)</p>
+            <div class="balancer-input-group">
+                <input type="text" id="synthesis-input" class="balancer-input" placeholder="Ví dụ: Fe -> FeCl3">
+                <button class="btn-primary" onclick="solveSynthesis()" style="background: linear-gradient(135deg, #10b981, #3b82f6); border:none;">
+                    <i class="fa-solid fa-route"></i> Tìm đường đi
+                </button>
+            </div>
+            <div id="synthesis-result" class="ai-result-panel" style="border-color: rgba(16, 185, 129, 0.3);">
+                <div class="ai-badge" style="background: linear-gradient(135deg, #10b981, #3b82f6);">Synthesis Expert</div>
+                <div id="synthesis-text" style="color: white; line-height: 1.8;"></div>
+            </div>
+        </section>
+
+        <!-- AI Q&A Assistant -->
+        <section class="lab-section reveal" style="border: 2px solid rgba(168, 85, 247, 0.2);">
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+                <div style="width: 50px; height: 50px; background: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white;">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div>
+                    <h2 style="margin: 0;">Hỏi đáp Hóa học với AI</h2>
+                    <p style="margin: 0; color: #94a3b8; font-size: 0.9rem;">Hỏi bất kỳ điều gì về lý thuyết, hiện tượng hoặc bài tập.</p>
+                </div>
+            </div>
+            
+            <div class="balancer-input-group">
+                <input type="text" id="qa-input" class="balancer-input" placeholder="Ví dụ: Tại sao kim loại kiềm lại tác dụng mạnh với nước?">
+                <button class="btn-primary" onclick="askChemistryAI()">Gửi câu hỏi</button>
+            </div>
+
+            <div id="qa-result" class="ai-result-panel">
+                <div class="ai-badge">Mtruong AI Assistant</div>
+                <div id="qa-text" style="color: #cbd5e1; line-height: 1.6; font-size: 1rem;"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Element Modal -->
+    <div id="element-modal" class="element-info-card">
+        <span onclick="closeModal()" style="position: absolute; top: 15px; right: 20px; cursor: pointer; opacity: 0.5;">&times;</span>
+        <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px;">
+            <div id="modal-symbol" style="font-size: 3rem; font-weight: 800; color: var(--primary-color);">H</div>
+            <div>
+                <h3 id="modal-name" style="margin: 0;">Hydrogen</h3>
+                <p id="modal-category" style="margin: 0; color: #94a3b8; text-transform: uppercase; font-size: 0.7rem; font-weight: 800;">Non-metal</p>
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="glass-card-dark" style="padding: 10px;">
+                <div style="font-size: 0.7rem; opacity: 0.6;">Số hiệu nguyên tử</div>
+                <div id="modal-number" style="font-weight: 700;">1</div>
+            </div>
+            <div class="glass-card-dark" style="padding: 10px;">
+                <div style="font-size: 0.7rem; opacity: 0.6;">Nguyên tử khối</div>
+                <div id="modal-weight" style="font-weight: 700;">1.008</div>
+            </div>
+        </div>
+        <p id="modal-desc" style="margin-top: 20px; font-size: 0.9rem; line-height: 1.5; color: #cbd5e1;">Đây là nguyên tố phổ biến nhất trong vũ trụ...</p>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Hoàng Mạnh Trường. Lab Hóa học được xây dựng với ❤️</p>
+    </footer>
+
+    <script src="../assets/js/common.js"></script>
+    <script>
+        const elements = [
+            // Period 1
+            { n: 1, s: "H", name: "Hydrogen", cat: "nonmetal", weight: 1.008, x: 1, y: 1 },
+            { n: 2, s: "He", name: "Helium", cat: "noble-gas", weight: 4.002, x: 18, y: 1 },
+            // Period 2
+            { n: 3, s: "Li", name: "Lithium", cat: "alkali-metal", weight: 6.941, x: 1, y: 2 },
+            { n: 4, s: "Be", name: "Beryllium", cat: "alkaline-earth", weight: 9.012, x: 2, y: 2 },
+            { n: 5, s: "B", name: "Boron", cat: "metalloid", weight: 10.811, x: 13, y: 2 },
+            { n: 6, s: "C", name: "Carbon", cat: "nonmetal", weight: 12.011, x: 14, y: 2 },
+            { n: 7, s: "N", name: "Nitrogen", cat: "nonmetal", weight: 14.007, x: 15, y: 2 },
+            { n: 8, s: "O", name: "Oxygen", cat: "nonmetal", weight: 15.999, x: 16, y: 2 },
+            { n: 9, s: "F", name: "Fluorine", cat: "nonmetal", weight: 18.998, x: 17, y: 2 },
+            { n: 10, s: "Ne", name: "Neon", cat: "noble-gas", weight: 20.180, x: 18, y: 2 },
+            // Period 3
+            { n: 11, s: "Na", name: "Sodium", cat: "alkali-metal", weight: 22.990, x: 1, y: 3 },
+            { n: 12, s: "Mg", name: "Magnesium", cat: "alkaline-earth", weight: 24.305, x: 2, y: 3 },
+            { n: 13, s: "Al", name: "Aluminum", cat: "post-transition", weight: 26.982, x: 13, y: 3 },
+            { n: 14, s: "Si", name: "Silicon", cat: "metalloid", weight: 28.085, x: 14, y: 3 },
+            { n: 15, s: "P", name: "Phosphorus", cat: "nonmetal", weight: 30.974, x: 15, y: 3 },
+            { n: 16, s: "S", name: "Sulfur", cat: "nonmetal", weight: 32.065, x: 16, y: 3 },
+            { n: 17, s: "Cl", name: "Chlorine", cat: "nonmetal", weight: 35.453, x: 17, y: 3 },
+            { n: 18, s: "Ar", name: "Argon", cat: "noble-gas", weight: 39.948, x: 18, y: 3 },
+            // Period 4
+            { n: 19, s: "K", name: "Potassium", cat: "alkali-metal", weight: 39.098, x: 1, y: 4 },
+            { n: 20, s: "Ca", name: "Calcium", cat: "alkaline-earth", weight: 40.078, x: 2, y: 4 },
+            { n: 21, s: "Sc", name: "Scandium", cat: "transition-metal", weight: 44.956, x: 3, y: 4 },
+            { n: 22, s: "Ti", name: "Titanium", cat: "transition-metal", weight: 47.867, x: 4, y: 4 },
+            { n: 23, s: "V", name: "Vanadium", cat: "transition-metal", weight: 50.942, x: 5, y: 4 },
+            { n: 24, s: "Cr", name: "Chromium", cat: "transition-metal", weight: 51.996, x: 6, y: 4 },
+            { n: 25, s: "Mn", name: "Manganese", cat: "transition-metal", weight: 54.938, x: 7, y: 4 },
+            { n: 26, s: "Fe", name: "Iron", cat: "transition-metal", weight: 55.845, x: 8, y: 4 },
+            { n: 27, s: "Co", name: "Cobalt", cat: "transition-metal", weight: 58.933, x: 9, y: 4 },
+            { n: 28, s: "Ni", name: "Nickel", cat: "transition-metal", weight: 58.693, x: 10, y: 4 },
+            { n: 29, s: "Cu", name: "Copper", cat: "transition-metal", weight: 63.546, x: 11, y: 4 },
+            { n: 30, s: "Zn", name: "Zinc", cat: "transition-metal", weight: 65.38, x: 12, y: 4 },
+            { n: 31, s: "Ga", name: "Gallium", cat: "post-transition", weight: 69.723, x: 13, y: 4 },
+            { n: 32, s: "Ge", name: "Germanium", cat: "metalloid", weight: 72.63, x: 14, y: 4 },
+            { n: 33, s: "As", name: "Arsenic", cat: "metalloid", weight: 74.922, x: 15, y: 4 },
+            { n: 34, s: "Se", name: "Selenium", cat: "nonmetal", weight: 78.96, x: 16, y: 4 },
+            { n: 35, s: "Br", name: "Bromine", cat: "nonmetal", weight: 79.904, x: 17, y: 4 },
+            { n: 36, s: "Kr", name: "Krypton", cat: "noble-gas", weight: 83.798, x: 18, y: 4 },
+            // Period 5
+            { n: 37, s: "Rb", name: "Rubidium", cat: "alkali-metal", weight: 85.468, x: 1, y: 5 },
+            { n: 38, s: "Sr", name: "Strontium", cat: "alkaline-earth", weight: 87.62, x: 2, y: 5 },
+            { n: 39, s: "Y", name: "Yttrium", cat: "transition-metal", weight: 88.906, x: 3, y: 5 },
+            { n: 40, s: "Zr", name: "Zirconium", cat: "transition-metal", weight: 91.224, x: 4, y: 5 },
+            { n: 41, s: "Nb", name: "Niobium", cat: "transition-metal", weight: 92.906, x: 5, y: 5 },
+            { n: 42, s: "Mo", name: "Molybdenum", cat: "transition-metal", weight: 95.96, x: 6, y: 5 },
+            { n: 43, s: "Tc", name: "Technetium", cat: "transition-metal", weight: 98, x: 7, y: 5 },
+            { n: 44, s: "Ru", name: "Ruthenium", cat: "transition-metal", weight: 101.07, x: 8, y: 5 },
+            { n: 45, s: "Rh", name: "Rhodium", cat: "transition-metal", weight: 102.91, x: 9, y: 5 },
+            { n: 46, s: "Pd", name: "Palladium", cat: "transition-metal", weight: 106.42, x: 10, y: 5 },
+            { n: 47, s: "Ag", name: "Silver", cat: "transition-metal", weight: 107.87, x: 11, y: 5 },
+            { n: 48, s: "Cd", name: "Cadmium", cat: "transition-metal", weight: 112.41, x: 12, y: 5 },
+            { n: 49, s: "In", name: "Indium", cat: "post-transition", weight: 114.82, x: 13, y: 5 },
+            { n: 50, s: "Sn", name: "Tin", cat: "post-transition", weight: 118.71, x: 14, y: 5 },
+            { n: 51, s: "Sb", name: "Antimony", cat: "metalloid", weight: 121.76, x: 15, y: 5 },
+            { n: 52, s: "Te", name: "Tellurium", cat: "metalloid", weight: 127.6, x: 16, y: 5 },
+            { n: 53, s: "I", name: "Iodine", cat: "nonmetal", weight: 126.90, x: 17, y: 5 },
+            { n: 54, s: "Xe", name: "Xenon", cat: "noble-gas", weight: 131.29, x: 18, y: 5 },
+            // Period 6
+            { n: 55, s: "Cs", name: "Cesium", cat: "alkali-metal", weight: 132.91, x: 1, y: 6 },
+            { n: 56, s: "Ba", name: "Barium", cat: "alkaline-earth", weight: 137.33, x: 2, y: 6 },
+            { n: 72, s: "Hf", name: "Hafnium", cat: "transition-metal", weight: 178.49, x: 4, y: 6 },
+            { n: 73, s: "Ta", name: "Tantalum", cat: "transition-metal", weight: 180.95, x: 5, y: 6 },
+            { n: 74, s: "W", name: "Tungsten", cat: "transition-metal", weight: 183.84, x: 6, y: 6 },
+            { n: 75, s: "Re", name: "Rhenium", cat: "transition-metal", weight: 186.21, x: 7, y: 6 },
+            { n: 76, s: "Os", name: "Osmium", cat: "transition-metal", weight: 190.23, x: 8, y: 6 },
+            { n: 77, s: "Ir", name: "Iridium", cat: "transition-metal", weight: 192.22, x: 9, y: 6 },
+            { n: 78, s: "Pt", name: "Platinum", cat: "transition-metal", weight: 195.08, x: 10, y: 6 },
+            { n: 79, s: "Au", name: "Gold", cat: "transition-metal", weight: 196.97, x: 11, y: 6 },
+            { n: 80, s: "Hg", name: "Mercury", cat: "transition-metal", weight: 200.59, x: 12, y: 6 },
+            { n: 81, s: "Tl", name: "Thallium", cat: "post-transition", weight: 204.38, x: 13, y: 6 },
+            { n: 82, s: "Pb", name: "Lead", cat: "post-transition", weight: 207.2, x: 14, y: 6 },
+            { n: 83, s: "Bi", name: "Bismuth", cat: "post-transition", weight: 208.98, x: 15, y: 6 },
+            { n: 84, s: "Po", name: "Polonium", cat: "post-transition", weight: 209, x: 16, y: 6 },
+            { n: 85, s: "At", name: "Astatine", cat: "metalloid", weight: 210, x: 17, y: 6 },
+            { n: 86, s: "Rn", name: "Radon", cat: "noble-gas", weight: 222, x: 18, y: 6 },
+            // Period 7
+            { n: 87, s: "Fr", name: "Francium", cat: "alkali-metal", weight: 223, x: 1, y: 7 },
+            { n: 88, s: "Ra", name: "Radium", cat: "alkaline-earth", weight: 226, x: 2, y: 7 },
+            { n: 104, s: "Rf", name: "Rutherfordium", cat: "transition-metal", weight: 267, x: 4, y: 7 },
+            { n: 105, s: "Db", name: "Dubnium", cat: "transition-metal", weight: 268, x: 5, y: 7 },
+            { n: 106, s: "Sg", name: "Seaborgium", cat: "transition-metal", weight: 269, x: 6, y: 7 },
+            { n: 107, s: "Bh", name: "Bohrium", cat: "transition-metal", weight: 270, x: 7, y: 7 },
+            { n: 108, s: "Hs", name: "Hassium", cat: "transition-metal", weight: 269, x: 8, y: 7 }
+        ];
+
+        async function startResearch() {
+            const topic = document.getElementById('research-input').value.trim();
+            if (!topic) return;
+
+            const loading = document.getElementById('research-loading');
+            const resultPanel = document.getElementById('research-result');
+            const resultContent = document.getElementById('research-content');
+
+            loading.style.display = 'flex';
+            resultPanel.style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_CONFIG.BASE_URL}/api/chemistry/research`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic: topic, type: 'chemistry' })
+                });
+                const data = await response.json();
+                
+                loading.style.display = 'none';
+                resultPanel.style.display = 'block';
+                
+                resultContent.innerHTML = `
+                    <div style="grid-column: 1 / -1; margin-bottom: 20px;">
+                        <h3 style="color: white; font-size: 1.5rem; border-bottom: 2px solid var(--primary-color); display: inline-block; padding-bottom: 5px;">${topic}</h3>
+                    </div>
+                    <div class="research-item"><h4 style="color: #f59e0b;"><i class="fa-solid fa-circle-info"></i> Tổng quan</h4><p>${data.overview}</p></div>
+                    <div class="research-item"><h4 style="color: #60a5fa;"><i class="fa-solid fa-atom"></i> Tính chất</h4><p>${data.properties}</p></div>
+                    <div class="research-item"><h4 style="color: #4ade80;"><i class="fa-solid fa-industry"></i> Ứng dụng</h4><p>${data.applications}</p></div>
+                    <div class="research-item"><h4 style="color: #f87171;"><i class="fa-solid fa-shield-halved"></i> An toàn</h4><p>${data.safety}</p></div>
+                `;
+            } catch (error) {
+                loading.style.display = 'none';
+                alert("Lỗi kết nối AI Nghiên cứu.");
+            }
+        }
+
+        function initTable() {
+            const table = document.getElementById('periodic-table');
+            elements.forEach(el => {
+                const div = document.createElement('div');
+                div.className = `element ${el.cat}`;
+                div.style.gridColumn = el.x;
+                div.style.gridRow = el.y;
+                div.innerHTML = `
+                    <span class="number">${el.n}</span>
+                    <span class="symbol">${el.s}</span>
+                    <span class="name">${el.name}</span>
+                `;
+                div.onclick = () => showInfo(el);
+                table.appendChild(div);
+            });
+        }
+
+        function showInfo(el) {
+            document.getElementById('modal-symbol').innerText = el.s;
+            document.getElementById('modal-name').innerText = el.name;
+            document.getElementById('modal-number').innerText = el.n;
+            document.getElementById('modal-weight').innerText = el.weight;
+            document.getElementById('modal-category').innerText = el.cat.replace('-', ' ');
+            document.getElementById('modal-desc').innerText = `Nguyên tố ${el.name} (Ký hiệu: ${el.s}) là một phần quan trọng của bảng tuần hoàn, thường xuất hiện trong các bài toán Hóa học lớp 8 đến lớp 12.`;
+            document.getElementById('element-modal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('element-modal').style.display = 'none';
+        }
+
+        function balanceEquation() {
+            let rawInput = document.getElementById('equation-input').value.trim();
+            if(!rawInput) return;
+            
+            document.getElementById('ai-result-panel').style.display = 'none';
+            const resultBox = document.getElementById('balancer-result');
+            resultBox.style.display = 'flex';
+            
+            // 1. Smart Sanitization
+            let normalized = rawInput.toLowerCase().replace(/\s+/g, '');
+            
+            // Map for normalization
+            const nameMap = {
+                'h2': 'H2', 'o2': 'O2', 'h2o': 'H2O', 'hcl': 'HCl', 'fe': 'Fe', 'mg': 'Mg', 'zn': 'Zn', 'al': 'Al',
+                'naoh': 'NaOH', 'nacl': 'NaCl', 'fecl2': 'FeCl2', 'mgcl2': 'MgCl2', 'zncl2': 'ZnCl2', 'alcl3': 'AlCl3',
+                'al2o3': 'Al2O3', 'mgo': 'MgO', 'fe3o4': 'Fe3O4', 'co2': 'CO2', 'ch4': 'CH4', 'bacl2': 'BaCl2',
+                'h2so4': 'H2SO4', 'baso4': 'BaSO4', 'cu': 'Cu', 'cuo': 'CuO', 'agno3': 'AgNO3', 'agcl': 'AgCl', 'nano3': 'NaNO3'
+            };
+
+            // 2. Prediction Logic
+            if (!normalized.includes('->') && !normalized.includes('=') && !normalized.includes('→')) {
+                const parts = normalized.split('+');
+                const has = (item) => parts.includes(item.toLowerCase());
+                let predicted = "";
+
+                if (has('hcl')) {
+                    if (has('fe')) predicted = "Fe + 2HCl → FeCl₂ + H₂";
+                    else if (has('mg')) predicted = "Mg + 2HCl → MgCl₂ + H₂";
+                    else if (has('zn')) predicted = "Zn + 2HCl → ZnCl₂ + H₂";
+                    else if (has('al')) predicted = "2Al + 6HCl → 2AlCl₃ + 3H₂";
+                }
+                else if (has('o2')) {
+                    if (has('h2')) predicted = "2H₂ + O₂ → 2H₂O";
+                    else if (has('c')) predicted = "C + O₂ → CO₂";
+                    else if (has('ch4')) predicted = "CH₄ + 2O₂ → CO₂ + 2H₂O";
+                    else if (has('al')) predicted = "4Al + 3O₂ → 2Al₂O₃";
+                    else if (has('mg')) predicted = "2Mg + O₂ → 2MgO";
+                    else if (has('fe')) predicted = "3Fe + 2O₂ → Fe₃O₄";
+                    else if (has('cu')) predicted = "2Cu + O₂ → 2CuO";
+                }
+                else if (has('naoh') && has('hcl')) predicted = "NaOH + HCl → NaCl + H₂O";
+                else if (has('bacl2') && has('h2so4')) predicted = "BaCl₂ + H₂SO₄ → BaSO₄ + 2HCl";
+                else if (has('agno3') && has('nacl')) predicted = "AgNO₃ + NaCl → AgCl + NaNO₃";
+
+                if (predicted) {
+                    resultBox.innerHTML = `<div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 5px;">Cân bằng nhanh:</div>${predicted}`;
+                    return;
+                }
+            }
+
+            const database = {
+                "h2+o2->h2o": "2H₂ + O₂ → 2H₂O",
+                "fe+hcl->fecl2+h2": "Fe + 2HCl → FeCl₂ + H₂",
+                "al+o2->al2o3": "4Al + 3O₂ → 2Al₂O₃",
+                "naoh+hcl->nacl+h2o": "NaOH + HCl → NaCl + H₂O",
+                "bacl2+h2so4->baso4+hcl": "BaCl₂ + H₂SO₄ → BaSO₄ + 2HCl",
+                "agno3+nacl->agcl+nano3": "AgNO₃ + NaCl → AgCl + NaNO₃"
+            };
+
+            const result = database[normalized.replace('→','->').replace('=','->')] || 
+                           "Không tìm thấy trong bộ nhớ nhanh. Hãy thử dùng nút 'Giải bằng AI' để có kết quả chính xác cho mọi phương trình nhé!";
+            resultBox.innerText = result;
+        }
+
+        function previewImage(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('image-preview').src = e.target.result;
+                    document.getElementById('image-preview-container').style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function clearImage() {
+            document.getElementById('image-input').value = '';
+            document.getElementById('image-preview-container').style.display = 'none';
+            document.getElementById('image-preview').src = '';
+        }
+
+        async function solveWithAI() {
+            const textInput = document.getElementById('equation-input').value.trim();
+            const imageInput = document.getElementById('image-input');
+            const hasImage = imageInput.files && imageInput.files[0];
+
+            if (!textInput && !hasImage) {
+                alert("Vui lòng nhập văn bản hoặc tải ảnh đề bài!");
+                return;
+            }
+
+            const loading = document.getElementById('ai-loading');
+            const resultBox = document.getElementById('balancer-result');
+            const aiPanel = document.getElementById('ai-result-panel');
+            const aiEq = document.getElementById('ai-equation');
+            const aiDesc = document.getElementById('ai-desc');
+
+            resultBox.style.display = 'none';
+            aiPanel.style.display = 'none';
+            loading.style.display = 'flex';
+
+            try {
+                const formData = new FormData();
+                if (textInput) formData.append('prompt', textInput);
+                if (hasImage) formData.append('image', imageInput.files[0]);
+
+                const response = await fetch(`${API_CONFIG.BASE_URL}/api/chemistry/solve-image`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                loading.style.display = 'none';
+                aiPanel.style.display = 'block';
+                aiEq.innerText = data.balanced || "Lời giải AI";
+                aiDesc.innerHTML = `<i class="fa-solid fa-lightbulb" style="color: #fbbf24; margin-right: 8px;"></i> ${data.explanation}`;
+            } catch (error) {
+                console.error("AI Error Details:", error);
+                loading.style.display = 'none';
+                resultBox.style.display = 'flex';
+                resultBox.innerHTML = `<div style="color: #ef4444;">
+                    Lỗi kết nối Server AI!<br>
+                    <small style="font-size: 0.7rem; color: #94a3b8;">
+                        URL: ${API_CONFIG.BASE_URL}/api/chemistry/solve-image<br>
+                        Chi tiết: ${error.message}
+                    </small>
+                </div>`;
+            }
+        }
+
+        async function solveSynthesis() {
+            const input = document.getElementById('synthesis-input').value.trim();
+            if (!input) return;
+
+            const resultPanel = document.getElementById('synthesis-result');
+            const resultText = document.getElementById('synthesis-text');
+            resultPanel.style.display = 'block';
+            resultText.innerText = "Mtruong AI đang tìm con đường tối ưu...";
+
+            try {
+                const response = await fetch(`${API_CONFIG.BASE_URL}/api/chemistry/solve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: "Provide a reaction chain or synthesis steps for: " + input })
+                });
+                const data = await response.json();
+                resultText.innerHTML = `<div style="font-size: 1.1rem; margin-bottom: 10px; font-weight: 700;">${data.balanced}</div>${data.explanation}`;
+            } catch (error) {
+                resultText.innerText = "Lỗi kết nối AI.";
+            }
+        }
+
+        async function askChemistryAI() {
+            const input = document.getElementById('qa-input').value.trim();
+            if (!input) return;
+
+            const resultPanel = document.getElementById('qa-result');
+            const resultText = document.getElementById('qa-text');
+            resultPanel.style.display = 'block';
+            resultText.innerText = "Mtruong AI đang suy nghĩ...";
+
+            try {
+                const response = await fetch(`${API_CONFIG.BASE_URL}/api/chemistry/solve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: "Answer this chemistry question briefly: " + input })
+                });
+                const data = await response.json();
+                resultText.innerHTML = data.explanation;
+            } catch (error) {
+                resultText.innerText = "Lỗi kết nối AI.";
+            }
+        }
+
+        initTable();
+    </script>
+</body>
+</html>
+

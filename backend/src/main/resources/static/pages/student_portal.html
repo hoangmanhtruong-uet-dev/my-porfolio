@@ -1,0 +1,606 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cổng Học Sinh Pro - MtruongHóa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/common.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --portal-primary: #a855f7;
+            --portal-accent: #d946ef;
+            --portal-bg: #0b0118;
+            --portal-card: rgba(30, 41, 59, 0.4);
+            --portal-border: rgba(168, 85, 247, 0.2);
+        }
+
+        body.portal-body {
+            background: var(--portal-bg) !important;
+            background-image: radial-gradient(circle at 10% 20%, rgba(168, 85, 247, 0.1) 0%, transparent 40%),
+                              radial-gradient(circle at 90% 80%, rgba(217, 70, 239, 0.1) 0%, transparent 40%) !important;
+            color: #f8fafc !important;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .dashboard-container {
+            padding-top: 100px;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding-bottom: 50px;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 30px;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        /* Sidebar Glass Card */
+        .glass-sidebar {
+            background: var(--portal-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--portal-border);
+            border-radius: 30px;
+            padding: 40px 25px;
+            text-align: center;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .avatar-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+        }
+
+        .avatar-main {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid var(--portal-primary);
+            padding: 5px;
+            object-fit: cover;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .level-badge {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            background: linear-gradient(135deg, var(--portal-primary), var(--portal-accent));
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.9rem;
+            border: 3px solid var(--portal-bg);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .xp-bar-container {
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .xp-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            margin-bottom: 8px;
+            color: #94a3b8;
+        }
+
+        .xp-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .xp-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--portal-primary), var(--portal-accent));
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Main Content Cards */
+        .card-pro {
+            background: var(--portal-card);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--portal-border);
+            border-radius: 24px;
+            padding: 30px;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .card-pro:hover {
+            border-color: var(--portal-primary);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .section-header h3 {
+            font-size: 1.3rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-header h3 i {
+            color: var(--portal-primary);
+        }
+
+        /* Grid Layouts */
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .stat-item-pro {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-item-pro .val {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--portal-primary);
+            display: block;
+        }
+
+        .stat-item-pro .lab {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+
+        /* Table Stylings */
+        .pro-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .pro-table th {
+            text-align: left;
+            color: #94a3b8;
+            font-size: 0.8rem;
+            padding: 15px;
+            border-bottom: 1px solid var(--portal-border);
+        }
+
+        .pro-table td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .rank-glow {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+        }
+
+        .rank-1 { background: linear-gradient(135deg, #ffd700, #b8860b); color: #000; box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
+        .rank-2 { background: linear-gradient(135deg, #c0c0c0, #808080); color: #000; }
+        .rank-3 { background: linear-gradient(135deg, #cd7f32, #8b4513); color: #fff; }
+
+        /* AI Path section */
+        .ai-path-card {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(217, 70, 239, 0.1));
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 24px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-path-card::before {
+            content: '\f0d0';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: -20px;
+            bottom: -20px;
+            font-size: 150px;
+            opacity: 0.05;
+            color: white;
+        }
+
+        /* Timeline History */
+        .history-list-pro {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .history-item-pro {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 15px 20px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .history-item-pro:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(5px);
+        }
+
+        .score-tag {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--portal-primary);
+        }
+
+        /* Navbar Link fix */
+        .navbar-unified {
+            background: rgba(11, 1, 24, 0.8) !important;
+            backdrop-filter: blur(10px);
+        }
+        .nav-links-unified a {
+            color: white !important;
+        }
+    </style>
+</head>
+<body class="portal-body">
+    <nav class="navbar-unified">
+        <a href="../index.html" class="nav-logo">
+            <i class="fa-solid fa-circle-user"></i> Mtruong<span>_dev</span>
+        </a>
+        <ul class="nav-links-unified">
+            <li><a href="../index.html">Trang Chủ</a></li>
+            <li>
+                <a href="about.html">Cá Nhân ▾</a>
+                <ul class="nav-dropdown">
+                    <li><a href="about.html">Về Tôi</a></li>
+                    <li><a href="education.html">Học Vấn</a></li>
+                    <li><a href="skills.html">Kỹ Năng</a></li>
+                    <li><a href="experience.html">Kinh Nghiệm</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="giasu.html">Giảng Dạy ▾</a>
+                <ul class="nav-dropdown">
+                    <li><a href="giasu.html">Gia Sư AI</a></li>
+                    <li><a href="quiz.html">Thi Thử Online</a></li>
+                    <li><a href="student_portal.html">Cổng Học Sinh</a></li>
+                </ul>
+            </li>
+            <li><a href="research_hub.html">Nghiên Cứu</a></li>
+            <li><a href="blog.html">Kiến Thức</a></li>
+            <li><a href="muctieu.html">Mục Tiêu</a></li>
+            <li><a href="cns.html">Bài Tập CNS</a></li>
+            <li>
+                <a href="manage.html">Quản Trị ▾</a>
+                <ul class="nav-dropdown">
+                    <li><a href="manage.html">Quản lý Lớp học</a></li>
+                    <li><a href="manage_quiz.html">Quản lý Đề thi</a></li>
+                    <li><a href="manage_projects.html">Quản lý Dự án</a></li>
+                </ul>
+            </li>
+        </ul>
+        <div id="auth-controls" class="nav-auth">
+            <button class="theme-toggle" title="Chuyển chế độ Sáng/Tối">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+            <div id="guest-links">
+                <button onclick="window.promptAdmin()" class="btn-premium-nav" id="admin-login-label">Đăng nhập Admin</button>
+            </div>
+            <div id="user-links" style="display: none; gap: 10px; align-items: center;">
+                <span id="nav-user-name" class="user-badge"></span>
+                <button onclick="logout()" class="logout-btn">Thoát</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="glass-sidebar">
+            <div class="avatar-container">
+                <img src="https://ui-avatars.com/api/?name=User" alt="Avatar" class="avatar-main" id="profile-avatar">
+                <div class="level-badge" id="user-level">1</div>
+            </div>
+            
+            <h2 id="user-name" style="font-size: 1.4rem; margin-bottom: 5px; font-weight: 800;">Học Sinh</h2>
+            <p id="user-rank-text" style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 20px;">Hạng: #--</p>
+            
+            <div class="xp-bar-container">
+                <div class="xp-text">
+                    <span>Tiến độ cấp độ</span>
+                    <span id="xp-val">0/100 XP</span>
+                </div>
+                <div class="xp-bar">
+                    <div class="xp-fill" id="xp-fill"></div>
+                </div>
+            </div>
+
+            <div class="stats-summary">
+                <div class="stat-item-pro">
+                    <span class="val" id="total-quizzes">0</span>
+                    <span class="lab">Bài thi</span>
+                </div>
+                <div class="stat-item-pro">
+                    <span class="val" id="avg-score">0.0</span>
+                    <span class="lab">Điểm TB</span>
+                </div>
+                <div class="stat-item-pro">
+                    <span class="val" id="total-xp">0</span>
+                    <span class="lab">Tổng XP</span>
+                </div>
+            </div>
+
+            <button class="btn btn-primary w-full mt-4" style="border-radius: 15px; padding: 12px;" onclick="fetchProfile()">
+                <i class="fa-solid fa-rotate"></i> Đồng bộ dữ liệu
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="dashboard-main" style="display: flex; flex-direction: column; gap: 30px;">
+            
+            <!-- AI & Chart Row -->
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 25px;">
+                <section class="ai-path-card">
+                    <div class="section-header">
+                        <h3><i class="fa-solid fa-wand-magic-sparkles"></i> Lộ trình học tập AI</h3>
+                    </div>
+                    <div id="ai-advice-content" style="font-size: 1rem; color: #cbd5e1; line-height: 1.6; margin-bottom: 20px;">
+                        Chào mừng bạn quay trở lại! Hãy làm thêm bài thi để AI có thể phân tích chính xác lộ trình dành riêng cho bạn.
+                    </div>
+                    <button class="btn btn-primary" onclick="analyzePath()" id="btn-analyze" style="display: none;">
+                        Phân tích năng lực
+                    </button>
+                </section>
+
+                <section class="card-pro">
+                    <div class="section-header">
+                        <h3><i class="fa-solid fa-chart-line"></i> Xu hướng</h3>
+                    </div>
+                    <div style="height: 180px;">
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Leaderboard & History Row -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                <!-- Leaderboard -->
+                <section class="card-pro">
+                    <div class="section-header">
+                        <h3><i class="fa-solid fa-crown"></i> Bảng Xếp Hạng</h3>
+                        <a href="quiz.html" style="font-size: 0.8rem; color: var(--portal-primary);">Thách đấu ngay</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="pro-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Học sinh</th>
+                                    <th>Điểm TB</th>
+                                    <th>Số bài</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboard-body"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- History -->
+                <section class="card-pro">
+                    <div class="section-header">
+                        <h3><i class="fa-solid fa-clock-rotate-left"></i> Hoạt động gần đây</h3>
+                    </div>
+                    <div id="history-list" class="history-list-pro">
+                        <p style="color: #94a3b8; text-align: center; padding: 20px;">Chưa có lịch sử làm bài.</p>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="../assets/js/common.js"></script>
+    <script>
+        let currentStudent = JSON.parse(localStorage.getItem('current_student'));
+        let progressChart = null;
+
+        async function checkAuth() {
+            if (!currentStudent) {
+                window.location.href = 'login.html';
+                return;
+            }
+            fetchProfile();
+        }
+
+        async function fetchProfile() {
+            try {
+                const response = await fetch(`${API_CONFIG.BASE_URL}/api/students/profile/${currentStudent.username}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    renderDashboard(data);
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        function renderDashboard(data) {
+            document.getElementById('user-name').innerText = data.fullName;
+            document.getElementById('total-quizzes').innerText = data.quizCount || 0;
+            document.getElementById('avg-score').innerText = (data.avgScore || 0).toFixed(1);
+            document.getElementById('user-rank-text').innerText = `Hạng toàn hệ thống: #${data.studentRank || '--'}`;
+            document.getElementById('profile-avatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(data.fullName)}&background=a855f7&color=fff&size=100`;
+
+            // Gamification logic (XP = quizCount * 20 + avgScore * 10)
+            const quizCount = data.quizCount || 0;
+            const avgScore = data.avgScore || 0;
+            const totalXP = Math.round(quizCount * 50 + avgScore * 5);
+            const level = Math.floor(totalXP / 100) + 1;
+            const xpInLevel = totalXP % 100;
+
+            document.getElementById('total-xp').innerText = totalXP;
+            document.getElementById('user-level').innerText = level;
+            document.getElementById('xp-val').innerText = `${xpInLevel}/100 XP`;
+            document.getElementById('xp-fill').style.width = `${xpInLevel}%`;
+
+            if (data.quizHistory) {
+                try {
+                    const history = JSON.parse(data.quizHistory);
+                    if (history.length > 0) {
+                        document.getElementById('btn-analyze').style.display = 'inline-block';
+                        renderHistory(history);
+                        initChart(history);
+                    }
+                } catch(e) { console.error("History parse error", e); }
+            }
+            fetchLeaderboard();
+        }
+
+        function renderHistory(history) {
+            const list = document.getElementById('history-list');
+            list.innerHTML = '';
+            history.slice(-5).reverse().forEach(h => {
+                const date = new Date(h.date).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+                const item = document.createElement('div');
+                item.className = 'history-item-pro';
+                item.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="background: rgba(168, 85, 247, 0.1); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--portal-primary);">
+                            <i class="fa-solid fa-file-invoice"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 0.95rem;">${h.examTitle}</div>
+                            <div style="font-size: 0.75rem; color: #94a3b8;">${date}</div>
+                        </div>
+                    </div>
+                    <div class="score-tag">${h.score}</div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        async function fetchLeaderboard() {
+            try {
+                const response = await fetch(`${API_CONFIG.BASE_URL}/api/students/leaderboard`);
+                if (response.ok) {
+                    const top = await response.json();
+                    const tbody = document.getElementById('leaderboard-body');
+                    tbody.innerHTML = '';
+                    top.forEach((s, i) => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td><div class="rank-glow rank-${i+1}">${i+1}</div></td>
+                            <td>
+                                <div style="font-weight: 600;">${s.fullName}</div>
+                            </td>
+                            <td><strong style="color: var(--portal-primary);">${s.avgScore.toFixed(1)}</strong></td>
+                            <td>${s.quizCount}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            } catch(e) {}
+        }
+
+        function initChart(history) {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            const recent = history.slice(-7);
+            const scores = recent.map(h => h.score);
+            const labels = recent.map((_, i) => i + 1);
+
+            if (progressChart) progressChart.destroy();
+            
+            const gradient = ctx.createLinearGradient(0, 0, 0, 150);
+            gradient.addColorStop(0, 'rgba(168, 85, 247, 0.3)');
+            gradient.addColorStop(1, 'rgba(168, 85, 247, 0)');
+
+            progressChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: scores,
+                        borderColor: '#a855f7',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#a855f7',
+                        pointHoverRadius: 6,
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: gradient
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { display: false, min: 0, max: 10 },
+                        x: { display: false }
+                    }
+                }
+            });
+        }
+
+        async function analyzePath() {
+            const content = document.getElementById('ai-advice-content');
+            const btn = document.getElementById('btn-analyze');
+            content.innerHTML = '<div style="display: flex; align-items: center; gap: 10px;"><i class="fa-solid fa-spinner fa-spin"></i> AI đang phân tích dữ liệu học tập của bạn...</div>';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_CONFIG.BASE_URL}/api/chemistry/solve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: `Analyze my student profile. Average Score: ${currentStudent.avgScore}. Quiz count: ${currentStudent.quizCount}. What is my learning path and career advice in Vietnam? Give a short, encouraging summary in Vietnamese.` })
+                });
+                const data = await response.json();
+                content.innerHTML = `<div style="animation: fadeIn 0.5s ease-out;">${data.explanation}</div>`;
+                
+                // Add confetti for analysis completion
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#a855f7', '#d946ef']
+                });
+            } catch (e) { 
+                content.innerText = "Xin lỗi, hiện tại không thể kết nối với trí tuệ nhân tạo. Vui lòng thử lại sau."; 
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+
+        checkAuth();
+    </script>
+</body>
+</html>
+

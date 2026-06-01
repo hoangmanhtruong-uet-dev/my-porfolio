@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Photobooth - Ghi lại khoảnh khắc ❤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --pb-accent: #ff4d4d;
+            --pb-bg: #050505;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background: var(--pb-bg);
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar */
+        nav {
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #fff, var(--pb-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-btn {
+            color: white;
+            text-decoration: none;
+            opacity: 0.6;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover { opacity: 1; }
+
+        /* Main Content */
+        .container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 40px;
+            padding: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Camera Section */
+        .camera-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+        }
+
+        .video-wrapper {
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: #000;
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid var(--border);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+
+        #video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1); /* Mirror effect */
+        }
+
+        .countdown {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 10rem;
+            font-weight: 800;
+            color: var(--pb-accent);
+            text-shadow: 0 0 50px rgba(255,77,77,0.5);
+            display: none;
+            z-index: 10;
+        }
+
+        .flash {
+            position: absolute;
+            inset: 0;
+            background: white;
+            display: none;
+            z-index: 20;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .btn-main {
+            padding: 18px 40px;
+            border-radius: 50px;
+            border: none;
+            background: var(--pb-accent);
+            color: white;
+            font-weight: 800;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(255,77,77,0.3);
+        }
+
+        .btn-main:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 20px 40px rgba(255,77,77,0.5); }
+        .btn-main:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .btn-tool {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+        }
+
+        .btn-tool:hover { background: white; color: black; }
+
+        /* Preview Strip */
+        .preview-section {
+            background: var(--glass);
+            border-radius: 30px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            border: 1px solid var(--border);
+            max-height: calc(100vh - 150px);
+        }
+
+        .strip-preview {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: white; /* Traditional white strip */
+            padding: 10px;
+            border-radius: 5px;
+            overflow-y: auto;
+        }
+
+        .strip-photo {
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: #eee;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        .strip-header {
+            text-align: center;
+            color: #333;
+            font-weight: 800;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        /* Filter Chips */
+        .filter-list {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .filter-chip {
+            padding: 8px 15px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.05);
+            font-size: 0.8rem;
+            cursor: pointer;
+            white-space: nowrap;
+            border: 1px solid transparent;
+        }
+
+        .filter-chip.active { border-color: var(--pb-accent); background: rgba(255,77,77,0.1); }
+
+        /* Hidden Canvas */
+        #canvas { display: none; }
+
+        @media (max-width: 1000px) {
+            .container { grid-template-columns: 1fr; overflow-y: auto; }
+            body { overflow: auto; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">LOVE PHOTOBOOTH</div>
+        <a href="love.html" class="back-btn"><i class="fa-solid fa-house"></i> TRANG CHỦ</a>
+    </nav>
+
+    <main class="container">
+        <!-- Capture Section -->
+        <section class="camera-section">
+            <div class="video-wrapper">
+                <video id="video" autoplay playsinline></video>
+                <div id="countdown" class="countdown">3</div>
+                <div id="flash" class="flash"></div>
+            </div>
+
+            <div class="filter-list">
+                <div class="filter-chip active" onclick="setFilter('none')">Gốc</div>
+                <div class="filter-chip" onclick="setFilter('grayscale(1)')">Trắng đen</div>
+                <div class="filter-chip" onclick="setFilter('sepia(0.8)')">Cổ điển</div>
+                <div class="filter-chip" onclick="setFilter('brightness(1.2) contrast(1.1)')">Rực rỡ</div>
+                <div class="filter-chip" onclick="setFilter('hue-rotate(180deg)')">Ảo ảnh</div>
+            </div>
+
+            <div class="toolbar">
+                <button class="btn-tool" onclick="toggleCamera()"><i class="fa-solid fa-camera-rotate"></i></button>
+                <button id="start-btn" class="btn-main" onclick="startSequence()">
+                    <i class="fa-solid fa-camera"></i> CHỤP NGAY (4 ẢNH)
+                </button>
+                <button class="btn-tool" onclick="resetStrip()"><i class="fa-solid fa-trash"></i></button>
+            </div>
+        </section>
+
+        <!-- Strip Preview -->
+        <section class="preview-section">
+            <h3 style="margin: 0; font-size: 1.1rem; opacity: 0.6;">BẢN IN CỦA BẠN</h3>
+            
+            <div id="capture-strip" class="strip-preview">
+                <div class="strip-header">❤️ MOMENTS OF LOVE ❤️</div>
+                <img class="strip-photo" src="" alt="Photo 1" style="display: none;">
+                <img class="strip-photo" src="" alt="Photo 2" style="display: none;">
+                <img class="strip-photo" src="" alt="Photo 3" style="display: none;">
+                <img class="strip-photo" src="" alt="Photo 4" style="display: none;">
+                <div class="strip-header" style="margin-top: 5px; font-size: 0.6rem;" id="strip-date">2024.05.08</div>
+            </div>
+
+            <button id="download-btn" class="btn-main" style="background: white; color: black; box-shadow: none;" disabled onclick="downloadStrip()">
+                <i class="fa-solid fa-download"></i> TẢI XUỐNG DẢI ẢNH
+            </button>
+        </section>
+    </main>
+
+    <canvas id="canvas"></canvas>
+
+    <!-- Audio Effects -->
+    <audio id="shutter-sound" src="https://assets.mixkit.co/active_storage/sfx/735/735-preview.mp3"></audio>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const countdownEl = document.getElementById('countdown');
+        const flashEl = document.getElementById('flash');
+        const shutterSound = document.getElementById('shutter-sound');
+        const photos = document.querySelectorAll('.strip-photo');
+        const startBtn = document.getElementById('start-btn');
+        const downloadBtn = document.getElementById('download-btn');
+
+        let currentPhotos = [];
+        let filter = 'none';
+
+        // Initialize Camera
+        async function initCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+            } catch (err) {
+                alert("Không thể truy cập camera! Hãy kiểm tra quyền truy cập.");
+            }
+        }
+
+        function setFilter(f) {
+            filter = f;
+            video.style.filter = f;
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.classList.toggle('active', chip.innerText.toLowerCase().includes(f === 'none' ? 'gốc' : ''));
+            });
+            // Update active state based on index is better
+        }
+
+        // Fix filter chip active state
+        document.querySelectorAll('.filter-chip').forEach((chip, index) => {
+            chip.onclick = () => {
+                document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                const filters = ['none', 'grayscale(1)', 'sepia(0.8)', 'brightness(1.2) contrast(1.1)', 'hue-rotate(180deg)'];
+                setFilter(filters[index]);
+            };
+        });
+
+        async function startSequence() {
+            startBtn.disabled = true;
+            currentPhotos = [];
+            photos.forEach(img => img.style.display = 'none');
+            
+            for (let i = 0; i < 4; i++) {
+                await takePhotoWithCountdown(i);
+            }
+
+            startBtn.disabled = false;
+            downloadBtn.disabled = false;
+        }
+
+        function takePhotoWithCountdown(index) {
+            return new Promise((resolve) => {
+                let count = 3;
+                countdownEl.innerText = count;
+                countdownEl.style.display = 'block';
+
+                const timer = setInterval(() => {
+                    count--;
+                    if (count > 0) {
+                        countdownEl.innerText = count;
+                    } else {
+                        clearInterval(timer);
+                        countdownEl.style.display = 'none';
+                        capture(index);
+                        resolve();
+                    }
+                }, 1000);
+            });
+        }
+
+        function capture(index) {
+            // Flash Effect
+            flashEl.style.display = 'block';
+            setTimeout(() => flashEl.style.display = 'none', 100);
+            shutterSound.play();
+
+            // Draw to canvas
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            
+            // Mirror flip
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+            
+            // Apply filter to canvas
+            ctx.filter = filter;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const dataUrl = canvas.toDataURL('image/jpeg');
+            photos[index].src = dataUrl;
+            photos[index].style.display = 'block';
+            currentPhotos.push(dataUrl);
+
+            // Update date
+            document.getElementById('strip-date').innerText = new Date().toLocaleDateString('vi-VN').replace(/\//g, '.');
+        }
+
+        function resetStrip() {
+            photos.forEach(img => {
+                img.src = "";
+                img.style.display = 'none';
+            });
+            downloadBtn.disabled = true;
+            currentPhotos = [];
+        }
+
+        function downloadStrip() {
+            // To download as a single strip, we need to combine them on a large canvas
+            const combinedCanvas = document.createElement('canvas');
+            const cctx = combinedCanvas.getContext('2d');
+            
+            const w = 600;
+            const h = 4 * (w * 0.75) + 120; // 4 photos + padding/text
+            
+            combinedCanvas.width = w;
+            combinedCanvas.height = h;
+
+            // Background
+            cctx.fillStyle = 'white';
+            cctx.fillRect(0, 0, w, h);
+
+            // Draw Photos
+            let y = 60;
+            const photoW = w - 40;
+            const photoH = photoW * 0.75;
+
+            // Draw Header
+            cctx.fillStyle = '#333';
+            cctx.font = 'bold 24px Outfit';
+            cctx.textAlign = 'center';
+            cctx.fillText('❤️ MOMENTS OF LOVE ❤️', w/2, 40);
+
+            currentPhotos.forEach((src, idx) => {
+                const img = new Image();
+                img.src = src;
+                img.onload = () => {
+                    cctx.drawImage(img, 20, y, photoW, photoH);
+                    y += photoH + 20;
+                    
+                    if (idx === 3) {
+                        // Draw Footer
+                        cctx.fillStyle = '#666';
+                        cctx.font = '16px Outfit';
+                        cctx.fillText(new Date().toLocaleDateString('vi-VN').replace(/\//g, '.'), w/2, h - 20);
+
+                        // Trigger Download
+                        const link = document.createElement('a');
+                        link.download = `photobooth-${Date.now()}.jpg`;
+                        link.href = combinedCanvas.toDataURL('image/jpeg', 0.9);
+                        link.click();
+                    }
+                };
+            });
+        }
+
+        initCamera();
+    </script>
+</body>
+</html>

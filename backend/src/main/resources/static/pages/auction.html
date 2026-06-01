@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Đấu Giá Trực Tuyến - Project Detail</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .auction-detail-container {
+            padding-top: 100px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-bottom: 100px;
+        }
+
+        .project-hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            margin-bottom: 80px;
+            align-items: center;
+        }
+
+        .auction-mockup {
+            background: #1e293b;
+            border-radius: 20px;
+            padding: 10px;
+            border: 4px solid #334155;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mockup-header {
+            background: #334155;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            gap: 8px;
+        }
+
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .red { background: #ff5f56; }
+        .yellow { background: #ffbd2e; }
+        .green { background: #27c93f; }
+
+        .mockup-body {
+            background: #0f172a;
+            padding: 20px;
+            height: 350px;
+            overflow-y: auto;
+        }
+
+        /* Auction UI Elements */
+        .auction-item-ui {
+            background: #1e293b;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bid-info h4 { color: #f15a24; margin-bottom: 5px; }
+        .bid-info span { color: #94a3b8; font-size: 0.8rem; }
+        .bid-price { font-weight: 800; color: #10b981; }
+
+        .tech-stack-row {
+            display: flex;
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .tech-pill {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .feature-box {
+            background: rgba(30, 41, 59, 0.5);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: transform 0.3s;
+        }
+
+        .feature-box:hover { transform: translateY(-10px); }
+        .feature-box i { font-size: 2rem; color: #f15a24; margin-bottom: 20px; }
+
+        @media (max-width: 900px) {
+            .project-hero { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="nav-content">
+            <div class="logo">
+                <a href="../index.html" style="text-decoration:none; color:inherit;"><i class="fa-solid fa-circle-user logo-icon"></i> <span>Mtruong</span>_dev</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="../index.html">Trang chủ</a></li>
+                <li><a href="projects.html">Quay lại Dự án</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="auction-detail-container">
+        <div class="project-hero">
+            <div class="project-text">
+                <span class="badge" style="background: #f15a24; color: white;">Hệ Thống Đấu Giá</span>
+                <h1 style="font-size: 3.5rem; margin: 20px 0;">Auction System & Data Management</h1>
+                <p class="description" style="font-size: 1.2rem;">Một ứng dụng mạnh mẽ cho phép người dùng tham gia đấu giá trực tuyến theo thời gian thực. Hệ thống tập trung vào hiệu năng xử lý dữ liệu và tính minh bạch trong mỗi giao dịch.</p>
+                
+                <div class="tech-stack-row">
+                    <div class="tech-pill">Java Desktop</div>
+                    <div class="tech-pill">MySQL Database</div>
+                    <div class="tech-pill">JDBC</div>
+                </div>
+
+                <a href="https://github.com/hoangmanhtruong" target="_blank" class="btn-orange">Xem Source Code trên GitHub</a>
+            </div>
+
+            <div class="auction-mockup">
+                <div class="mockup-header">
+                    <div class="dot red"></div>
+                    <div class="dot yellow"></div>
+                    <div class="dot green"></div>
+                </div>
+                <div class="mockup-body">
+                    <h3 style="color: white; margin-bottom: 20px;">Đấu Giá Đang Diễn Ra</h3>
+                    <div class="auction-item-ui">
+                        <div class="bid-info">
+                            <h4>Laptop Gaming ROG</h4>
+                            <span>Người đấu giá: truong_dev</span>
+                        </div>
+                        <div class="bid-price">25.500.000 VNĐ</div>
+                    </div>
+                    <div class="auction-item-ui">
+                        <div class="bid-info">
+                            <h4>iPhone 15 Pro Max</h4>
+                            <span>Người đấu giá: nino_tutor</span>
+                        </div>
+                        <div class="bid-price">32.000.000 VNĐ</div>
+                    </div>
+                    <div class="auction-item-ui">
+                        <div class="bid-info">
+                            <h4>Màn hình 4K Dell</h4>
+                            <span>Người đấu giá: student_01</span>
+                        </div>
+                        <div class="bid-price">8.200.000 VNĐ</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="project-features">
+            <h2 class="section-title">Các Chức Năng Chính</h2>
+            <div class="feature-grid">
+                <div class="feature-box">
+                    <i class="fa-solid fa-gavel"></i>
+                    <h3>Đấu Giá Thực</h3>
+                    <p>Cập nhật giá thầu ngay lập tức mà không cần tải lại trang, đảm bảo tính cạnh tranh cao nhất.</p>
+                </div>
+                <div class="feature-box">
+                    <i class="fa-solid fa-database"></i>
+                    <h3>Quản Lý Dữ Liệu</h3>
+                    <p>Sử dụng MySQL để lưu trữ hàng ngàn giao dịch, thông tin người dùng và lịch sử đấu giá một cách an toàn.</p>
+                </div>
+                <div class="feature-box">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <h3>Bảo Mật Cao</h3>
+                    <p>Hệ thống xác thực người dùng và kiểm soát quyền hạn chặt chẽ cho từng phiên đấu giá.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Hoàng Mạnh Trường. Designed and Built with ❤️</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 2 — Kỹ Năng Tìm Kiếm Thông Tin Học Thuật | CNS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/common.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --blue:#3b82f6; --cyan:#06b6d4; --green:#22c55e;
+            --orange:#f97316; --red:#ef4444; --purple:#a855f7; --yellow:#facc15;
+        }
+        body { background:#050810; overflow-x:hidden; }
+
+        .layout {
+            display:grid;
+            grid-template-columns:260px 1fr;
+            gap:32px;
+            max-width:1140px;
+            margin:0 auto;
+            padding:120px 24px 100px;
+            align-items:start;
+        }
+
+        /* ── Sidebar ── */
+        .sidebar { position:sticky; top:100px; }
+        .sidebar-card {
+            background:rgba(255,255,255,0.03);
+            border:1px solid rgba(255,255,255,0.07);
+            border-radius:20px;
+            padding:20px;
+            margin-bottom:16px;
+        }
+        .sidebar-title {
+            font-size:0.7rem; font-weight:700;
+            text-transform:uppercase; letter-spacing:1.5px;
+            color:rgba(255,255,255,0.3); margin-bottom:14px;
+        }
+
+        /* Progress ring */
+        .progress-ring-wrap { display:flex; flex-direction:column; align-items:center; padding:8px 0 4px; }
+        .ring-svg { transform:rotate(-90deg); }
+        .ring-bg  { fill:none; stroke:rgba(255,255,255,0.06); stroke-width:8; }
+        .ring-fill{ fill:none; stroke:url(#ringGrad2); stroke-width:8; stroke-linecap:round; transition:stroke-dashoffset 0.6s cubic-bezier(0.23,1,0.32,1); }
+        .ring-label{ font-size:1.8rem; font-weight:800; color:#f8fafc; margin-top:-4px; }
+        .ring-sub  { font-size:0.72rem; color:rgba(255,255,255,0.35); margin-top:2px; }
+
+        /* Section nav */
+        .sec-nav-item {
+            display:flex; align-items:center; gap:10px;
+            padding:7px 10px; border-radius:10px; cursor:pointer;
+            transition:background 0.2s; font-size:0.82rem;
+            color:rgba(255,255,255,0.45); text-decoration:none;
+        }
+        .sec-nav-item:hover { background:rgba(255,255,255,0.05); color:#fff; }
+        .sec-nav-item.done { color:var(--purple); }
+        .snav-dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.15); flex-shrink:0; transition:background 0.3s; }
+        .sec-nav-item.done .snav-dot { background:var(--purple); }
+
+        /* Meta */
+        .meta-row {
+            display:flex; align-items:center; gap:10px;
+            padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05);
+            font-size:0.82rem; color:rgba(255,255,255,0.45);
+        }
+        .meta-row:last-child { border-bottom:none; }
+        .meta-row i { width:16px; text-align:center; }
+
+        /* ── Main ── */
+        .breadcrumb {
+            display:flex; align-items:center; gap:7px;
+            font-size:0.78rem; color:rgba(255,255,255,0.3); margin-bottom:28px;
+        }
+        .breadcrumb a { color:rgba(255,255,255,0.3); text-decoration:none; transition:color 0.2s; }
+        .breadcrumb a:hover { color:var(--purple); }
+
+        .hero-badge {
+            display:inline-flex; align-items:center; gap:6px;
+            padding:4px 14px; border-radius:50px;
+            background:rgba(168,85,247,0.1); border:1px solid rgba(168,85,247,0.22);
+            color:#c084fc; font-size:0.75rem; font-weight:700;
+            letter-spacing:0.5px; margin-bottom:14px;
+        }
+        .hero-title { font-size:2rem; font-weight:800; color:#f8fafc; line-height:1.25; margin-bottom:12px; }
+        .hero-title span { background:linear-gradient(135deg,var(--purple),var(--cyan)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .hero-desc { color:rgba(255,255,255,0.48); font-size:0.95rem; line-height:1.7; max-width:640px; margin-bottom:28px; }
+
+        /* Score banner */
+        .score-banner {
+            display:flex; align-items:center; gap:16px;
+            padding:16px 22px;
+            background:linear-gradient(135deg,rgba(168,85,247,0.08),rgba(6,182,212,0.04));
+            border:1px solid rgba(168,85,247,0.2); border-radius:16px; margin-bottom:36px;
+        }
+        .score-big { font-size:2.2rem; font-weight:800; color:var(--purple); line-height:1; }
+        .score-info .s-label { font-size:0.72rem; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:1px; }
+        .score-info .s-val   { font-size:0.9rem; color:rgba(255,255,255,0.7); margin-top:2px; }
+
+        /* Section header */
+        .section-hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+        .section-hdr h2 { font-size:1.05rem; font-weight:700; color:#f8fafc; display:flex; align-items:center; gap:8px; }
+        .section-hdr h2 i { color:var(--purple); }
+
+        /* ── Accordion Section Card ── */
+        .sec-card {
+            background:rgba(255,255,255,0.025);
+            border:1px solid rgba(255,255,255,0.07);
+            border-radius:20px; margin-bottom:14px; overflow:hidden;
+            transition:border-color 0.3s, box-shadow 0.3s;
+            scroll-margin-top:110px;
+        }
+        .sec-card:hover { border-color:rgba(168,85,247,0.25); box-shadow:0 4px 24px rgba(168,85,247,0.07); }
+        .sec-card.read { border-color:rgba(168,85,247,0.22); background:rgba(168,85,247,0.03); }
+
+        .sec-head {
+            display:flex; align-items:center; gap:14px;
+            padding:18px 22px; cursor:pointer; user-select:none;
+        }
+        .sec-num-badge {
+            width:34px; height:34px; border-radius:10px;
+            background:rgba(168,85,247,0.14); color:#c084fc;
+            display:flex; align-items:center; justify-content:center;
+            font-weight:800; font-size:0.85rem; flex-shrink:0;
+            transition:background 0.3s, color 0.3s;
+        }
+        .sec-card.read .sec-num-badge { background:rgba(168,85,247,0.25); color:#e879f9; }
+
+        .sec-head-text { flex:1; }
+        .sec-head-title { font-size:0.92rem; font-weight:700; color:#f8fafc; }
+        .sec-head-sub   { font-size:0.72rem; color:rgba(255,255,255,0.28); margin-top:2px; }
+
+        .sec-read-btn {
+            width:28px; height:28px; border-radius:50%;
+            border:2px solid rgba(255,255,255,0.12); background:none;
+            cursor:pointer; display:flex; align-items:center; justify-content:center;
+            color:transparent; transition:all 0.25s; flex-shrink:0;
+        }
+        .sec-read-btn:hover { border-color:var(--purple); color:var(--purple); }
+        .sec-card.read .sec-read-btn { background:var(--purple); border-color:var(--purple); color:#fff; }
+
+        .expand-icon { color:rgba(255,255,255,0.2); font-size:0.75rem; transition:transform 0.3s, color 0.2s; flex-shrink:0; }
+        .sec-card.open .expand-icon { transform:rotate(180deg); color:var(--purple); }
+
+        .sec-body { max-height:0; overflow:hidden; transition:max-height 0.45s cubic-bezier(0.23,1,0.32,1); }
+        .sec-card.open .sec-body { max-height:3000px; }
+        .sec-body-inner { padding:0 22px 22px; border-top:1px solid rgba(255,255,255,0.05); padding-top:18px; }
+
+        /* Content styles */
+        .prose { font-size:0.88rem; color:rgba(255,255,255,0.55); line-height:1.75; margin-bottom:14px; }
+        .prose strong { color:rgba(255,255,255,0.85); }
+        .prose em { color:#c084fc; font-style:italic; }
+
+        .topic-box {
+            background:linear-gradient(135deg,rgba(168,85,247,0.08),rgba(6,182,212,0.04));
+            border:1px solid rgba(168,85,247,0.2); border-radius:14px;
+            padding:16px 20px; margin-bottom:16px; text-align:center;
+        }
+        .topic-box .topic-label { font-size:0.72rem; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+        .topic-box .topic-text  { font-size:1rem; font-weight:700; color:#e879f9; font-style:italic; }
+
+        /* Bullet list */
+        .bullet-list { list-style:none; padding:0; margin:0 0 14px; }
+        .bullet-list li {
+            display:flex; align-items:flex-start; gap:10px;
+            font-size:0.86rem; color:rgba(255,255,255,0.55);
+            line-height:1.6; padding:5px 0;
+            border-bottom:1px solid rgba(255,255,255,0.04);
+        }
+        .bullet-list li:last-child { border-bottom:none; }
+        .bullet-list li .bi { color:var(--purple); flex-shrink:0; margin-top:3px; font-size:0.7rem; }
+
+        /* Keyword chips */
+        .kw-chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+        .kw-chip {
+            padding:5px 14px; border-radius:50px;
+            background:rgba(168,85,247,0.1); border:1px solid rgba(168,85,247,0.22);
+            color:#c084fc; font-size:0.78rem; font-family:'JetBrains Mono',monospace;
+        }
+
+        /* Source cards */
+        .source-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
+        .source-card {
+            background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07);
+            border-radius:14px; padding:14px 16px;
+            transition:border-color 0.3s, transform 0.3s;
+        }
+        .source-card:hover { border-color:rgba(168,85,247,0.3); transform:translateY(-2px); }
+        .source-card .sc-num { font-size:0.7rem; color:rgba(255,255,255,0.3); margin-bottom:4px; }
+        .source-card .sc-title { font-size:0.82rem; font-weight:700; color:#f8fafc; margin-bottom:3px; line-height:1.4; }
+        .source-card .sc-meta  { font-size:0.72rem; color:rgba(255,255,255,0.35); }
+        .source-card .sc-stars { margin-top:8px; color:var(--yellow); font-size:0.7rem; }
+
+        /* Reliability table */
+        .rel-table { width:100%; border-collapse:collapse; font-size:0.82rem; margin-bottom:14px; }
+        .rel-table th {
+            text-align:left; padding:10px 14px;
+            background:rgba(168,85,247,0.1); color:#c084fc;
+            font-size:0.72rem; text-transform:uppercase; letter-spacing:0.5px;
+            border-bottom:1px solid rgba(168,85,247,0.2);
+        }
+        .rel-table td {
+            padding:10px 14px; color:rgba(255,255,255,0.55);
+            border-bottom:1px solid rgba(255,255,255,0.04); vertical-align:top;
+        }
+        .rel-table tr:hover td { background:rgba(255,255,255,0.02); }
+        .rel-table .badge-strong { color:var(--green); font-weight:700; }
+        .rel-table .badge-medium { color:var(--yellow); font-weight:700; }
+        .rel-table .badge-weak   { color:rgba(255,255,255,0.35); }
+
+        /* Detail analysis card */
+        .analysis-card {
+            background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.07);
+            border-radius:16px; padding:18px 20px; margin-bottom:12px;
+            transition:border-color 0.3s;
+        }
+        .analysis-card:hover { border-color:rgba(168,85,247,0.25); }
+        .analysis-card .ac-header { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+        .analysis-card .ac-num { width:28px; height:28px; border-radius:8px; background:rgba(168,85,247,0.15); color:#c084fc; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.78rem; flex-shrink:0; }
+        .analysis-card .ac-title { font-size:0.9rem; font-weight:700; color:#f8fafc; }
+        .analysis-card .ac-year  { font-size:0.72rem; color:rgba(255,255,255,0.3); margin-left:auto; }
+
+        .pro-con-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
+        .pro-box, .con-box {
+            border-radius:10px; padding:10px 14px; font-size:0.8rem; line-height:1.6;
+        }
+        .pro-box { background:rgba(34,197,94,0.07); border:1px solid rgba(34,197,94,0.15); color:rgba(255,255,255,0.55); }
+        .pro-box .pc-label { color:var(--green); font-weight:700; font-size:0.72rem; text-transform:uppercase; margin-bottom:5px; }
+        .con-box { background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.15); color:rgba(255,255,255,0.55); }
+        .con-box .pc-label { color:#f87171; font-weight:700; font-size:0.72rem; text-transform:uppercase; margin-bottom:5px; }
+
+        .verdict-row {
+            display:flex; align-items:center; gap:8px;
+            padding:8px 12px; border-radius:8px;
+            background:rgba(168,85,247,0.07); border:1px solid rgba(168,85,247,0.15);
+            font-size:0.8rem; color:rgba(255,255,255,0.6);
+        }
+        .verdict-row i { color:var(--purple); }
+
+        /* Stars rating */
+        .stars-5 { color:var(--yellow); }
+        .stars-4 { color:var(--yellow); }
+        .stars-3 { color:var(--orange); }
+        .stars-2 { color:rgba(255,255,255,0.3); }
+
+        /* Group badges */
+        .group-section { margin-bottom:20px; }
+        .group-label { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+        .group-label.core    { color:var(--green); }
+        .group-label.support { color:var(--blue); }
+        .group-label.limited { color:rgba(255,255,255,0.35); }
+        .group-chips { display:flex; flex-wrap:wrap; gap:8px; }
+        .group-chip {
+            padding:5px 14px; border-radius:50px; font-size:0.8rem; font-weight:600;
+        }
+        .group-chip.core    { background:rgba(34,197,94,0.1);  border:1px solid rgba(34,197,94,0.25);  color:var(--green); }
+        .group-chip.support { background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.25); color:#60a5fa; }
+        .group-chip.limited { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.4); }
+
+        /* Conclusion box */
+        .conclusion-box {
+            background:linear-gradient(135deg,rgba(168,85,247,0.07),rgba(6,182,212,0.03));
+            border:1px solid rgba(168,85,247,0.18); border-radius:18px; padding:22px 24px; margin-top:8px;
+        }
+        .conclusion-box h4 { font-size:0.9rem; font-weight:700; color:#e879f9; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+
+        /* Image slot */
+        .img-wrap { margin-top:14px; }
+        .img-placeholder {
+            width:100%; border:2px dashed rgba(168,85,247,0.2); border-radius:12px;
+            padding:20px; text-align:center; cursor:pointer;
+            transition:border-color 0.3s, background 0.3s;
+            background:rgba(168,85,247,0.02); position:relative; box-sizing:border-box; display:block;
+        }
+        .img-placeholder:hover { border-color:rgba(168,85,247,0.5); background:rgba(168,85,247,0.06); }
+        .img-placeholder input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+        .img-preview { width:100%; border-radius:12px; border:1px solid rgba(255,255,255,0.07); display:block; max-height:340px; object-fit:contain; background:rgba(0,0,0,0.25); cursor:zoom-in; }
+        .img-actions { display:flex; gap:8px; margin-top:8px; }
+        .btn-img-change { font-size:0.73rem; padding:5px 12px; border-radius:50px; border:1px solid rgba(168,85,247,0.28); background:rgba(168,85,247,0.07); color:#c084fc; cursor:pointer; font-family:'Outfit',sans-serif; transition:all 0.2s; position:relative; overflow:hidden; }
+        .btn-img-change input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; }
+        .btn-img-change:hover { background:rgba(168,85,247,0.18); }
+        .btn-img-remove { font-size:0.73rem; padding:5px 12px; border-radius:50px; border:1px solid rgba(239,68,68,0.25); background:rgba(239,68,68,0.06); color:#f87171; cursor:pointer; font-family:'Outfit',sans-serif; transition:all 0.2s; }
+        .btn-img-remove:hover { background:rgba(239,68,68,0.16); }
+
+        /* Back btn */
+        .back-btn { display:inline-flex; align-items:center; gap:8px; padding:11px 22px; border-radius:50px; border:1px solid rgba(168,85,247,0.25); background:rgba(168,85,247,0.07); color:#c084fc; text-decoration:none; font-size:0.85rem; font-weight:600; transition:all 0.3s; margin-top:28px; }
+        .back-btn:hover { background:rgba(168,85,247,0.18); border-color:rgba(168,85,247,0.5); transform:translateX(-3px); }
+
+        .nav-btns{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;}
+        .nav-btn-prev,.nav-btn-next{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:50px;font-size:0.85rem;font-weight:600;text-decoration:none;transition:all 0.3s;}
+        .nav-btn-prev{border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.45);}
+        .nav-btn-prev:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.2);color:#fff;transform:translateX(-3px);}
+        .nav-btn-next{border:1px solid rgba(168,85,247,0.3);background:rgba(168,85,247,0.08);color:#c084fc;margin-left:auto;}
+        .nav-btn-next:hover{background:rgba(168,85,247,0.2);border-color:#a855f7;color:#fff;transform:translateX(3px);}
+
+        /* Admin FAB */
+        .admin-fab { padding:10px 18px; border-radius:50px; border:1px solid rgba(168,85,247,0.25); background:rgba(168,85,247,0.1); color:#c084fc; font-family:'Outfit',sans-serif; font-size:0.82rem; font-weight:700; cursor:pointer; transition:all 0.3s; }
+        .admin-fab.logged { background:rgba(34,197,94,0.12); border-color:rgba(34,197,94,0.3); color:var(--green); }
+
+        @media(max-width:768px){ .layout{grid-template-columns:1fr;padding-top:100px;} .sidebar{position:static;} .source-grid,.pro-con-grid{grid-template-columns:1fr;} }
+    </style>
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <nav class="navbar-unified">
+        <a href="../index.html" class="nav-logo"><i class="fa-solid fa-circle-user"></i> Mtruong<span>_dev</span></a>
+        <ul class="nav-links-unified">
+            <li><a href="../index.html">Trang Chủ</a></li>
+            <li><a href="about.html">Cá Nhân ▾</a>
+                <ul class="nav-dropdown">
+                    <li><a href="about.html">Về Tôi</a></li>
+                    <li><a href="education.html">Học Vấn</a></li>
+                    <li><a href="skills.html">Kỹ Năng</a></li>
+                    <li><a href="experience.html">Kinh Nghiệm</a></li>
+                </ul>
+            </li>
+            <li><a href="research_hub.html">Nghiên Cứu</a></li>
+            <li><a href="blog.html">Kiến Thức</a></li>
+            <li><a href="muctieu.html">Mục Tiêu</a></li>
+            <li><a href="cns.html">Bài Tập CNS</a></li>
+        </ul>
+        <div id="auth-controls" class="nav-auth">
+            <button class="theme-toggle" title="Chuyển chế độ"><i class="fa-solid fa-moon"></i></button>
+        </div>
+    </nav>
+
+    <div class="layout">
+        <!-- ── SIDEBAR ── -->
+        <aside class="sidebar">
+            <div class="sidebar-card">
+                <div class="sidebar-title">Tiến độ đọc</div>
+                <div class="progress-ring-wrap">
+                    <svg class="ring-svg" width="100" height="100" viewBox="0 0 100 100">
+                        <defs>
+                            <linearGradient id="ringGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#a855f7"/>
+                                <stop offset="100%" stop-color="#06b6d4"/>
+                            </linearGradient>
+                        </defs>
+                        <circle class="ring-bg" cx="50" cy="50" r="40"/>
+                        <circle class="ring-fill" id="ring-fill" cx="50" cy="50" r="40" stroke-dasharray="251.2" stroke-dashoffset="251.2"/>
+                    </svg>
+                    <div class="ring-label" id="ring-pct">0%</div>
+                    <div class="ring-sub" id="ring-sub">0 / 7 mục</div>
+                </div>
+            </div>
+            <div class="sidebar-card">
+                <div class="sidebar-title">Mục lục</div>
+                <div id="sec-nav"></div>
+            </div>
+            <div class="sidebar-card">
+                <div class="sidebar-title">Thông tin bài</div>
+                <div class="meta-row"><i class="fa-solid fa-calendar" style="color:var(--purple)"></i> Hạn nộp: 22/03/2026</div>
+                <div class="meta-row"><i class="fa-solid fa-clock" style="color:var(--cyan)"></i> ~60 phút</div>
+                <div class="meta-row"><i class="fa-solid fa-star" style="color:var(--yellow)"></i> Điểm: <strong style="color:var(--purple);margin-left:4px;">— / 10</strong></div>
+                <div class="meta-row"><i class="fa-solid fa-tag" style="color:var(--blue)"></i> Báo cáo học thuật</div>
+                <div class="meta-row"><i class="fa-solid fa-book" style="color:var(--green)"></i> 10 tài liệu tham khảo</div>
+            </div>
+        </aside>
+
+        <!-- ── MAIN ── -->
+        <main>
+            <div class="breadcrumb">
+                <a href="cns.html"><i class="fa-solid fa-layer-group"></i> Bài Tập CNS</a>
+                <i class="fa-solid fa-chevron-right" style="font-size:0.55rem"></i>
+                <span>Chương 1</span>
+                <i class="fa-solid fa-chevron-right" style="font-size:0.55rem"></i>
+                <span style="color:rgba(255,255,255,0.55)">Bài 2</span>
+            </div>
+
+            <div class="hero-badge"><i class="fa-solid fa-magnifying-glass"></i> Chương 1 · Báo cáo</div>
+            <h1 class="hero-title">
+                Kỹ Năng Tìm Kiếm &<br>
+                <span>Đánh Giá Thông Tin Học Thuật</span>
+            </h1>
+            <p class="hero-desc">
+                Báo cáo về kỹ năng tìm kiếm, chọn lọc và đánh giá độ tin cậy của 10 nguồn tài liệu học thuật về chủ đề <em style="color:#c084fc">"Ứng dụng AI trong giáo dục đại học"</em>.
+            </p>
+
+            <div class="score-banner">
+                <div class="score-big" style="color:var(--purple)">10</div>
+                <div class="score-info">
+                    <div class="s-label">Tài liệu tham khảo</div>
+                    <div class="s-val">Báo cáo học thuật · Chương 1 · Bài 2</div>
+                </div>
+                <i class="fa-solid fa-book-open" style="font-size:1.8rem;color:var(--purple);opacity:0.6"></i>
+            </div>
+
+            <div class="section-hdr">
+                <h2><i class="fa-solid fa-list"></i> Nội dung báo cáo</h2>
+                <button class="btn-reset-all" onclick="resetAll()" style="font-size:0.72rem;padding:5px 12px;border-radius:50px;border:1px solid rgba(255,255,255,0.1);background:none;color:rgba(255,255,255,0.3);cursor:pointer;font-family:'Outfit',sans-serif;">
+                    <i class="fa-solid fa-rotate-left"></i> Reset
+                </button>
+            </div>
+
+            <div id="sections-list"></div>
+
+            <a href="cns.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Quay lại danh sách bài tập</a>
+            <div class="nav-btns">
+                <a href="cns_bai1.html" class="nav-btn-prev"><i class="fa-solid fa-chevron-left"></i> Bài 1: Quản lý tệp</a>
+                <a href="cns_bai3.html" class="nav-btn-next">Bài 3: Viết Prompt <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+        </main>
+    </div>
+
+    <footer class="tutor-footer">
+        <div class="footer-content">
+            <p>&copy; 2026 Hoàng Mạnh Trường. Học để hiểu, không chỉ để qua môn.</p>
+        </div>
+    </footer>
+
+    <!-- Admin Modal -->
+    <div id="admin-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:10001;justify-content:center;align-items:center;backdrop-filter:blur(12px);">
+        <div style="background:rgba(8,12,35,0.98);border:1px solid rgba(168,85,247,0.22);border-radius:28px;padding:2rem;width:300px;text-align:center;">
+            <i class="fa-solid fa-shield-halved" style="font-size:2rem;color:var(--purple);margin-bottom:1rem;display:block;"></i>
+            <h3 style="margin-bottom:1.2rem;font-size:0.95rem;color:#f8fafc;">Xác thực Admin</h3>
+            <input type="password" id="admin-pwd" placeholder="Mật khẩu..."
+                style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:11px;border-radius:12px;font-family:'Outfit',sans-serif;margin-bottom:12px;text-align:center;letter-spacing:5px;transition:border-color 0.3s;"
+                onkeydown="if(event.key==='Enter')checkPwd()">
+            <button onclick="checkPwd()" style="width:100%;padding:11px;border-radius:12px;border:none;background:linear-gradient(135deg,#a855f7,#06b6d4);color:#fff;font-family:'Outfit',sans-serif;font-weight:700;cursor:pointer;margin-bottom:8px;">Xác nhận</button>
+            <button onclick="closeModal()" style="background:none;border:none;color:rgba(255,255,255,0.3);cursor:pointer;font-family:'Outfit',sans-serif;font-size:0.82rem;">Hủy</button>
+        </div>
+    </div>
+    <div style="position:fixed;bottom:24px;right:24px;z-index:999;">
+        <button id="admin-fab" class="admin-fab" onclick="toggleAdmin()"><i class="fa-solid fa-lock"></i> Admin</button>
+    </div>
+
+    <script>
+    const sections = [
+      { id:1, title:"I. Giới thiệu", sub:"Mục tiêu & phạm vi nghiên cứu",
+        render: () => `
+          <div class="prose">Trong bối cảnh bùng nổ thông tin hiện nay, việc tìm kiếm và đánh giá nguồn tài liệu học thuật đáng tin cậy là một kỹ năng quan trọng đối với sinh viên. Báo cáo này nhằm rèn luyện khả năng tìm kiếm, chọn lọc và đánh giá các nguồn thông tin liên quan đến một chủ đề cụ thể.</div>
+          <div class="topic-box">
+            <div class="topic-label">Chủ đề lựa chọn</div>
+            <div class="topic-text">"Ứng dụng Trí tuệ nhân tạo (AI) trong giáo dục đại học"</div>
+          </div>
+          <div class="prose"><strong>Phạm vi nghiên cứu:</strong></div>
+          <ul class="bullet-list">
+            <li><i class="bi fa-solid fa-circle-dot"></i> Tập trung vào các ứng dụng AI trong giảng dạy, học tập và quản lý giáo dục</li>
+            <li><i class="bi fa-solid fa-circle-dot"></i> Các nghiên cứu từ năm 2018 trở lại đây</li>
+            <li><i class="bi fa-solid fa-circle-dot"></i> Ưu tiên bài báo khoa học, sách chuyên khảo và nguồn uy tín</li>
+          </ul>`
+      },
+      { id:2, title:"II. Phương pháp tìm kiếm", sub:"Nguồn & từ khóa sử dụng",
+        render: () => `
+          <div class="prose"><strong>Các nguồn đã sử dụng:</strong></div>
+          <ul class="bullet-list">
+            <li><i class="bi fa-solid fa-database"></i> Google Scholar</li>
+            <li><i class="bi fa-solid fa-database"></i> Tạp chí khoa học: IEEE, Springer, Elsevier</li>
+            <li><i class="bi fa-solid fa-database"></i> Sách chuyên khảo</li>
+            <li><i class="bi fa-solid fa-database"></i> Các nguồn mở (website học thuật, báo cáo tổ chức giáo dục)</li>
+          </ul>
+          <div class="prose" style="margin-top:14px"><strong>Từ khóa tìm kiếm:</strong></div>
+          <div class="kw-chips">
+            <span class="kw-chip">"Artificial Intelligence in Education"</span>
+            <span class="kw-chip">"AI in higher education"</span>
+            <span class="kw-chip">"Machine learning in teaching"</span>
+            <span class="kw-chip">"Educational technology AI"</span>
+          </div>`
+      },
+      { id:3, title:"III. Danh sách tài liệu", sub:"10 tài liệu tham khảo",
+        render: () => `
+          <div class="source-grid">
+            ${[
+              {n:1, t:"Artificial Intelligence in Education", a:"Holmes, W. et al.", y:"2019", pub:"Springer", stars:5},
+              {n:2, t:"Machine Learning and Human Intelligence", a:"Luckin, R.", y:"2018", pub:"UCL Press", stars:4},
+              {n:3, t:"Systematic review of AI in higher education", a:"Zawacki-Richter, O. et al.", y:"2019", pub:"Int. J. Educational Technology", stars:5},
+              {n:4, t:"AI in education: A review", a:"Chen, L. et al.", y:"2020", pub:"IEEE Access", stars:5},
+              {n:5, t:"Educational data mining", a:"Baker, R. & Inventado, P.", y:"2018", pub:"Handbook of Learning Analytics", stars:4},
+              {n:6, t:"State of AI in education", a:"Holmes, W. & Tuomi, I.", y:"2022", pub:"Computers and Education", stars:5},
+              {n:7, t:"Evolution of AI in education", a:"Roll, I. & Wylie, R.", y:"2016", pub:"IJAIED", stars:3},
+              {n:8, t:"AI and Education Guidance", a:"UNESCO", y:"2021", pub:"UNESCO", stars:5},
+              {n:9, t:"AI in Education Report", a:"OECD", y:"2020", pub:"OECD", stars:4},
+              {n:10, t:"EdTech and AI", a:"World Bank", y:"2021", pub:"World Bank", stars:4}
+            ].map(s => `
+              <div class="source-card">
+                <div class="sc-num">[${s.n}] ${s.y}</div>
+                <div class="sc-title">${s.t}</div>
+                <div class="sc-meta">${s.a} · ${s.pub}</div>
+                <div class="sc-stars">${'★'.repeat(s.stars)}${'☆'.repeat(5-s.stars)}</div>
+              </div>`).join('')}
+          </div>`
+      },
+      { id:4, title:"IV. Khung tiêu chí đánh giá", sub:"7 tiêu chí đánh giá độ tin cậy",
+        render: () => `
+          <div class="prose">Mỗi tài liệu được đánh giá theo <strong>7 tiêu chí</strong>:</div>
+          <table class="rel-table">
+            <thead><tr><th>#</th><th>Tiêu chí</th><th>Mô tả</th></tr></thead>
+            <tbody>
+              ${[
+                [1,"Tác giả (Authority)","Chuyên môn, học hàm, tổ chức của tác giả"],
+                [2,"Nguồn xuất bản (Publisher)","Uy tín của nhà xuất bản / tạp chí"],
+                [3,"Phương pháp (Methodology)","Tính khoa học của phương pháp nghiên cứu"],
+                [4,"Trích dẫn (Impact)","Số lượt trích dẫn, ảnh hưởng học thuật"],
+                [5,"Tính cập nhật (Currency)","Năm xuất bản, mức độ phù hợp thời điểm"],
+                [6,"Hạn chế (Limitations)","Điểm yếu, phạm vi giới hạn của tài liệu"],
+                [7,"Phù hợp đề tài (Relevance)","Mức độ liên quan đến chủ đề nghiên cứu"]
+              ].map(r => `<tr><td style="color:var(--purple);font-weight:700">${r[0]}</td><td style="color:#f8fafc;font-weight:600">${r[1]}</td><td>${r[2]}</td></tr>`).join('')}
+            </tbody>
+          </table>`
+      },
+      { id:5, title:"V. Phân tích chi tiết", sub:"Đánh giá từng tài liệu",
+        render: () => `
+          ${[
+            { n:1, t:"Holmes et al. (2019)", verdict:"Rất đáng tin cậy, phù hợp làm tài liệu nền tảng",
+              pros:["Bao quát toàn diện lĩnh vực AI trong giáo dục","Được trích dẫn rộng rãi → ảnh hưởng học thuật cao"],
+              cons:["Thiên về lý thuyết, thiếu dữ liệu thực nghiệm","Một số nội dung nhanh lỗi thời do công nghệ thay đổi nhanh"], stars:5 },
+            { n:2, t:"Luckin (2018)", verdict:"Tin cậy cao nhưng mang tính định hướng hơn là ứng dụng",
+              pros:["Lập luận sâu sắc về mối quan hệ AI – con người","Góc nhìn triết học và giáo dục rất giá trị"],
+              cons:["Không tập trung riêng vào giáo dục đại học","Thiếu minh chứng thực nghiệm"], stars:4 },
+            { n:3, t:"Zawacki-Richter et al. (2019)", verdict:"Nguồn rất mạnh, nên dùng làm trụ cột trong bài",
+              pros:["Phân tích có hệ thống hàng trăm nghiên cứu","Phương pháp Systematic Review chặt chẽ"],
+              cons:["Phụ thuộc vào chất lượng nghiên cứu được chọn","Không cung cấp giải pháp cụ thể"], stars:5 },
+            { n:4, t:"Chen et al. (2020) – IEEE", verdict:"Rất tin cậy, nhưng cần kết hợp nguồn giáo dục",
+              pros:["Cập nhật công nghệ AI mới nhất","Có yếu tố kỹ thuật rõ ràng"],
+              cons:["Ít bàn về khía cạnh giáo dục sâu","Thiên về công nghệ hơn pedagogy"], stars:5 },
+            { n:5, t:"Baker & Inventado (2018)", verdict:"Tốt cho phần kỹ thuật chuyên sâu",
+              pros:["Nền tảng dữ liệu mạnh","Giải thích rõ cách AI phân tích hành vi học tập"],
+              cons:["Phạm vi hẹp (data mining)","Không bao quát toàn bộ AI"], stars:4 },
+            { n:6, t:"Holmes & Tuomi (2022)", verdict:"Rất giá trị cho phần xu hướng tương lai",
+              pros:["Phản ánh xu hướng AI hiện đại","Có phân tích chính sách giáo dục"],
+              cons:["Một số nhận định còn mang tính dự đoán","Chưa có nhiều kiểm chứng dài hạn"], stars:5 },
+            { n:7, t:"Roll & Wylie (2016)", verdict:"Trung bình – chỉ nên dùng làm nền lịch sử",
+              pros:["Cho thấy tiến hóa của AI trong giáo dục","Có giá trị lịch sử học thuật"],
+              cons:["Không phản ánh công nghệ mới (deep learning, GPT…)","Hơi cũ so với xu hướng hiện tại"], stars:3 },
+            { n:8, t:"UNESCO (2021)", verdict:"Rất đáng tin, phù hợp phần định hướng chính sách",
+              pros:["Quan điểm chính sách toàn cầu","Độ tin cậy cực cao từ tổ chức quốc tế"],
+              cons:["Không đi sâu kỹ thuật","Mang tính khuyến nghị hơn là phân tích"], stars:5 },
+            { n:9, t:"OECD (2020)", verdict:"Tốt cho phần phân tích vĩ mô",
+              pros:["Có dữ liệu thống kê lớn","Phân tích tác động kinh tế – giáo dục"],
+              cons:["Ít chi tiết về công nghệ AI","Không chuyên sâu kỹ thuật"], stars:4 },
+            { n:10, t:"World Bank (2021)", verdict:"Tin cậy cao, hữu ích cho ví dụ thực tế",
+              pros:["Dữ liệu thực tế từ nhiều quốc gia","Có case study minh họa"],
+              cons:["Tập trung vào nước đang phát triển","Không chuyên sâu kỹ thuật"], stars:4 }
+          ].map(a => `
+            <div class="analysis-card">
+              <div class="ac-header">
+                <div class="ac-num">${a.n}</div>
+                <div class="ac-title">${a.t}</div>
+                <div class="ac-year">${'★'.repeat(a.stars)}${'☆'.repeat(5-a.stars)}</div>
+              </div>
+              <div class="pro-con-grid">
+                <div class="pro-box"><div class="pc-label">✓ Ưu điểm</div>${a.pros.map(p=>`<div>• ${p}</div>`).join('')}</div>
+                <div class="con-box"><div class="pc-label">✗ Nhược điểm</div>${a.cons.map(c=>`<div>• ${c}</div>`).join('')}</div>
+              </div>
+              <div class="verdict-row"><i class="fa-solid fa-gavel"></i> <strong>Đánh giá:</strong>&nbsp;${a.verdict}</div>
+            </div>`).join('')}`
+      },
+      { id:6, title:"VI. Xếp hạng & So sánh", sub:"Phân nhóm tài liệu theo mức độ",
+        render: () => `
+          <div class="group-section">
+            <div class="group-label core"><i class="fa-solid fa-crown"></i> Nhóm rất mạnh (Core sources)</div>
+            <div class="group-chips">
+              <span class="group-chip core">Zawacki-Richter (2019)</span>
+              <span class="group-chip core">Holmes (2019)</span>
+              <span class="group-chip core">Holmes & Tuomi (2022)</span>
+              <span class="group-chip core">Chen (2020)</span>
+            </div>
+            <div class="prose" style="margin-top:8px;font-size:0.8rem">→ Dùng làm <strong>xương sống</strong> của bài</div>
+          </div>
+          <div class="group-section">
+            <div class="group-label support"><i class="fa-solid fa-layer-group"></i> Nhóm bổ trợ học thuật</div>
+            <div class="group-chips">
+              <span class="group-chip support">Luckin (2018)</span>
+              <span class="group-chip support">Baker (2018)</span>
+              <span class="group-chip support">UNESCO (2021)</span>
+              <span class="group-chip support">OECD (2020)</span>
+              <span class="group-chip support">World Bank (2021)</span>
+            </div>
+            <div class="prose" style="margin-top:8px;font-size:0.8rem">→ Dùng để <strong>mở rộng và phân tích</strong></div>
+          </div>
+          <div class="group-section">
+            <div class="group-label limited"><i class="fa-solid fa-clock-rotate-left"></i> Nhóm hạn chế / nền tảng</div>
+            <div class="group-chips">
+              <span class="group-chip limited">Roll & Wylie (2016)</span>
+            </div>
+            <div class="prose" style="margin-top:8px;font-size:0.8rem">→ Chỉ dùng để <strong>so sánh lịch sử</strong></div>
+          </div>`
+      },
+      { id:7, title:"VII. Kết luận", sub:"Nhận xét tổng hợp & danh mục Harvard",
+        render: () => `
+          <div class="conclusion-box">
+            <h4><i class="fa-solid fa-circle-check"></i> Nhận xét tổng hợp</h4>
+            <ul class="bullet-list">
+              <li><i class="bi fa-solid fa-circle-dot"></i> Các nguồn tài liệu có <strong>độ tin cậy cao</strong>, đa dạng về loại hình</li>
+              <li><i class="bi fa-solid fa-circle-dot"></i> Bài báo khoa học chiếm tỷ lệ lớn (&gt;50%)</li>
+              <li><i class="bi fa-solid fa-circle-dot"></i> Có sự cân bằng giữa: lý thuyết · thực nghiệm · chính sách</li>
+              <li><i class="bi fa-solid fa-circle-dot"></i> Nội dung cập nhật, đa số từ 2018–2022</li>
+              <li><i class="bi fa-solid fa-circle-dot"></i> Kết hợp nhiều loại nguồn giúp <strong>giảm sai lệch</strong> và tăng độ chính xác</li>
+            </ul>
+          </div>
+          <div class="prose" style="margin-top:20px"><strong>Danh mục tài liệu tham khảo (Harvard):</strong></div>
+          <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px 20px;font-size:0.8rem;color:rgba(255,255,255,0.5);line-height:2.2;font-family:'JetBrains Mono',monospace;">
+            Holmes, W. et al. (2019). <em>Artificial Intelligence in Education</em>. Springer.<br>
+            Luckin, R. (2018). <em>Machine Learning and Human Intelligence</em>. UCL Press.<br>
+            Zawacki-Richter, O. et al. (2019). "Systematic review of AI in higher education". <em>Int. J. Educational Technology</em>.<br>
+            Chen, L. et al. (2020). "AI in education: A review". <em>IEEE Access</em>.<br>
+            Baker, R. & Inventado, P. (2018). "Educational Data Mining". Springer.<br>
+            Holmes, W. & Tuomi, I. (2022). "State of AI in education". <em>Computers and Education</em>.<br>
+            Roll, I. & Wylie, R. (2016). "Evolution of AI in education". <em>IJAIED</em>.<br>
+            UNESCO (2021). <em>AI and Education Guidance</em>.<br>
+            OECD (2020). <em>AI in Education Report</em>.<br>
+            World Bank (2021). <em>EdTech and AI</em>.
+          </div>`
+      }
+    ];
+
+    const DONE_KEY = 'cns_bai2_read';
+    const IMGS_KEY = 'cns_bai2_imgs';
+    let readSecs = new Set(JSON.parse(localStorage.getItem(DONE_KEY) || '[]'));
+    let savedImgs = JSON.parse(localStorage.getItem(IMGS_KEY) || '{}');
+    let isAdmin = sessionStorage.getItem('cns_admin') === 'true';
+
+    function saveDone(){ localStorage.setItem(DONE_KEY, JSON.stringify([...readSecs])); }
+    function saveImgs(){ localStorage.setItem(IMGS_KEY, JSON.stringify(savedImgs)); }
+
+    function render(){
+        renderSections();
+        renderSideNav();
+        updateRing();
+    }
+
+    function renderSections(){
+        const container = document.getElementById('sections-list');
+        container.innerHTML = sections.map(s => {
+            const done = readSecs.has(s.id);
+            const imgSrc = savedImgs[s.id];
+            let imgSlot = '';
+            if(imgSrc){
+                imgSlot = `<div class="img-wrap">
+                    <img src="${imgSrc}" class="img-preview" onclick="zoomImg('${imgSrc}')">
+                    ${isAdmin ? `<div class="img-actions">
+                        <label class="btn-img-change"><i class="fa-solid fa-image"></i> Đổi ảnh<input type="file" accept="image/*" onchange="handleImg(event,${s.id})"></label>
+                        <button class="btn-img-remove" onclick="removeImg(${s.id})"><i class="fa-solid fa-trash"></i> Xóa</button>
+                    </div>` : ''}
+                </div>`;
+            } else if(isAdmin){
+                imgSlot = `<div class="img-wrap">
+                    <label class="img-placeholder">
+                        <div style="font-size:1.4rem;color:rgba(168,85,247,0.35);margin-bottom:5px;"><i class="fa-solid fa-image"></i></div>
+                        <div style="font-size:0.75rem;color:rgba(255,255,255,0.25);">Nhấp để chèn ảnh minh họa</div>
+                        <input type="file" accept="image/*" onchange="handleImg(event,${s.id})">
+                    </label>
+                </div>`;
+            }
+            return `
+                <div class="sec-card ${done?'read':''}" id="sec-${s.id}">
+                    <div class="sec-head" onclick="toggleSec(${s.id})">
+                        <div class="sec-num-badge">${done?'<i class="fa-solid fa-check" style="font-size:0.8rem"></i>':s.id}</div>
+                        <div class="sec-head-text">
+                            <div class="sec-head-title">${s.title}</div>
+                            <div class="sec-head-sub">${s.sub}</div>
+                        </div>
+                        <button class="sec-read-btn" onclick="event.stopPropagation();toggleRead(${s.id})" title="${done?'Bỏ đánh dấu':'Đánh dấu đã đọc'}">
+                            <i class="fa-solid fa-check" style="font-size:0.7rem"></i>
+                        </button>
+                        <i class="fa-solid fa-chevron-down expand-icon"></i>
+                    </div>
+                    <div class="sec-body">
+                        <div class="sec-body-inner">
+                            ${s.render()}
+                            ${imgSlot}
+                        </div>
+                    </div>
+                </div>`;
+        }).join('');
+    }
+
+    function renderSideNav(){
+        document.getElementById('sec-nav').innerHTML = sections.map(s => `
+            <a class="sec-nav-item ${readSecs.has(s.id)?'done':''}" onclick="scrollToSec(${s.id})">
+                <span class="snav-dot"></span>
+                <span>${s.title}</span>
+            </a>`).join('');
+    }
+
+    function updateRing(){
+        const pct = Math.round((readSecs.size / sections.length) * 100);
+        const circ = 251.2;
+        document.getElementById('ring-fill').style.strokeDashoffset = circ - (circ * pct / 100);
+        document.getElementById('ring-pct').textContent = pct + '%';
+        document.getElementById('ring-sub').textContent = `${readSecs.size} / ${sections.length} mục`;
+    }
+
+    function toggleSec(id){
+        const card = document.getElementById('sec-'+id);
+        card.classList.toggle('open');
+    }
+
+    function toggleRead(id){
+        if(readSecs.has(id)) readSecs.delete(id); else readSecs.add(id);
+        saveDone(); render();
+        document.getElementById('sec-'+id).classList.add('open');
+    }
+
+    function resetAll(){
+        if(!confirm('Reset toàn bộ tiến độ?')) return;
+        readSecs.clear(); saveDone(); render();
+    }
+
+    function scrollToSec(id){
+        const el = document.getElementById('sec-'+id);
+        if(!el) return;
+        el.classList.add('open');
+        el.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+
+    function handleImg(event, id){
+        if(!isAdmin) return;
+        const file = event.target.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = e => { savedImgs[id] = e.target.result; saveImgs(); render(); };
+        reader.readAsDataURL(file);
+    }
+
+    function removeImg(id){ if(!isAdmin) return; delete savedImgs[id]; saveImgs(); render(); }
+
+    function zoomImg(src){
+        const o = document.createElement('div');
+        o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.93);z-index:99999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;backdrop-filter:blur(10px);';
+        o.innerHTML = `<img src="${src}" style="max-width:92vw;max-height:90vh;border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,0.8);">`;
+        o.onclick = () => o.remove();
+        document.body.appendChild(o);
+    }
+
+    function toggleAdmin(){
+        if(isAdmin){ if(confirm('Đăng xuất Admin?')){ sessionStorage.removeItem('cns_admin'); isAdmin=false; updateFab(); render(); } }
+        else { document.getElementById('admin-modal').style.display='flex'; setTimeout(()=>document.getElementById('admin-pwd').focus(),80); }
+    }
+    function closeModal(){ document.getElementById('admin-modal').style.display='none'; document.getElementById('admin-pwd').value=''; }
+    function checkPwd(){
+        const pwd = document.getElementById('admin-pwd').value;
+        if(pwd==='1002'){ sessionStorage.setItem('cns_admin','true'); isAdmin=true; closeModal(); updateFab(); render(); }
+        else { const i=document.getElementById('admin-pwd'); i.style.borderColor='#ef4444'; setTimeout(()=>i.style.borderColor='',800); i.value=''; }
+    }
+    function updateFab(){
+        const fab = document.getElementById('admin-fab');
+        if(isAdmin){ fab.innerHTML='<i class="fa-solid fa-unlock"></i> Admin'; fab.className='admin-fab logged'; }
+        else { fab.innerHTML='<i class="fa-solid fa-lock"></i> Admin'; fab.className='admin-fab'; }
+    }
+
+    updateFab(); render();
+    setTimeout(()=>{ const f=document.getElementById('sec-1'); if(f) f.classList.add('open'); },100);
+    </script>
+    <script src="../assets/js/common.js"></script>
+</body>
+</html>

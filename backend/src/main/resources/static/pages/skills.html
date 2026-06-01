@@ -1,0 +1,827 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kỹ Năng Lập Trình - Hoàng Mạnh Trường</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/common.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .skills-page-container {
+            padding-top: 120px;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding-bottom: 80px;
+        }
+
+        .skills-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .skills-section {
+            margin-bottom: 50px;
+        }
+
+        .skills-category-title {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: #3b82f6;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .skill-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            justify-content: center;
+        }
+
+        .skill-item-card {
+            background: rgba(30, 41, 59, 0.5);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .skill-item-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.15);
+            background: rgba(30, 41, 59, 0.7);
+        }
+
+        .skill-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .skill-name { font-weight: 600; color: white; display: flex; align-items: center; gap: 8px; }
+        .skill-level { 
+            font-size: 0.8rem; 
+            font-weight: 700; 
+            padding: 2px 8px; 
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        
+        .level-proficient { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .level-intermediate { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .level-basic { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .level-learning { background: rgba(167, 139, 250, 0.2); color: #a78bfa; }
+
+        .progress-bar-bg {
+            height: 8px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 4px;
+        }
+
+        .progress-fill {
+            width: 0; /* Start at 0 for animation */
+            transition: width 1.5s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+        }
+
+        /* Cert badge */
+        .cert-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        .cert-badge:hover { opacity: 0.8; }
+        .cert-badge.purple { background: rgba(168,85,247,0.2); color: #c084fc; }
+        .cert-badge.blue   { background: rgba(59,130,246,0.2); color: #60a5fa; }
+        .cert-badge.green  { background: rgba(16,185,129,0.2); color: #34d399; }
+        .cert-badge.orange { background: rgba(249,115,22,0.2); color: #fb923c; }
+
+        /* Cert showcase cards */
+        .cert-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .cert-card {
+            background: rgba(30,41,59,0.5);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.07);
+            padding: 24px;
+            display: flex;
+            gap: 18px;
+            align-items: flex-start;
+            transition: 0.3s;
+        }
+        .cert-card:hover { border-color: #3b82f6; transform: translateY(-3px); }
+        .cert-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+        .cert-card h4 { margin: 0 0 4px; font-size: 1rem; color: white; }
+        .cert-card p  { margin: 0 0 10px; font-size: 0.82rem; color: #94a3b8; }
+
+        /* Roadmap Section */
+        .roadmap-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            padding: 40px;
+            border-radius: 25px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            text-align: center;
+        }
+
+        .roadmap-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .roadmap-progress {
+            max-width: 650px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .roadmap-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 30px;
+        }
+
+        .roadmap-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 15px;
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.03);
+            transition: 0.3s;
+        }
+
+        .roadmap-item:hover {
+            background: rgba(15, 23, 42, 0.6);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .roadmap-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 0.9rem;
+        }
+
+        /* Status Colors */
+        .roadmap-item.completed .roadmap-icon { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .roadmap-item.current .roadmap-icon { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .roadmap-item.upcoming .roadmap-icon { background: rgba(255, 255, 255, 0.05); color: #94a3b8; }
+
+        .roadmap-content h4 {
+            margin: 0 0 5px;
+            font-size: 1rem;
+            color: white;
+        }
+
+        .roadmap-content p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .roadmap-badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-left: 10px;
+        }
+        .badge-completed { background: #10b981; color: #064e3b; }
+        .badge-current { background: #3b82f6; color: #1e3a8a; }
+        .badge-planned { background: rgba(255,255,255,0.1); color: #94a3b8; }
+
+        /* ── Filter Bar ─────────────────────────────── */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 2.5rem;
+            position: sticky;
+            top: 70px;
+            z-index: 50;
+            background: rgba(11,1,24,0.85);
+            backdrop-filter: blur(12px);
+            padding: 14px 0;
+        }
+        .filter-btn {
+            padding: 8px 22px;
+            border-radius: 30px;
+            border: 1px solid rgba(168,85,247,0.3);
+            background: rgba(168,85,247,0.08);
+            color: #c4b5fd;
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 0 18px rgba(168,85,247,0.45);
+        }
+        /* hide/show animation */
+        .skill-item-card {
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        .skill-item-card.hidden {
+            display: none;
+        }
+
+        /* ── Tooltip ────────────────────────────────── */
+        .progress-wrap {
+            position: relative;
+        }
+        .progress-wrap .tip {
+            display: none;
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e1b4b;
+            border: 1px solid rgba(168,85,247,0.4);
+            color: #e2e8f0;
+            font-size: 0.8rem;
+            padding: 8px 14px;
+            border-radius: 10px;
+            white-space: nowrap;
+            z-index: 100;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            pointer-events: none;
+        }
+        .progress-wrap .tip::after {
+            content: '';
+            position: absolute;
+            top: 100%; left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: rgba(168,85,247,0.4);
+        }
+        .progress-wrap:hover .tip {
+            display: block;
+        }
+
+        /* ── Floating CV Button ─────────────────────── */
+        .cv-float {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            z-index: 9000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #7c3aed, #db2777);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 8px 30px rgba(124,58,237,0.5);
+            transition: transform 0.2s, box-shadow 0.2s;
+            animation: pulse-glow 2.5s infinite;
+        }
+        .cv-float:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 14px 40px rgba(124,58,237,0.7);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar-unified">
+        <a href="../index.html" class="nav-logo">
+            <i class="fa-solid fa-circle-user"></i> Mtruong<span>_dev</span>
+        </a>
+        <ul class="nav-links-unified">
+            <li><a href="../index.html">Trang Chủ</a></li>
+            <li>
+                <a href="about.html">Cá Nhân ▾</a>
+                <ul class="nav-dropdown">
+                    <li><a href="about.html">Về Tôi</a></li>
+                    <li><a href="education.html">Học Vấn</a></li>
+                    <li><a href="skills.html">Kỹ Năng</a></li>
+                    <li><a href="experience.html">Kinh Nghiệm</a></li>
+                </ul>
+            </li>
+            <li><a href="giasu.html">Gia Sư</a></li>
+            <li><a href="chemlab.html">Phòng Lab AI</a></li>
+            <li><a href="quiz.html">Thi Thử</a></li>
+            <li><a href="student_portal.html">Cổng HS</a></li>
+            <li><a href="blog.html">Kiến Thức</a></li>
+            <li><a href="muctieu.html">Mục Tiêu</a></li>
+            <li><a href="cns.html">Bài Tập CNS</a></li>
+            <li>
+                <a href="manage.html">Quản Trị ▾</a>
+                <ul class="nav-dropdown">
+                    <li><a href="manage.html">Quản lý Lớp học</a></li>
+                    <li><a href="manage_quiz.html">Quản lý Đề thi</a></li>
+                    <li><a href="manage_projects.html">Quản lý Dự án</a></li>
+                </ul>
+            </li>
+        </ul>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <button class="theme-toggle" title="Chuyển chế độ">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+            <a href="manage_quiz.html" class="btn btn-primary" style="padding: 8px 20px; font-size: 0.85rem; border-radius: 50px;">Admin</a>
+        </div>
+    </nav>
+
+    <!-- Floating CV Button -->
+    <a href="cv.pdf" download class="cv-float">
+        <i class="fa-solid fa-file-arrow-down"></i> Tải CV (PDF)
+    </a>
+
+    <main class="skills-page-container">
+        <div class="skills-header">
+            <h1 class="section-title">Technical Skills</h1>
+            <p style="color: #94a3b8; font-size: 1.1rem;">Nền tảng kỹ thuật và lộ trình phát triển bản thân</p>
+        </div>
+
+        <!-- Roadmap -->
+        <section class="skills-section">
+            <div class="roadmap-card">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px;">
+                    <i class="fa-solid fa-rocket" style="font-size: 2.5rem; color: #f15a24;"></i>
+                    <h2 class="roadmap-title" style="margin-bottom: 0;">Lộ trình học tập 2026</h2>
+                </div>
+                
+                <div class="roadmap-progress">
+                    <div class="roadmap-list">
+                        <!-- Q1 -->
+                        <div class="roadmap-item completed">
+                            <div class="roadmap-icon"><i class="fa-solid fa-check-circle"></i></div>
+                            <div class="roadmap-content">
+                                <h4>Q1: Nắm vững Java Core & DSA <span class="roadmap-badge badge-completed">Done</span></h4>
+                                <p>Hoàn thành kiến thức về OOP, Collections, Stream API và các cấu trúc dữ liệu cơ bản trên HackerRank.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q2 -->
+                        <div class="roadmap-item current">
+                            <div class="roadmap-icon"><i class="fa-solid fa-spinner fa-spin"></i></div>
+                            <div class="roadmap-content">
+                                <h4>Q2: Chinh phục Spring Boot & SQL <span class="roadmap-badge badge-current">In Progress</span></h4>
+                                <p>Xây dựng REST API, làm việc với MySQL, JPA/Hibernate và triển khai Backend cho Website cá nhân.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q3 -->
+                        <div class="roadmap-item upcoming">
+                            <div class="roadmap-icon"><i class="fa-solid fa-circle-dot"></i></div>
+                            <div class="roadmap-content">
+                                <h4>Q3: Phát triển Dự án Full-stack Thực tế <span class="roadmap-badge badge-planned">Planned</span></h4>
+                                <p>Kết hợp Spring Boot với React hoặc Vue.js để tạo ra các ứng dụng quản lý lớp học và gia sư hoàn chỉnh.</p>
+                            </div>
+                        </div>
+
+                        <!-- Q4 -->
+                        <div class="roadmap-item upcoming">
+                            <div class="roadmap-icon"><i class="fa-solid fa-flag-checkered"></i></div>
+                            <div class="roadmap-content">
+                                <h4>Q4: Tìm hiểu Cloud & DevOps cơ bản <span class="roadmap-badge badge-planned">Goal</span></h4>
+                                <p>Làm quen với Docker, CI/CD (GitHub Actions) và triển khai dự án lên AWS hoặc Heroku.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CodeLearn Integration -->
+        <section class="skills-section">
+            <div class="roadmap-card" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 182, 212, 0.1)); border-color: rgba(16, 185, 129, 0.3);">
+                <i class="fa-solid fa-laptop-code" style="font-size: 2.5rem; color: #10b981; margin-bottom: 20px;"></i>
+                <h2 class="roadmap-title" style="background: linear-gradient(to right, #10b981, #06b6d4); -webkit-background-clip: text; background-clip: text; color: transparent;">CodeLearn.io Live Stats</h2>
+                <p style="color: #94a3b8; font-size: 0.95rem; margin-bottom: 20px;">Kết nối trực tiếp tới CodeLearn qua Spring Boot Jsoup API</p>
+                <div style="display: flex; gap: 10px; max-width: 400px; margin: 0 auto 20px;">
+                    <input type="text" id="cl-username" placeholder="Nhập username CodeLearn..." style="flex: 1; padding: 12px 20px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: white; outline: none;">
+                    <button onclick="fetchCodeLearnStats()" style="background: #10b981; color: white; border: none; padding: 0 20px; border-radius: 10px; cursor: pointer; font-weight: 600; transition: 0.3s;" id="btn-fetch-cl">Đồng bộ</button>
+                </div>
+                <div id="cl-result" style="display: none; text-align: left; background: rgba(0,0,0,0.3); padding: 20px; border-radius: 15px;">
+                    <p id="cl-msg" style="color: #10b981; margin-bottom: 15px; font-weight: bold;"></p>
+                    <div id="cl-skills-container" style="display: grid; gap: 15px;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── FILTER BAR ────────────────────────────── -->
+        <div class="filter-bar">
+            <button class="filter-btn active" data-filter="all">✦ Tất cả</button>
+            <button class="filter-btn" data-filter="backend"><i class="fa-solid fa-server"></i> Backend</button>
+            <button class="filter-btn" data-filter="frontend"><i class="fa-brands fa-html5"></i> Frontend</button>
+            <button class="filter-btn" data-filter="dsa"><i class="fa-solid fa-brain"></i> DSA & Toán</button>
+            <button class="filter-btn" data-filter="tools"><i class="fa-solid fa-wrench"></i> Tools</button>
+        </div>
+
+        <!-- ── UNIFIED SKILL GRID ───────────────────── -->
+        <section class="skills-section">
+            <div class="skill-grid" id="skill-grid">
+
+                <!-- Java -->
+                <div class="skill-item-card" data-category="backend">
+                    <div class="skill-info">
+                        <span class="skill-name"><i class="fa-brands fa-java" style="color:#f89820"></i> Java (JDK 21)</span>
+                        <span class="skill-level level-proficient">80%</span>
+                    </div>
+                    <div class="progress-wrap">
+                        <div class="progress-bar-bg"><div class="progress-fill" data-percent="80%"></div></div>
+                        <div class="tip">✅ Thành thạo OOP, Collections, Stream API<br>🎯 Tiếp theo: Design Patterns, Concurrency nâng cao</div>
+                    </div>
+                    <div class="skill-details mt-3">
+                        <p class="text-muted" style="font-size:.85rem;margin-bottom:8px"><strong>Keywords:</strong> Collections, Multithreading, Stream API, JDBC, OOP.</p>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+                            <span class="cert-badge purple"><i class="fa-solid fa-certificate"></i> HackerRank Verified</span>
+                        </div>
+                        <p style="font-size:.85rem;color:#3b82f6"><i class="fa-solid fa-link"></i> Dự án: <a href="projects.html" style="color:inherit;text-decoration:underline">Hệ thống Đặt lịch Gia sư</a></p>
+                    </div>
+                </div>
+
+                <!-- SQL / MySQL -->
+                <div class="skill-item-card" data-category="backend">
+                    <div class="skill-info">
+                        <span class="skill-name"><i class="fa-solid fa-database" style="color:#00758f"></i> SQL / MySQL</span>
+                        <span class="skill-level level-intermediate">70%</span>
+                    </div>
+                    <div class="progress-wrap">
+                        <div class="progress-bar-bg"><div class="progress-fill" data-percent="70%"></div></div>
+                        <div class="tip">✅ Thành thạo JOIN, Subquery, Indexing<br>🎯 Tiếp theo: Query Optimization, Partitioning</div>
+                    </div>
+                    <div class="skill-details mt-3">
+                        <p class="text-muted" style="font-size:.85rem;margin-bottom:8px"><strong>Keywords:</strong> Normalization, Joins, Indexing, Stored Procedures.</p>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+                            <span class="cert-badge blue"><i class="fa-solid fa-certificate"></i> Coursera Certified</span>
+                        </div>
+                        <p style="font-size:.85rem;color:#3b82f6"><i class="fa-solid fa-link"></i> Dự án: <a href="projects.html" style="color:inherit;text-decoration:underline">Hệ thống Đấu giá trực tuyến</a></p>
+                    </div>
+                </div>
+
+                <!-- Spring Boot -->
+                <div class="skill-item-card" data-category="backend">
+                    <div class="skill-info">
+                        <span class="skill-name"><i class="fa-solid fa-leaf" style="color:#6db33f"></i> Spring Boot</span>
+                        <span class="skill-level level-learning">Learning</span>
+                    </div>
+                    <div class="progress-wrap">
+                        <div class="progress-bar-bg"><div class="progress-fill" data-percent="45%"></div></div>
+                        <div class="tip">✅ REST API, Spring Data JPA, MVC<br>🎯 Tiếp theo: Spring Security, Microservices</div>
+                    </div>
+                    <div class="skill-details mt-3">
+                        <p class="text-muted" style="font-size:.85rem;margin-bottom:8px"><strong>Keywords:</strong> Spring MVC, REST API, Spring Data JPA, Security.</p>
+                        <p style="font-size:.85rem;color:#3b82f6"><i class="fa-solid fa-link"></i> Dự án: <a href="projects.html" style="color:inherit;text-decoration:underline">Backend Website Cá nhân</a></p>
+                    </div>
+                </div>
+
+                <!-- Python -->
+                <div class="skill-item-card" data-category="backend">
+                    <div class="skill-info">
+                        <span class="skill-name"><i class="fa-brands fa-python" style="color:#3776ab"></i> Python</span>
+                        <span class="skill-level level-basic">Basic</span>
+                    </div>
+                    <div class="progress-wrap">
+                        <div class="progress-bar-bg"><div class="progress-fill" data-percent="50%"></div></div>
+                        <div class="tip">✅ Web Scraping, Automation Script<br>🎯 Tiếp theo: Data Science, Flask API</div>
+                    </div>
+                    <div class="skill-details mt-3">
+                        <p class="text-muted" style="font-size:.85rem;margin-bottom:8px"><strong>Keywords:</strong> Data Analysis, Web Scraping (BeautifulSoup), Automation.</p>
+                        <p style="font-size:.85rem;color:#3b82f6"><i class="fa-solid fa-link"></i> Dự án: <a href="projects.html" style="color:inherit;text-decoration:underline">Tool cào dữ liệu CodeLearn</a></p>
+                    </div>
+                </div>
+
+                <!-- HTML/CSS/JS -->
+                <div class="skill-item-card" data-category="frontend">
+                    <div class="skill-info">
+                        <span class="skill-name"><i class="fa-brands fa-html5" style="color:#e34f26"></i> HTML / CSS / JS</span>
+                        <span class="skill-level level-proficient">85%</span>
+                    </div>
+                    <div class="progress-wrap">
+                        <div class="progress-bar-bg"><div class="progress-fill" data-percent="85%"></div></div>
+                        <div class="tip">✅ Responsive, Animations, DOM manipulation<br>🎯 Tiếp theo: Vue.js hoặc React cơ bản</div>
+                    </div>
+                    <div class="skill-details mt-3">
+                        <p class="text-muted" style="font-size:.85rem;margin-bottom:8px"><strong>Keywords:</strong> Flexbox, Grid, Responsive Design, Vanilla JS, DOM.</p>
+                        <p style="font-size:.85rem;color:#3b82f6"><i class="fa-solid fa-link"></i> Dự án: <a href="projects.html" style="color:inherit;text-decoration:underline">Giao diện Web cá nhân</a></p>
+                    </div>
+                </div>
+
+                <!-- Git -->
+                <div class="skill-item-card" data-category="tools">
+                    <div class="skill-info">
+                        <span class="skill-name"><i class="fa-brands fa-git-alt" style="color:#f05032"></i> Git / GitHub</span>
+                        <span class="skill-level level-proficient">90%</span>
+                    </div>
+                    <div class="progress-wrap">
+                        <div class="progress-bar-bg"><div class="progress-fill" data-percent="90%"></div></div>
+                        <div class="tip">✅ Branching, PR, Merge Conflicts, Tags<br>🎯 Tiếp theo: GitHub Actions CI/CD</div>
+                    </div>
+                    <div class="skill-details mt-3">
+                        <p class="text-muted" style="font-size:.85rem;margin-bottom:8px"><strong>Keywords:</strong> Branching, Merging, Pull Requests, Git Flow.</p>
+                    </div>
+                </div>
+
+                <!-- Data Structures -->
+                <div class="skill-item-card" data-category="dsa">
+                    <div class="skill-info">
+                        <span class="skill-name"><i class="fa-solid fa-sitemap" style="color:#f59e0b"></i> Data Structures</span>
+                        <span class="skill-level level-intermediate">75%</span>
+                    </div>
+                    <div class="progress-wrap">
+                        <div class="progress-bar-bg"><div class="progress-fill" data-percent="75%"></div></div>
+                        <div class="tip">✅ Array, LinkedList, Stack, Queue, Tree<br>🎯 Tiếp theo: Graph, Trie, Segment Tree</div>
+                    </div>
+                    <div class="skill-details mt-3">
+                        <p class="text-muted" style="font-size:.85rem;margin-bottom:8px"><strong>Keywords:</strong> Array, LinkedList, Stack, Queue, Tree, HashMap.</p>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap">
+                            <a href="https://www.hackerrank.com" target="_blank" class="cert-badge purple"><i class="fa-solid fa-star"></i> HackerRank Solved</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Algorithms -->
+                <div class="skill-item-card" data-category="dsa">
+                    <div class="skill-info">
+                        <span class="skill-name"><i class="fa-solid fa-code-branch" style="color:#22d3ee"></i> Algorithms</span>
+                        <span class="skill-level level-intermediate">65%</span>
+                    </div>
+                    <div class="progress-wrap">
+                        <div class="progress-bar-bg"><div class="progress-fill" data-percent="65%"></div></div>
+                        <div class="tip">✅ Sorting, BFS/DFS, Binary Search<br>🎯 Tiếp theo: DP nâng cao, Greedy tối ưu</div>
+                    </div>
+                    <div class="skill-details mt-3">
+                        <p class="text-muted" style="font-size:.85rem;margin-bottom:8px"><strong>Keywords:</strong> Sorting, BFS/DFS, Dynamic Programming, Greedy, Binary Search.</p>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap">
+                            <a href="https://leetcode.com" target="_blank" class="cert-badge blue"><i class="fa-solid fa-terminal"></i> LeetCode Practice</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Toán & Logic -->
+                <div class="skill-item-card" data-category="dsa">
+                    <div class="skill-info">
+                        <span class="skill-name"><i class="fa-solid fa-calculator" style="color:#a78bfa"></i> Toán & Logic</span>
+                        <span class="skill-level level-proficient">85%</span>
+                    </div>
+                    <div class="progress-wrap">
+                        <div class="progress-bar-bg"><div class="progress-fill" data-percent="85%"></div></div>
+                        <div class="tip">✅ Giải Nhì HSG Tỉnh Hóa học<br>🎯 Tiếp theo: Competitive Math, Combinatorics</div>
+                    </div>
+                    <div class="skill-details mt-3">
+                        <p class="text-muted" style="font-size:.85rem;margin-bottom:8px"><strong>Keywords:</strong> Tư duy logic, Hóa học, Toán học, Phân tích bài toán.</p>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap">
+                            <span class="cert-badge orange"><i class="fa-solid fa-award"></i> Giải Nhì HSG Tỉnh Hóa</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- Certifications Showcase -->
+        <section class="skills-section">
+            <h2 class="skills-category-title"><i class="fa-solid fa-medal"></i> Chứng Chỉ & Xác Nhận</h2>
+            <div class="cert-cards">
+                <div class="cert-card">
+                    <div class="cert-icon" style="background: rgba(46,173,90,0.15); color: #2ead5a;">
+                        <i class="fa-brands fa-hackerrank"></i>
+                    </div>
+                    <div>
+                        <h4>HackerRank — Java</h4>
+                        <p>Xác nhận thành thạo Java Core, OOP & Problem Solving.</p>
+                        <a href="https://www.hackerrank.com/certificates" target="_blank" class="cert-badge green">
+                            <i class="fa-solid fa-external-link"></i> Xem chứng chỉ
+                        </a>
+                    </div>
+                </div>
+
+                <div class="cert-card">
+                    <div class="cert-icon" style="background: rgba(59,130,246,0.15); color: #3b82f6;">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <div>
+                        <h4>ĐGNL HSA — 96/150 điểm</h4>
+                        <p>Kỳ thi Đánh giá Năng lực, ĐHQGHN — Năm 2024.</p>
+                        <span class="cert-badge blue">
+                            <i class="fa-solid fa-check-circle"></i> Đã xác nhận
+                        </span>
+                    </div>
+                </div>
+
+                <div class="cert-card">
+                    <div class="cert-icon" style="background: rgba(245,158,11,0.15); color: #f59e0b;">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <div>
+                        <h4>Giải Nhì HSG Tỉnh — Hóa học</h4>
+                        <p>Kỳ thi Học sinh Giỏi Tỉnh môn Hóa học, năm 2023.</p>
+                        <span class="cert-badge orange">
+                            <i class="fa-solid fa-award"></i> Giải thưởng cấp Tỉnh
+                        </span>
+                    </div>
+                </div>
+
+                <div class="cert-card">
+                    <div class="cert-icon" style="background: rgba(168,85,247,0.15); color: #a855f7;">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <div>
+                        <h4>UET — Lập trình Java</h4>
+                        <p>Môn học Lập trình Hướng Đối Tượng với Java tại UET-ĐHQGHN.</p>
+                        <a href="projects.html" class="cert-badge purple">
+                            <i class="fa-solid fa-link"></i> Xem dự án liên quan
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Hoàng Mạnh Trường. Designed and Built with ❤️</p>
+    </footer>
+
+    <script src="../assets/js/common.js"></script>
+    <script>
+        async function fetchCodeLearnStats() {
+            const username = document.getElementById('cl-username').value.trim();
+            if (!username) return alert('Vui lòng nhập Username CodeLearn!');
+
+            const btn = document.getElementById('btn-fetch-cl');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            document.getElementById('cl-result').style.display = 'none';
+
+            try {
+                // Gọi API cào dữ liệu từ Backend Spring Boot
+                const response = await fetch(`${API_CONFIG.BASE_URL}/api/codelearn/stats/${username}`);
+                const data = await response.json();
+
+                if (response.ok && data.status === 'success') {
+                    document.getElementById('cl-result').style.display = 'block';
+                    document.getElementById('cl-msg').innerHTML = `<i class="fa-solid fa-check-circle"></i> Đồng bộ thành công Profile: <a href="${data.profileUrl}" target="_blank" style="color: #10b981;">${data.username}</a>`;
+                    
+                    const skillsContainer = document.getElementById('cl-skills-container');
+                    skillsContainer.innerHTML = '';
+
+                    for (const [skill, score] of Object.entries(data.skills)) {
+                        skillsContainer.innerHTML += `
+                            <div class="skill-item-card" style="padding: 15px;">
+                                <div class="skill-info">
+                                    <span class="skill-name" style="color: #10b981;">${skill}</span>
+                                    <span class="skill-level" style="color: white; font-weight: bold;">${score} Điểm</span>
+                                </div>
+                                <div class="progress-bar-bg"><div class="progress-fill" style="width: ${score}%; background: linear-gradient(90deg, #10b981, #06b6d4);"></div></div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Không thể kết nối đến Backend. Hãy chắc chắn Spring Boot đang chạy ở port 8080!');
+            } finally {
+                btn.innerHTML = 'Đồng bộ';
+            }
+        }
+
+        async function fetchHackerRankStats() {
+            const username = document.getElementById('hr-username').value.trim();
+            if (!username) return alert('Vui lòng nhập Username HackerRank!');
+
+            const btn = document.getElementById('btn-fetch-hr');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            document.getElementById('hr-result').style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_CONFIG.BASE_URL}/api/hackerrank/stats/${username}`);
+                const data = await response.json();
+
+                if (response.ok && data.status === 'success') {
+                    document.getElementById('hr-result').style.display = 'block';
+                    document.getElementById('hr-msg').innerHTML = `<i class="fa-solid fa-check-circle"></i> Đồng bộ thành công Profile: <a href="${data.profileUrl}" target="_blank" style="color: #2ead5a;">${data.username}</a>`;
+                    
+                    const badgesContainer = document.getElementById('hr-badges-container');
+                    badgesContainer.innerHTML = '';
+
+                    const achievements = data.achievements;
+                    for (const [skill, stars] of Object.entries(achievements.badges)) {
+                        let starsHtml = '';
+                        for(let i=0; i<5; i++) {
+                            starsHtml += `<i class="fa-solid fa-star" style="font-size: 0.7rem; color: ${i < stars ? '#ffb800' : 'rgba(255,255,255,0.1)'}"></i>`;
+                        }
+
+                        badgesContainer.innerHTML += `
+                            <div class="skill-item-card" style="padding: 15px; text-align: center; border-color: rgba(46, 173, 90, 0.2);">
+                                <div style="font-size: 1rem; font-weight: bold; color: white; margin-bottom: 10px;">${skill}</div>
+                                <div style="margin-bottom: 5px;">${starsHtml}</div>
+                                <div style="color: #2ead5a; font-size: 0.8rem; font-weight: 600;">${stars} Stars Badge</div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Không thể kết nối đến Backend. Hãy chắc chắn Spring Boot đang chạy!');
+            } finally {
+                btn.innerHTML = 'Đồng bộ';
+            }
+        }
+        // ── LAZY LOAD ANIMATION LOGIC ─────────────────────────
+        const observerOptions = {
+            threshold: 0.2
+        };
+
+        const progressObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const progressFill = entry.target;
+                    const percent = progressFill.getAttribute('data-percent');
+                    progressFill.style.width = percent;
+                    observer.unobserve(progressFill);
+                }
+            });
+        }, observerOptions);
+
+        function initProgressAnimations() {
+            document.querySelectorAll('.progress-fill').forEach(fill => {
+                fill.style.width = '0'; // Reset for re-observation if needed
+                progressObserver.observe(fill);
+            });
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', initProgressAnimations);
+
+        // ── FILTER BAR LOGIC ──────────────────────────────────
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Toggle active state
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const filter = btn.dataset.filter;
+                const cards = document.querySelectorAll('#skill-grid .skill-item-card');
+
+                cards.forEach(card => {
+                    if (filter === 'all' || card.dataset.category === filter) {
+                        card.classList.remove('hidden');
+                        // Re-trigger animation if visible
+                        const fill = card.querySelector('.progress-fill');
+                        if (fill) progressObserver.observe(fill);
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+

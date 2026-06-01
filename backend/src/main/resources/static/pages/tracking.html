@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vị Trí Hiện Tại ❤️</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/833/833472.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Outfit:wght@300;400;600;800&family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        .tracking-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+        .tracking-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .tracking-header h2 {
+            font-family: 'Pacifico', cursive;
+            font-size: 3.5rem;
+            color: #ff4d4d;
+        }
+
+        #tracking-map {
+            height: 500px;
+            width: 100%;
+            border-radius: 35px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            border: 2px solid rgba(255, 77, 77, 0.2);
+            z-index: 1;
+        }
+
+        /* Status Cards */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        .status-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+        }
+        .avatar-mini {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid #ff4d4d;
+            object-fit: cover;
+        }
+        .status-info h4 { font-size: 1.3rem; margin-bottom: 5px; }
+        .status-info p { font-size: 0.9rem; opacity: 0.7; }
+        .status-badge {
+            background: #4ade80;
+            color: black;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 3px 10px;
+            border-radius: 100px;
+            text-transform: uppercase;
+        }
+
+        /* Distance Alert */
+        .distance-info {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(255, 77, 77, 0.1);
+            border-radius: 20px;
+            color: #ff4d4d;
+            font-weight: 700;
+            display: none;
+        }
+
+        /* Custom Markers */
+        .map-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 15px rgba(255, 77, 77, 0.5);
+            background-size: cover;
+            background-position: center;
+        }
+
+        .update-btn {
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 100px;
+            cursor: pointer;
+            font-weight: 700;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+        }
+        .update-btn:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(255, 77, 77, 0.4); }
+
+        .note-box {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 25px;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body class="love-page-body">
+    <!-- Global Widgets -->
+    <div class="dark-mode-toggle" onclick="toggleDarkMode()">
+        <i class="fa-solid fa-moon" id="dark-mode-icon"></i>
+    </div>
+
+    <div class="music-player">
+        <i class="fa-solid fa-play music-btn" id="play-pause" onclick="toggleMusic()"></i>
+        <span id="song-title">Perfect - Ed Sheeran ❤️</span>
+        <audio id="bg-music" loop>
+            <source src="https://files.catbox.moe/979u74.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <div class="back-nav">
+        <a href="love.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Quay lại trang chủ</a>
+    </div>
+
+    <main class="tracking-container">
+        <div class="tracking-header">
+            <h2>Vị Trí Của Chúng Mình</h2>
+            <p>Luôn biết đối phương đang ở đâu để thêm phần an tâm ❤️</p>
+        </div>
+
+        <div id="tracking-map"></div>
+
+        <div id="distance-alert" class="distance-info">
+            <i class="fa-solid fa-location-arrow"></i> Khoảng cách hiện tại: <span id="distance-val">0</span> km
+        </div>
+
+        <div class="status-grid">
+            <!-- Male Status -->
+            <div class="status-card">
+                <img id="status-img-male" src="" class="avatar-mini">
+                <div class="status-info">
+                    <span class="status-badge">Đang ở đây</span>
+                    <h4 id="status-name-male">Bạn Trai</h4>
+                    <p id="status-loc-male">Đang cập nhật...</p>
+                    <button class="update-btn" onclick="updateMyLocation('male')">
+                        <i class="fa-solid fa-crosshairs"></i> Cập nhật vị trí
+                    </button>
+                </div>
+            </div>
+
+            <!-- Female Status -->
+            <div class="status-card">
+                <img id="status-img-female" src="" class="avatar-mini">
+                <div class="status-info">
+                    <span class="status-badge" style="background: #fda4af;">Đang ở đây</span>
+                    <h4 id="status-name-female">Bạn Gái</h4>
+                    <p id="status-loc-female">Đang cập nhật...</p>
+                    <button class="update-btn" style="background: #f43f5e;" onclick="updateMyLocation('female')">
+                        <i class="fa-solid fa-crosshairs"></i> Cập nhật vị trí
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="note-box">
+            <i class="fa-solid fa-circle-info"></i> <strong>Lưu ý Full-stack:</strong> Hiện tại vị trí đang được lưu trong trình duyệt của bạn (LocalStorage). Để chia sẻ vị trí thực tế giữa hai điện thoại khác nhau, bạn cần kết nối ứng dụng này với một Backend (ví dụ: Spring Boot + PostgreSQL) và sử dụng WebSocket hoặc Firebase để cập nhật tọa độ liên tục.
+        </div>
+    </main>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const config = JSON.parse(localStorage.getItem('inLoveConfig')) || {
+            nameMale: "Hoàng Mạnh Trường",
+            nameFemale: "Nguyễn Thị Anh Thư",
+            imgMale: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80",
+            imgFemale: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80"
+        };
+
+        let map, markerMale, markerFemale;
+        let positions = JSON.parse(localStorage.getItem('lovePositions')) || {
+            male: { lat: 21.0285, lng: 105.8542 },
+            female: { lat: 21.0333, lng: 105.8333 }
+        };
+
+        function initTracking() {
+            document.getElementById('status-name-male').innerText = config.nameMale;
+            document.getElementById('status-name-female').innerText = config.nameFemale;
+            document.getElementById('status-img-male').src = config.imgMale;
+            document.getElementById('status-img-female').src = config.imgFemale;
+
+            map = L.map('tracking-map').setView([21.0285, 105.8542], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+            const iconMale = L.divIcon({
+                html: `<div class="map-avatar" style="background-image: url('${config.imgMale}')"></div>`,
+                className: 'custom-div-icon', iconSize: [50, 50], iconAnchor: [25, 25]
+            });
+
+            const iconFemale = L.divIcon({
+                html: `<div class="map-avatar" style="background-image: url('${config.imgFemale}'); border-color: #f43f5e;"></div>`,
+                className: 'custom-div-icon', iconSize: [50, 50], iconAnchor: [25, 25]
+            });
+
+            markerMale = L.marker([positions.male.lat, positions.male.lng], {icon: iconMale}).addTo(map);
+            markerFemale = L.marker([positions.female.lat, positions.female.lng], {icon: iconFemale}).addTo(map);
+
+            updateDistance();
+            
+            // Re-center to show both
+            const group = new L.featureGroup([markerMale, markerFemale]);
+            map.fitBounds(group.getBounds().pad(0.5));
+        }
+
+        function updateMyLocation(role) {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    positions[role] = { lat, lng };
+                    localStorage.setItem('lovePositions', JSON.stringify(positions));
+                    
+                    if (role === 'male') {
+                        markerMale.setLatLng([lat, lng]);
+                        document.getElementById('status-loc-male').innerText = `Vừa cập nhật: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                    } else {
+                        markerFemale.setLatLng([lat, lng]);
+                        document.getElementById('status-loc-female').innerText = `Vừa cập nhật: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                    }
+
+                    map.setView([lat, lng], 15);
+                    updateDistance();
+                    alert('Đã cập nhật vị trí của bạn lên bản đồ! ❤️');
+                }, () => {
+                    alert('Không thể truy cập GPS. Vui lòng kiểm tra quyền truy cập vị trí của trình duyệt.');
+                });
+            } else {
+                alert('Trình duyệt của bạn không hỗ trợ định vị GPS.');
+            }
+        }
+
+        function updateDistance() {
+            const d = map.distance(
+                [positions.male.lat, positions.male.lng],
+                [positions.female.lat, positions.female.lng]
+            );
+            const km = (d / 1000).toFixed(2);
+            document.getElementById('distance-alert').style.display = 'block';
+            document.getElementById('distance-val').innerText = km;
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('light-mode');
+            const icon = document.getElementById('dark-mode-icon');
+            icon.className = document.body.classList.contains('light-mode') ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        }
+
+        const audio = document.getElementById('bg-music');
+        function toggleMusic() {
+            if (audio.paused) { 
+                audio.play(); 
+                document.getElementById('play-pause').className = 'fa-solid fa-pause music-btn'; 
+            } else { 
+                audio.pause(); 
+                document.getElementById('play-pause').className = 'fa-solid fa-play music-btn'; 
+            }
+        }
+
+        window.onload = initTracking;
+    </script>
+</body>
+</html>
