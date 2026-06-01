@@ -20,6 +20,7 @@ mvnw.cmd
 *.DS_Store
 
 # Local Config & secrets (chỉ commit file .example)
+.env
 # **/application.properties
 !**/application.properties.example
 **/ca.pem

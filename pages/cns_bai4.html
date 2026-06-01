@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 4 — Sử Dụng Công Cụ Hợp Tác Trực Tuyến | CNS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/common.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root{--blue:#3b82f6;--cyan:#06b6d4;--green:#22c55e;--orange:#f97316;--red:#ef4444;--purple:#a855f7;--yellow:#facc15;--accent:#f59e0b;}
+        body{background:#050810;overflow-x:hidden;}
+        .layout{display:grid;grid-template-columns:260px 1fr;gap:32px;max-width:1140px;margin:0 auto;padding:120px 24px 100px;align-items:start;}
+        .sidebar{position:sticky;top:100px;}
+        .sidebar-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:20px;margin-bottom:16px;}
+        .sidebar-title{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,0.3);margin-bottom:14px;}
+        .progress-ring-wrap{display:flex;flex-direction:column;align-items:center;padding:8px 0 4px;}
+        .ring-svg{transform:rotate(-90deg);}
+        .ring-bg{fill:none;stroke:rgba(255,255,255,0.06);stroke-width:8;}
+        .ring-fill{fill:none;stroke:url(#rg4);stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 0.6s cubic-bezier(0.23,1,0.32,1);}
+        .ring-label{font-size:1.8rem;font-weight:800;color:#f8fafc;margin-top:-4px;}
+        .ring-sub{font-size:0.72rem;color:rgba(255,255,255,0.35);margin-top:2px;}
+        .sec-nav-item{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:10px;cursor:pointer;transition:background 0.2s;font-size:0.82rem;color:rgba(255,255,255,0.45);text-decoration:none;}
+        .sec-nav-item:hover{background:rgba(255,255,255,0.05);color:#fff;}
+        .sec-nav-item.done{color:var(--accent);}
+        .snav-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.15);flex-shrink:0;transition:background 0.3s;}
+        .sec-nav-item.done .snav-dot{background:var(--accent);}
+        .meta-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:0.82rem;color:rgba(255,255,255,0.45);}
+        .meta-row:last-child{border-bottom:none;}
+        .meta-row i{width:16px;text-align:center;}
+        .breadcrumb{display:flex;align-items:center;gap:7px;font-size:0.78rem;color:rgba(255,255,255,0.3);margin-bottom:28px;}
+        .breadcrumb a{color:rgba(255,255,255,0.3);text-decoration:none;transition:color 0.2s;}
+        .breadcrumb a:hover{color:var(--accent);}
+        .hero-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 14px;border-radius:50px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);color:#fcd34d;font-size:0.75rem;font-weight:700;letter-spacing:0.5px;margin-bottom:14px;}
+        .hero-title{font-size:2rem;font-weight:800;color:#f8fafc;line-height:1.25;margin-bottom:12px;}
+        .hero-title span{background:linear-gradient(135deg,#f59e0b,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .hero-desc{color:rgba(255,255,255,0.48);font-size:0.95rem;line-height:1.7;max-width:640px;margin-bottom:28px;}
+        .score-banner{display:flex;align-items:center;gap:16px;padding:16px 22px;background:linear-gradient(135deg,rgba(245,158,11,0.08),rgba(6,182,212,0.04));border:1px solid rgba(245,158,11,0.2);border-radius:16px;margin-bottom:36px;}
+        .score-big{font-size:2.2rem;font-weight:800;color:var(--accent);line-height:1;}
+        .score-info .s-label{font-size:0.72rem;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:1px;}
+        .score-info .s-val{font-size:0.9rem;color:rgba(255,255,255,0.7);margin-top:2px;}
+        .section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+        .section-hdr h2{font-size:1.05rem;font-weight:700;color:#f8fafc;display:flex;align-items:center;gap:8px;}
+        .section-hdr h2 i{color:var(--accent);}
+        .sec-card{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:20px;margin-bottom:14px;overflow:hidden;transition:border-color 0.3s,box-shadow 0.3s;scroll-margin-top:110px;}
+        .sec-card:hover{border-color:rgba(245,158,11,0.25);box-shadow:0 4px 24px rgba(245,158,11,0.07);}
+        .sec-card.read{border-color:rgba(245,158,11,0.22);background:rgba(245,158,11,0.03);}
+        .sec-head{display:flex;align-items:center;gap:14px;padding:18px 22px;cursor:pointer;user-select:none;}
+        .sec-num-badge{width:34px;height:34px;border-radius:10px;background:rgba(245,158,11,0.14);color:#fcd34d;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;flex-shrink:0;transition:background 0.3s,color 0.3s;}
+        .sec-card.read .sec-num-badge{background:rgba(245,158,11,0.25);color:#fde68a;}
+        .sec-head-text{flex:1;}
+        .sec-head-title{font-size:0.92rem;font-weight:700;color:#f8fafc;}
+        .sec-head-sub{font-size:0.72rem;color:rgba(255,255,255,0.28);margin-top:2px;}
+        .sec-read-btn{width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,0.12);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:transparent;transition:all 0.25s;flex-shrink:0;}
+        .sec-read-btn:hover{border-color:var(--accent);color:var(--accent);}
+        .sec-card.read .sec-read-btn{background:var(--accent);border-color:var(--accent);color:#fff;}
+        .expand-icon{color:rgba(255,255,255,0.2);font-size:0.75rem;transition:transform 0.3s,color 0.2s;flex-shrink:0;}
+        .sec-card.open .expand-icon{transform:rotate(180deg);color:var(--accent);}
+        .sec-body{max-height:0;overflow:hidden;transition:max-height 0.45s cubic-bezier(0.23,1,0.32,1);}
+        .sec-card.open .sec-body{max-height:5000px;}
+        .sec-body-inner{padding:18px 22px 22px;border-top:1px solid rgba(255,255,255,0.05);}
+        .prose{font-size:0.88rem;color:rgba(255,255,255,0.55);line-height:1.75;margin-bottom:14px;}
+        .prose strong{color:rgba(255,255,255,0.85);}
+        .prose em{color:#fcd34d;font-style:italic;}
+        .bullet-list{list-style:none;padding:0;margin:0 0 14px;}
+        .bullet-list li{display:flex;align-items:flex-start;gap:10px;font-size:0.86rem;color:rgba(255,255,255,0.55);line-height:1.6;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+        .bullet-list li:last-child{border-bottom:none;}
+        .bullet-list li .bi{color:var(--accent);flex-shrink:0;margin-top:3px;font-size:0.7rem;}
+        .tool-card{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:18px 20px;margin-bottom:14px;transition:border-color 0.3s;}
+        .tool-card:hover{border-color:rgba(245,158,11,0.25);}
+        .tool-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+        .tool-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
+        .tool-icon.notion{background:rgba(255,255,255,0.08);color:#fff;}
+        .tool-icon.gdocs{background:rgba(59,130,246,0.15);color:#60a5fa;}
+        .tool-icon.gdrive{background:rgba(34,197,94,0.15);color:#4ade80;}
+        .tool-name{font-size:0.95rem;font-weight:700;color:#f8fafc;}
+        .tool-type{font-size:0.72rem;color:rgba(255,255,255,0.3);margin-top:2px;}
+        .kanban-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;}
+        .kanban-col{border-radius:12px;padding:12px 14px;}
+        .kanban-col.todo{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);}
+        .kanban-col.inprogress{background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.15);}
+        .kanban-col.done{background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);}
+        .kanban-label{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;}
+        .kanban-col.todo .kanban-label{color:#f87171;}
+        .kanban-col.inprogress .kanban-label{color:#fb923c;}
+        .kanban-col.done .kanban-label{color:#4ade80;}
+        .kanban-item{background:rgba(255,255,255,0.04);border-radius:8px;padding:7px 10px;font-size:0.78rem;color:rgba(255,255,255,0.6);margin-bottom:6px;line-height:1.4;}
+        .kanban-item:last-child{margin-bottom:0;}
+        .log-table{width:100%;border-collapse:collapse;font-size:0.82rem;margin-bottom:14px;}
+        .log-table th{text-align:left;padding:10px 14px;background:rgba(245,158,11,0.1);color:#fcd34d;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid rgba(245,158,11,0.2);}
+        .log-table td{padding:10px 14px;color:rgba(255,255,255,0.55);border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:top;}
+        .log-table tr:hover td{background:rgba(255,255,255,0.02);}
+        .evidence-box{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:10px;background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.18);font-size:0.8rem;color:rgba(255,255,255,0.6);margin-bottom:10px;}
+        .evidence-box i{color:var(--accent);flex-shrink:0;margin-top:2px;}
+        .conclusion-box{background:linear-gradient(135deg,rgba(245,158,11,0.07),rgba(6,182,212,0.03));border:1px solid rgba(245,158,11,0.18);border-radius:18px;padding:22px 24px;margin-top:8px;}
+        .conclusion-box h4{font-size:0.9rem;font-weight:700;color:#fcd34d;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+        .doc-link{display:flex;align-items:center;gap:14px;padding:14px 18px;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.18);border-radius:12px;text-decoration:none;transition:all 0.3s;margin-top:10px;}
+        .doc-link:hover{background:rgba(59,130,246,0.14);border-color:rgba(59,130,246,0.4);}
+        .doc-link .dl-icon{width:38px;height:38px;border-radius:10px;background:rgba(59,130,246,0.15);color:#60a5fa;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+        .doc-link .dl-title{font-size:0.88rem;font-weight:700;color:#f8fafc;}
+        .doc-link .dl-url{font-size:0.72rem;color:rgba(255,255,255,0.3);font-family:'JetBrains Mono',monospace;margin-top:2px;}
+        .img-wrap{margin-top:14px;}
+        .img-placeholder{width:100%;border:2px dashed rgba(245,158,11,0.2);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:border-color 0.3s,background 0.3s;background:rgba(245,158,11,0.02);position:relative;box-sizing:border-box;display:block;}
+        .img-placeholder:hover{border-color:rgba(245,158,11,0.5);background:rgba(245,158,11,0.06);}
+        .img-placeholder input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+        .img-preview{width:100%;border-radius:12px;border:1px solid rgba(255,255,255,0.07);display:block;max-height:340px;object-fit:contain;background:rgba(0,0,0,0.25);cursor:zoom-in;}
+        .img-actions{display:flex;gap:8px;margin-top:8px;}
+        .btn-img-change{font-size:0.73rem;padding:5px 12px;border-radius:50px;border:1px solid rgba(245,158,11,0.28);background:rgba(245,158,11,0.07);color:#fcd34d;cursor:pointer;font-family:'Outfit',sans-serif;transition:all 0.2s;position:relative;overflow:hidden;}
+        .btn-img-change input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+        .btn-img-change:hover{background:rgba(245,158,11,0.18);}
+        .btn-img-remove{font-size:0.73rem;padding:5px 12px;border-radius:50px;border:1px solid rgba(239,68,68,0.25);background:rgba(239,68,68,0.06);color:#f87171;cursor:pointer;font-family:'Outfit',sans-serif;transition:all 0.2s;}
+        .btn-img-remove:hover{background:rgba(239,68,68,0.16);}
+        .back-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:50px;border:1px solid rgba(245,158,11,0.25);background:rgba(245,158,11,0.07);color:#fcd34d;text-decoration:none;font-size:0.85rem;font-weight:600;transition:all 0.3s;margin-top:28px;}
+        .back-btn:hover{background:rgba(245,158,11,0.18);border-color:rgba(245,158,11,0.5);transform:translateX(-3px);}
+        .nav-btns{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;}
+        .nav-btn-prev,.nav-btn-next{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:50px;font-size:0.85rem;font-weight:600;text-decoration:none;transition:all 0.3s;}
+        .nav-btn-prev{border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.45);}
+        .nav-btn-prev:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.2);color:#fff;transform:translateX(-3px);}
+        .nav-btn-next{border:1px solid rgba(245,158,11,0.3);background:rgba(245,158,11,0.08);color:#fcd34d;margin-left:auto;}
+        .nav-btn-next:hover{background:rgba(245,158,11,0.2);border-color:#f59e0b;color:#fff;transform:translateX(3px);}
+        .admin-fab{padding:10px 18px;border-radius:50px;border:1px solid rgba(245,158,11,0.25);background:rgba(245,158,11,0.1);color:#fcd34d;font-family:'Outfit',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;transition:all 0.3s;}
+        .admin-fab.logged{background:rgba(34,197,94,0.12);border-color:rgba(34,197,94,0.3);color:var(--green);}
+        @media(max-width:768px){.layout{grid-template-columns:1fr;padding-top:100px;}.sidebar{position:static;}.kanban-grid{grid-template-columns:1fr;}}
+    </style>
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <nav class="navbar-unified">
+        <a href="../index.html" class="nav-logo"><i class="fa-solid fa-circle-user"></i> Mtruong<span>_dev</span></a>
+        <ul class="nav-links-unified">
+            <li><a href="../index.html">Trang Chủ</a></li>
+            <li><a href="about.html">Cá Nhân ▾</a>
+                <ul class="nav-dropdown">
+                    <li><a href="about.html">Về Tôi</a></li>
+                    <li><a href="education.html">Học Vấn</a></li>
+                    <li><a href="skills.html">Kỹ Năng</a></li>
+                    <li><a href="experience.html">Kinh Nghiệm</a></li>
+                </ul>
+            </li>
+            <li><a href="research_hub.html">Nghiên Cứu</a></li>
+            <li><a href="blog.html">Kiến Thức</a></li>
+            <li><a href="muctieu.html">Mục Tiêu</a></li>
+            <li><a href="cns.html">Bài Tập CNS</a></li>
+        </ul>
+        <div id="auth-controls" class="nav-auth">
+            <button class="theme-toggle" title="Chuyển chế độ"><i class="fa-solid fa-moon"></i></button>
+        </div>
+    </nav>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-card">
+                <div class="sidebar-title">Tiến độ đọc</div>
+                <div class="progress-ring-wrap">
+                    <svg class="ring-svg" width="100" height="100" viewBox="0 0 100 100">
+                        <defs>
+                            <linearGradient id="rg4" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#f59e0b"/>
+                                <stop offset="100%" stop-color="#06b6d4"/>
+                            </linearGradient>
+                        </defs>
+                        <circle class="ring-bg" cx="50" cy="50" r="40"/>
+                        <circle class="ring-fill" id="ring-fill" cx="50" cy="50" r="40" stroke-dasharray="251.2" stroke-dashoffset="251.2"/>
+                    </svg>
+                    <div class="ring-label" id="ring-pct">0%</div>
+                    <div class="ring-sub" id="ring-sub">0 / 4 mục</div>
+                </div>
+            </div>
+            <div class="sidebar-card">
+                <div class="sidebar-title">Mục lục</div>
+                <div id="sec-nav"></div>
+            </div>
+            <div class="sidebar-card">
+                <div class="sidebar-title">Thông tin bài</div>
+                <div class="meta-row"><i class="fa-solid fa-calendar" style="color:var(--accent)"></i> Hạn nộp: 12/04/2026</div>
+                <div class="meta-row"><i class="fa-solid fa-clock" style="color:var(--cyan)"></i> ~40 phút</div>
+                <div class="meta-row"><i class="fa-solid fa-star" style="color:var(--yellow)"></i> Điểm: <strong style="color:var(--accent);margin-left:4px;">9 / 10</strong></div>
+                <div class="meta-row"><i class="fa-solid fa-tag" style="color:var(--blue)"></i> Báo cáo cá nhân</div>
+                <div class="meta-row"><i class="fa-solid fa-users" style="color:var(--green)"></i> 3 công cụ hợp tác</div>
+            </div>
+        </aside>
+
+        <main>
+            <div class="breadcrumb">
+                <a href="cns.html"><i class="fa-solid fa-layer-group"></i> Bài Tập CNS</a>
+                <i class="fa-solid fa-chevron-right" style="font-size:0.55rem"></i>
+                <span>Chương 3</span>
+                <i class="fa-solid fa-chevron-right" style="font-size:0.55rem"></i>
+                <span style="color:rgba(255,255,255,0.55)">Bài 4</span>
+            </div>
+
+            <div class="hero-badge"><i class="fa-solid fa-users-gear"></i> Chương 3 · Báo cáo cá nhân</div>
+            <h1 class="hero-title">Sử Dụng Công Cụ<br><span>Hợp Tác Trực Tuyến</span></h1>
+            <p class="hero-desc">Báo cáo cá nhân về việc sử dụng các công cụ hợp tác trực tuyến trong dự án nhóm — Notion, Google Docs và Google Drive — từ đó rút ra trải nghiệm và bài học thực tế.</p>
+
+            <div class="score-banner">
+                <div class="score-big">3</div>
+                <div class="score-info">
+                    <div class="s-label">Công cụ đã sử dụng</div>
+                    <div class="s-val">Notion · Google Docs · Google Drive</div>
+                </div>
+                <i class="fa-solid fa-network-wired" style="font-size:1.8rem;color:var(--accent);opacity:0.6"></i>
+            </div>
+
+            <div class="section-hdr">
+                <h2><i class="fa-solid fa-list"></i> Nội dung báo cáo</h2>
+                <button onclick="resetAll()" style="font-size:0.72rem;padding:5px 12px;border-radius:50px;border:1px solid rgba(255,255,255,0.1);background:none;color:rgba(255,255,255,0.3);cursor:pointer;font-family:'Outfit',sans-serif;">
+                    <i class="fa-solid fa-rotate-left"></i> Reset
+                </button>
+            </div>
+
+            <div id="sections-list"></div>
+
+            <a href="cns.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Quay lại danh sách bài tập</a>
+            <div class="nav-btns">
+                <a href="cns_bai3.html" class="nav-btn-prev"><i class="fa-solid fa-chevron-left"></i> Bài 3: Viết Prompt</a>
+                <a href="cns_bai5.html" class="nav-btn-next">Bài 5: Sáng tạo nội dung AI <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+        </main>
+    </div>
+
+    <footer class="tutor-footer">
+        <div class="footer-content">
+            <p>&copy; 2026 Hoàng Mạnh Trường. Học để hiểu, không chỉ để qua môn.</p>
+        </div>
+    </footer>
+
+    <div id="admin-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:10001;justify-content:center;align-items:center;backdrop-filter:blur(12px);">
+        <div style="background:rgba(8,12,35,0.98);border:1px solid rgba(245,158,11,0.22);border-radius:28px;padding:2rem;width:300px;text-align:center;">
+            <i class="fa-solid fa-shield-halved" style="font-size:2rem;color:var(--accent);margin-bottom:1rem;display:block;"></i>
+            <h3 style="margin-bottom:1.2rem;font-size:0.95rem;color:#f8fafc;">Xác thực Admin</h3>
+            <input type="password" id="admin-pwd" placeholder="Mật khẩu..."
+                style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:11px;border-radius:12px;font-family:'Outfit',sans-serif;margin-bottom:12px;text-align:center;letter-spacing:5px;"
+                onkeydown="if(event.key==='Enter')checkPwd()">
+            <button onclick="checkPwd()" style="width:100%;padding:11px;border-radius:12px;border:none;background:linear-gradient(135deg,#f59e0b,#06b6d4);color:#fff;font-family:'Outfit',sans-serif;font-weight:700;cursor:pointer;margin-bottom:8px;">Xác nhận</button>
+            <button onclick="closeModal()" style="background:none;border:none;color:rgba(255,255,255,0.3);cursor:pointer;font-family:'Outfit',sans-serif;font-size:0.82rem;">Hủy</button>
+        </div>
+    </div>
+    <div style="position:fixed;bottom:24px;right:24px;z-index:999;">
+        <button id="admin-fab" class="admin-fab" onclick="toggleAdmin()"><i class="fa-solid fa-lock"></i> Admin</button>
+    </div>
+
+    <script>
+    /* ── Image helpers ── */
+    const IMGS_KEY = 'cns_bai4_imgs';
+    let savedImgs = JSON.parse(localStorage.getItem(IMGS_KEY) || '{}');
+    function saveImgs(){ localStorage.setItem(IMGS_KEY, JSON.stringify(savedImgs)); }
+    function initImgSlot(slotId){
+        const wrap = document.getElementById(slotId); if(!wrap) return;
+        const key = 'img4_' + slotId;
+        const saved = localStorage.getItem(key);
+        if(saved) showPreview(wrap, saved, key);
+        wrap.querySelector('input[type="file"]')?.addEventListener('change', function(e){
+            const file = e.target.files[0]; if(!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => { localStorage.setItem(key, ev.target.result); showPreview(wrap, ev.target.result, key); };
+            reader.readAsDataURL(file);
+        });
+    }
+    function showPreview(wrap, src, key){
+        wrap.innerHTML = '<img src="'+src+'" class="img-preview" onclick="openLightbox(\''+key+'\')">'
+            +'<div class="img-actions">'
+            +'<label class="btn-img-change"><input type="file" accept="image/*"> Đổi ảnh</label>'
+            +'<button class="btn-img-remove" onclick="removeImg(\''+key+'\',\''+wrap.id+'\')">Xóa</button>'
+            +'</div>';
+        wrap.querySelector('input')?.addEventListener('change', function(e){
+            const file = e.target.files[0]; if(!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => { localStorage.setItem(key, ev.target.result); showPreview(wrap, ev.target.result, key); };
+            reader.readAsDataURL(file);
+        });
+    }
+    function removeImg(key, slotId){
+        localStorage.removeItem(key);
+        const wrap = document.getElementById(slotId);
+        wrap.innerHTML = '<label class="img-placeholder"><input type="file" accept="image/*">'
+            +'<i class="fa-solid fa-image" style="font-size:1.5rem;color:rgba(245,158,11,0.4);margin-bottom:8px;display:block;"></i>'
+            +'<span style="font-size:0.8rem;color:rgba(255,255,255,0.3);">Nhấn để tải ảnh lên</span></label>';
+        initImgSlot(slotId);
+    }
+    function openLightbox(key){
+        const src = localStorage.getItem(key); if(!src) return;
+        const lb = document.createElement('div');
+        lb.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:20000;display:flex;align-items:center;justify-content:center;cursor:zoom-out;';
+        lb.innerHTML = '<img src="'+src+'" style="max-width:90vw;max-height:90vh;border-radius:12px;">';
+        lb.onclick = () => lb.remove();
+        document.body.appendChild(lb);
+    }
+    function imgSlot(id, label){
+        return '<div class="img-wrap"><div id="'+id+'"><label class="img-placeholder"><input type="file" accept="image/*">'
+            +'<i class="fa-solid fa-image" style="font-size:1.5rem;color:rgba(245,158,11,0.4);margin-bottom:8px;display:block;"></i>'
+            +'<span style="font-size:0.8rem;color:rgba(255,255,255,0.3);">'+label+'</span></label></div></div>';
+    }
+
+    /* ── Sections ── */
+    const sections = [
+      { id:1, title:'I. Giới thiệu chung', sub:'Bối cảnh & mục tiêu bài tập',
+        render: function(){
+            return '<div class="prose">Trong bối cảnh làm việc nhóm trong môi trường số, việc sử dụng các công cụ hỗ trợ là rất cần thiết để tăng hiệu quả phối hợp và quản lý công việc. Trong bài tập này, em đã tham gia sử dụng các công cụ trực tuyến để thực hiện một <strong>dự án nhóm nhỏ</strong>, từ đó rút ra những trải nghiệm và bài học thực tế.</div>'
+            +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:4px;">'
+            +'<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;text-align:center;"><i class="fa-solid fa-table-columns" style="font-size:1.4rem;color:var(--accent);margin-bottom:8px;display:block;"></i><div style="font-size:0.7rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px;">Công cụ 1</div><div style="font-size:0.82rem;font-weight:600;color:#f8fafc;margin-top:3px;">Notion</div></div>'
+            +'<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;text-align:center;"><i class="fa-solid fa-file-lines" style="font-size:1.4rem;color:#60a5fa;margin-bottom:8px;display:block;"></i><div style="font-size:0.7rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px;">Công cụ 2</div><div style="font-size:0.82rem;font-weight:600;color:#f8fafc;margin-top:3px;">Google Docs</div></div>'
+            +'<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;text-align:center;"><i class="fa-brands fa-google-drive" style="font-size:1.4rem;color:#4ade80;margin-bottom:8px;display:block;"></i><div style="font-size:0.7rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px;">Công cụ 3</div><div style="font-size:0.82rem;font-weight:600;color:#f8fafc;margin-top:3px;">Google Drive</div></div>'
+            +'</div>';
+        }
+      },
+      { id:2, title:'II. Các công cụ đã sử dụng', sub:'Notion · Google Docs · Google Drive',
+        render: function(){
+            return '<div class="tool-card">'
+            +'<div class="tool-header"><div class="tool-icon notion"><i class="fa-solid fa-table-columns"></i></div><div><div class="tool-name">Notion</div><div class="tool-type">Quản lý dự án</div></div></div>'
+            +'<ul class="bullet-list"><li><i class="bi fa-solid fa-circle-dot"></i>Tạo và phân công nhiệm vụ cho từng thành viên</li><li><i class="bi fa-solid fa-circle-dot"></i>Theo dõi tiến độ công việc theo thời gian thực</li><li><i class="bi fa-solid fa-circle-dot"></i>Đặt deadline cụ thể cho từng task</li></ul>'
+            +'</div>'
+            +'<div class="tool-card">'
+            +'<div class="tool-header"><div class="tool-icon gdocs"><i class="fa-solid fa-file-lines"></i></div><div><div class="tool-name">Google Docs</div><div class="tool-type">Soạn thảo tài liệu</div></div></div>'
+            +'<ul class="bullet-list"><li><i class="bi fa-solid fa-circle-dot"></i>Soạn nội dung chung của nhóm theo thời gian thực</li><li><i class="bi fa-solid fa-circle-dot"></i>Chỉnh sửa và đóng góp trực tiếp vào tài liệu</li><li><i class="bi fa-solid fa-circle-dot"></i>Theo dõi lịch sử chỉnh sửa (Version history)</li></ul>'
+            +'</div>'
+            +'<div class="tool-card">'
+            +'<div class="tool-header"><div class="tool-icon gdrive"><i class="fa-brands fa-google-drive"></i></div><div><div class="tool-name">Google Drive</div><div class="tool-type">Lưu trữ & quản lý tài liệu</div></div></div>'
+            +'<ul class="bullet-list"><li><i class="bi fa-solid fa-circle-dot"></i>Lưu trữ tập trung toàn bộ tài nguyên của dự án</li><li><i class="bi fa-solid fa-circle-dot"></i>Phân loại và tổ chức tài liệu theo hệ thống thư mục khoa học</li><li><i class="bi fa-solid fa-circle-dot"></i>Chia sẻ quyền truy cập và cộng tác file nhanh chóng giữa các thành viên</li></ul>'
+            +'</div>';
+        }
+      },
+      { id:3, title:'III. Thực hiện nhiệm vụ cá nhân', sub:'Notion · Google Docs · Google Drive',
+        render: function(){
+            return '<div class="prose">Trong quá trình thực hiện dự án, em đã sử dụng kết hợp nhiều công cụ để quản lý và hoàn thành công việc cá nhân một cách hiệu quả.</div>'
+            +'<div class="prose"><strong>1. Quản lý nhiệm vụ cá nhân (Notion)</strong></div>'
+            +'<div class="prose">Em sử dụng Notion để tạo bảng quản lý công việc theo dạng <strong>Kanban</strong>. Mỗi nhiệm vụ đều được ghi rõ nội dung, deadline và trạng thái. Em thường xuyên cập nhật tiến độ để đảm bảo hoàn thành đúng hạn.</div>'
+            +'<div class="kanban-grid">'
+            +'<div class="kanban-col todo"><div class="kanban-label">To Do</div><div class="kanban-item">Nghiên cứu công cụ</div><div class="kanban-item">Lên kế hoạch nội dung</div></div>'
+            +'<div class="kanban-col inprogress"><div class="kanban-label">In Progress</div><div class="kanban-item">Viết báo cáo cá nhân</div><div class="kanban-item">Chụp minh chứng</div></div>'
+            +'<div class="kanban-col done"><div class="kanban-label">Done</div><div class="kanban-item">Tạo bảng Kanban</div><div class="kanban-item">Phân công nhiệm vụ</div><div class="kanban-item">Tổng hợp nội dung</div></div>'
+            +'</div>'
+            +'<div class="evidence-box"><i class="fa-solid fa-camera"></i><span><strong>Minh chứng:</strong> Ảnh bảng task trên Notion có tên tài khoản · Ảnh task đã chuyển sang "Done"</span></div>'
+            +imgSlot('img-notion', 'Tải ảnh bảng Notion (Kanban board)')
+            +'<div class="prose" style="margin-top:20px"><strong>2. Soạn thảo và đóng góp nội dung (Google Docs)</strong></div>'
+            +'<div class="prose">Em tham gia trực tiếp vào việc xây dựng nội dung trên Google Docs. Nhờ tính năng cộng tác thời gian thực, việc làm việc nhóm trở nên nhanh và thuận tiện hơn.</div>'
+            +'<ul class="bullet-list"><li><i class="bi fa-solid fa-circle-dot"></i>Viết nội dung theo phần được phân công</li><li><i class="bi fa-solid fa-circle-dot"></i>Chỉnh sửa và cập nhật theo góp ý của nhóm</li><li><i class="bi fa-solid fa-circle-dot"></i>Comment góp ý cho các thành viên khác</li></ul>'
+            +'<div class="evidence-box"><i class="fa-solid fa-camera"></i><span><strong>Minh chứng:</strong> Ảnh nội dung em đã viết · Ảnh lịch sử chỉnh sửa (Version history) có tên em</span></div>'
+            +imgSlot('img-docs', 'Tải ảnh Google Docs (nội dung đã viết)')
+            +'<div class="prose" style="margin-top:20px"><strong>3. Lưu trữ và tổ chức tài liệu (Google Drive)</strong></div>'
+            +'<div class="prose">Em sử dụng Google Drive để lưu trữ tài liệu một cách khoa học. Ngoài ra, em còn <strong>gắn link Drive vào Notion</strong> để tiện truy cập từ bảng quản lý công việc.</div>'
+            +'<ul class="bullet-list"><li><i class="bi fa-solid fa-circle-dot"></i>Tạo thư mục riêng cho dự án</li><li><i class="bi fa-solid fa-circle-dot"></i>Phân chia file theo từng nội dung</li><li><i class="bi fa-solid fa-circle-dot"></i>Đặt tên file rõ ràng, dễ tìm kiếm</li></ul>'
+            +'<div class="evidence-box"><i class="fa-solid fa-camera"></i><span><strong>Minh chứng:</strong> Ảnh cấu trúc thư mục trên Google Drive</span></div>'
+            +imgSlot('img-drive', 'Tải ảnh cấu trúc thư mục Google Drive');
+        }
+      },
+      { id:4, title:'IV. Nhật ký minh chứng & Kết luận', sub:'Log theo ngày & tài liệu tham khảo',
+        render: function(){
+            return '<div class="prose"><strong>Nhật ký thực hiện theo ngày:</strong></div>'
+            +'<table class="log-table"><thead><tr><th>Ngày</th><th>Hoạt động</th><th>Công cụ</th></tr></thead><tbody>'
+            +'<tr><td style="color:#fcd34d;font-weight:600;white-space:nowrap">Ngày 1</td><td>Tạo bảng công việc, phân công nhiệm vụ cho các thành viên</td><td><span style="color:rgba(255,255,255,0.5)">Notion</span></td></tr>'
+            +'<tr><td style="color:#fcd34d;font-weight:600;white-space:nowrap">Ngày 2</td><td>Bắt đầu làm nội dung theo phần được phân công</td><td><span style="color:rgba(255,255,255,0.5)">Google Docs</span></td></tr>'
+            +'<tr><td style="color:#fcd34d;font-weight:600;white-space:nowrap">Ngày 7</td><td>Tổng hợp và kiểm tra lại toàn bộ nội dung · Hoàn thiện tài liệu</td><td><span style="color:rgba(255,255,255,0.5)">Google Docs · Drive</span></td></tr>'
+            +'</tbody></table>'
+            +'<div class="prose" style="margin-top:16px"><strong>Tài liệu dự án (Google Docs):</strong></div>'
+            +'<a href="https://docs.google.com/document/d/1S_GPY1yLlDuCZ7e9LL4MEhed70lyaRDEXGyypNsVNfE/edit" target="_blank" class="doc-link">'
+            +'<div class="dl-icon"><i class="fa-solid fa-file-lines"></i></div>'
+            +'<div><div class="dl-title">Tài liệu dự án nhóm — Google Docs</div><div class="dl-url">docs.google.com/document/d/1S_GPY1y...</div></div>'
+            +'<i class="fa-solid fa-arrow-up-right-from-square" style="color:rgba(255,255,255,0.3);margin-left:auto"></i>'
+            +'</a>'
+            +'<div class="conclusion-box" style="margin-top:20px">'
+            +'<h4><i class="fa-solid fa-flag-checkered"></i> Kết luận & Bài học rút ra</h4>'
+            +'<ul class="bullet-list">'
+            +'<li><i class="bi fa-solid fa-circle-dot"></i>Sự kết hợp giữa <strong>Notion + Google Docs + Drive</strong> tạo ra một hệ sinh thái làm việc nhóm hoàn chỉnh và hiệu quả</li>'
+            +'<li><i class="bi fa-solid fa-circle-dot"></i>Notion giúp <em>quản lý tiến độ</em> rõ ràng, tránh bỏ sót nhiệm vụ</li>'
+            +'<li><i class="bi fa-solid fa-circle-dot"></i>Google Docs cho phép <em>cộng tác thời gian thực</em>, giảm thiểu xung đột phiên bản</li>'
+            +'<li><i class="bi fa-solid fa-circle-dot"></i>Google Drive đảm bảo <em>lưu trữ tập trung</em>, dễ truy cập từ mọi thiết bị</li>'
+            +'<li><i class="bi fa-solid fa-circle-dot"></i>Kỹ năng sử dụng công cụ số là <strong>năng lực cốt lõi</strong> trong môi trường làm việc hiện đại</li>'
+            +'</ul>'
+            +'</div>';
+        }
+      }
+    ];
+
+    /* ── Engine ── */
+    const STORAGE_KEY = 'cns_bai4_read';
+    let readSet = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'));
+    function saveRead(){ localStorage.setItem(STORAGE_KEY, JSON.stringify([...readSet])); }
+    function updateRing(){
+        const pct = Math.round((readSet.size / sections.length) * 100), circ = 251.2;
+        document.getElementById('ring-fill').style.strokeDashoffset = circ - (circ * pct / 100);
+        document.getElementById('ring-pct').textContent = pct + '%';
+        document.getElementById('ring-sub').textContent = readSet.size + ' / ' + sections.length + ' mục';
+        document.querySelectorAll('.sec-nav-item').forEach(el => {
+            const id = parseInt(el.dataset.id);
+            el.classList.toggle('done', readSet.has(id));
+            el.querySelector('.snav-dot').style.background = readSet.has(id) ? 'var(--accent)' : 'rgba(255,255,255,0.15)';
+        });
+    }
+    function renderSections(){
+        const list = document.getElementById('sections-list'), nav = document.getElementById('sec-nav');
+        list.innerHTML = sections.map(s =>
+            '<div class="sec-card ' + (readSet.has(s.id) ? 'read' : '') + '" id="sec-' + s.id + '">'
+            + '<div class="sec-head" onclick="toggleSec(' + s.id + ')">'
+            + '<div class="sec-num-badge">' + s.id + '</div>'
+            + '<div class="sec-head-text"><div class="sec-head-title">' + s.title + '</div><div class="sec-head-sub">' + s.sub + '</div></div>'
+            + '<button class="sec-read-btn" onclick="event.stopPropagation();toggleRead(' + s.id + ')" title="Đánh dấu đã đọc"><i class="fa-solid fa-check" style="font-size:0.7rem"></i></button>'
+            + '<i class="fa-solid fa-chevron-down expand-icon"></i>'
+            + '</div>'
+            + '<div class="sec-body"><div class="sec-body-inner">' + s.render() + '</div></div>'
+            + '</div>'
+        ).join('');
+        nav.innerHTML = sections.map(s =>
+            '<a class="sec-nav-item ' + (readSet.has(s.id) ? 'done' : '') + '" data-id="' + s.id + '" href="#sec-' + s.id + '" onclick="openSec(' + s.id + ')">'
+            + '<span class="snav-dot"></span>' + s.title + '</a>'
+        ).join('');
+        ['img-notion','img-docs','img-drive'].forEach(initImgSlot);
+        updateRing();
+    }
+    function toggleSec(id){ document.getElementById('sec-' + id).classList.toggle('open'); }
+    function openSec(id){ document.getElementById('sec-' + id).classList.add('open'); }
+    function toggleRead(id){
+        if(readSet.has(id)) readSet.delete(id); else readSet.add(id);
+        saveRead();
+        document.getElementById('sec-' + id).classList.toggle('read', readSet.has(id));
+        updateRing();
+    }
+    function resetAll(){
+        readSet.clear(); saveRead();
+        document.querySelectorAll('.sec-card').forEach(c => c.classList.remove('read'));
+        updateRing();
+    }
+    let isAdmin = false;
+    const ADMIN_PASS = 'mtruong2026';
+    function toggleAdmin(){
+        if(isAdmin){ isAdmin=false; document.getElementById('admin-fab').classList.remove('logged'); document.getElementById('admin-fab').innerHTML='<i class="fa-solid fa-lock"></i> Admin'; return; }
+        document.getElementById('admin-modal').style.display='flex';
+        setTimeout(()=>document.getElementById('admin-pwd').focus(),100);
+    }
+    function checkPwd(){
+        if(document.getElementById('admin-pwd').value===ADMIN_PASS){
+            isAdmin=true; closeModal();
+            document.getElementById('admin-fab').classList.add('logged');
+            document.getElementById('admin-fab').innerHTML='<i class="fa-solid fa-unlock"></i> Admin';
+        } else {
+            document.getElementById('admin-pwd').style.borderColor='#ef4444';
+            setTimeout(()=>document.getElementById('admin-pwd').style.borderColor='',1000);
+        }
+    }
+    function closeModal(){ document.getElementById('admin-modal').style.display='none'; document.getElementById('admin-pwd').value=''; }
+
+    renderSections();
+    setTimeout(()=>{ const f=document.getElementById('sec-1'); if(f) f.classList.add('open'); },100);
+    </script>
+    <script src="../assets/js/common.js"></script>
+</body>
+</html>

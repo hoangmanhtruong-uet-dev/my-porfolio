@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 1 — Quản Lý Tệp & Thư Mục | CNS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/common.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --blue: #3b82f6;
+            --cyan: #06b6d4;
+            --green: #22c55e;
+            --orange: #f97316;
+            --red: #ef4444;
+            --purple: #a855f7;
+        }
+
+        body { background: #050810; overflow-x: hidden; }
+
+        /* ── Layout ── */
+        .layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 32px;
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 120px 24px 100px;
+            align-items: start;
+        }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            position: sticky;
+            top: 100px;
+        }
+
+        .sidebar-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .sidebar-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.3);
+            margin-bottom: 14px;
+        }
+
+        /* Progress ring */
+        .progress-ring-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 0 4px;
+        }
+
+        .ring-svg { transform: rotate(-90deg); }
+
+        .ring-bg { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 8; }
+        .ring-fill {
+            fill: none;
+            stroke: url(#ringGrad);
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.6s cubic-bezier(0.23,1,0.32,1);
+        }
+
+        .ring-label {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #f8fafc;
+            margin-top: -4px;
+        }
+
+        .ring-sub {
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.35);
+            margin-top: 2px;
+        }
+
+        /* Step nav list */
+        .step-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.45);
+            text-decoration: none;
+        }
+
+        .step-nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+
+        .step-nav-item.done { color: var(--green); }
+        .step-nav-item.done .snav-dot { background: var(--green); }
+
+        .snav-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            flex-shrink: 0;
+            transition: background 0.3s;
+        }
+
+        /* Meta card */
+        .meta-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.45);
+        }
+        .meta-row:last-child { border-bottom: none; }
+        .meta-row i { width: 16px; text-align: center; }
+
+        /* ── Main content ── */
+        .main-content {}
+
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.3);
+            margin-bottom: 28px;
+        }
+        .breadcrumb a { color: rgba(255,255,255,0.3); text-decoration: none; transition: color 0.2s; }
+        .breadcrumb a:hover { color: var(--blue); }
+
+        /* Hero */
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 14px;
+            border-radius: 50px;
+            background: rgba(59,130,246,0.1);
+            border: 1px solid rgba(59,130,246,0.22);
+            color: #60a5fa;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 14px;
+        }
+
+        .hero-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #f8fafc;
+            line-height: 1.25;
+            margin-bottom: 12px;
+        }
+
+        .hero-title span {
+            background: linear-gradient(135deg, var(--blue), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-desc {
+            color: rgba(255,255,255,0.48);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            max-width: 640px;
+            margin-bottom: 28px;
+        }
+
+        /* Score banner */
+        .score-banner {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 22px;
+            background: linear-gradient(135deg, rgba(34,197,94,0.08), rgba(6,182,212,0.04));
+            border: 1px solid rgba(34,197,94,0.2);
+            border-radius: 16px;
+            margin-bottom: 36px;
+        }
+
+        .score-big {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--green);
+            line-height: 1;
+        }
+
+        .score-info { flex: 1; }
+        .score-info .s-label { font-size: 0.72rem; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 1px; }
+        .score-info .s-val { font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-top: 2px; }
+
+        /* Section header */
+        .section-hdr {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .section-hdr h2 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-hdr h2 i { color: var(--blue); }
+
+        .btn-reset-all {
+            font-size: 0.72rem;
+            padding: 5px 12px;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: none;
+            color: rgba(255,255,255,0.3);
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.2s;
+        }
+        .btn-reset-all:hover { border-color: rgba(239,68,68,0.4); color: #f87171; }
+
+        /* ── Step Card ── */
+        .step-card {
+            background: rgba(255,255,255,0.025);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 20px;
+            margin-bottom: 14px;
+            overflow: hidden;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            scroll-margin-top: 110px;
+        }
+
+        .step-card:hover {
+            border-color: rgba(59,130,246,0.28);
+            box-shadow: 0 4px 24px rgba(59,130,246,0.08);
+        }
+
+        .step-card.completed {
+            border-color: rgba(34,197,94,0.25);
+            background: rgba(34,197,94,0.03);
+        }
+
+        .step-card.completed:hover {
+            border-color: rgba(34,197,94,0.45);
+            box-shadow: 0 4px 24px rgba(34,197,94,0.1);
+        }
+
+        /* Card header row */
+        .step-head {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 18px 22px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .step-num-badge {
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            background: rgba(59,130,246,0.14);
+            color: #60a5fa;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 0.85rem;
+            flex-shrink: 0;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .step-card.completed .step-num-badge {
+            background: rgba(34,197,94,0.15);
+            color: var(--green);
+        }
+
+        .step-head-text { flex: 1; }
+
+        .step-head-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: #f8fafc;
+            transition: color 0.3s;
+        }
+
+        .step-card.completed .step-head-title { color: rgba(255,255,255,0.6); }
+
+        .step-head-sub {
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.28);
+            margin-top: 2px;
+        }
+
+        .step-check-btn {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.12);
+            background: none;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: transparent;
+            transition: all 0.25s ease;
+            flex-shrink: 0;
+        }
+
+        .step-check-btn:hover {
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        .step-card.completed .step-check-btn {
+            background: var(--green);
+            border-color: var(--green);
+            color: #fff;
+        }
+
+        .step-expand-icon {
+            color: rgba(255,255,255,0.2);
+            font-size: 0.75rem;
+            transition: transform 0.3s ease, color 0.2s;
+            flex-shrink: 0;
+        }
+
+        .step-card.open .step-expand-icon { transform: rotate(180deg); color: var(--blue); }
+
+        /* Card body (collapsible) */
+        .step-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.23,1,0.32,1);
+        }
+
+        .step-card.open .step-body { max-height: 1200px; }
+
+        .step-body-inner {
+            padding: 0 22px 22px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 18px;
+        }
+
+        .step-desc {
+            font-size: 0.88rem;
+            color: rgba(255,255,255,0.55);
+            line-height: 1.75;
+            margin-bottom: 14px;
+        }
+
+        .step-desc code {
+            background: rgba(59,130,246,0.12);
+            color: #93c5fd;
+            padding: 1px 7px;
+            border-radius: 5px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+        }
+
+        .step-kbd {
+            display: inline-flex; align-items: center; gap: 3px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.14);
+            border-bottom-width: 2px;
+            border-radius: 6px;
+            padding: 1px 8px;
+            font-size: 0.76rem;
+            color: rgba(255,255,255,0.75);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Tip / Warning boxes */
+        .tip-box {
+            display: flex;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            line-height: 1.55;
+            margin-bottom: 14px;
+        }
+
+        .tip-box.info {
+            background: rgba(59,130,246,0.07);
+            border-left: 3px solid var(--blue);
+            color: rgba(255,255,255,0.5);
+        }
+
+        .tip-box.warn {
+            background: rgba(249,115,22,0.07);
+            border-left: 3px solid var(--orange);
+            color: rgba(255,255,255,0.5);
+        }
+
+        .tip-box.danger {
+            background: rgba(239,68,68,0.07);
+            border-left: 3px solid var(--red);
+            color: rgba(255,255,255,0.5);
+        }
+
+        .tip-box i { margin-top: 1px; flex-shrink: 0; }
+        .tip-box.info i { color: var(--blue); }
+        .tip-box.warn i { color: var(--orange); }
+        .tip-box.danger i { color: var(--red); }
+
+        /* Image slot */
+        .step-img-wrap { margin-top: 14px; }
+
+        .step-img-placeholder {
+            width: 100%;
+            border: 2px dashed rgba(59,130,246,0.2);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s, background 0.3s;
+            background: rgba(59,130,246,0.02);
+            position: relative;
+            box-sizing: border-box;
+            display: block;
+        }
+
+        .step-img-placeholder:hover {
+            border-color: rgba(59,130,246,0.5);
+            background: rgba(59,130,246,0.06);
+        }
+
+        .step-img-placeholder input[type="file"] {
+            position: absolute; inset: 0;
+            opacity: 0; cursor: pointer;
+            width: 100%; height: 100%;
+        }
+
+        .step-img-preview {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.07);
+            display: block;
+            max-height: 340px;
+            object-fit: contain;
+            background: rgba(0,0,0,0.25);
+            cursor: zoom-in;
+            transition: opacity 0.2s;
+        }
+
+        .step-img-preview:hover { opacity: 0.9; }
+
+        .step-img-actions {
+            display: flex; gap: 8px; margin-top: 8px;
+        }
+
+        .btn-img-change {
+            font-size: 0.73rem; padding: 5px 12px;
+            border-radius: 50px;
+            border: 1px solid rgba(59,130,246,0.28);
+            background: rgba(59,130,246,0.07);
+            color: #60a5fa; cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.2s; position: relative; overflow: hidden;
+        }
+
+        .btn-img-change input[type="file"] {
+            position: absolute; inset: 0; opacity: 0; cursor: pointer;
+        }
+
+        .btn-img-change:hover { background: rgba(59,130,246,0.18); }
+
+        .btn-img-remove {
+            font-size: 0.73rem; padding: 5px 12px;
+            border-radius: 50px;
+            border: 1px solid rgba(239,68,68,0.25);
+            background: rgba(239,68,68,0.06);
+            color: #f87171; cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .btn-img-remove:hover { background: rgba(239,68,68,0.16); }
+
+        /* Result box */
+        .result-box {
+            background: linear-gradient(135deg, rgba(34,197,94,0.06), rgba(6,182,212,0.03));
+            border: 1px solid rgba(34,197,94,0.18);
+            border-radius: 20px;
+            padding: 26px 28px;
+            margin-top: 32px;
+        }
+
+        .result-box h3 {
+            font-size: 0.95rem; font-weight: 700;
+            color: var(--green); margin-bottom: 14px;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .result-box ul {
+            list-style: none; padding: 0; margin: 0;
+        }
+
+        .result-box li {
+            display: flex; align-items: flex-start; gap: 10px;
+            font-size: 0.86rem; color: rgba(255,255,255,0.55);
+            line-height: 1.6; padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .result-box li:last-child { border-bottom: none; }
+        .result-box li::before {
+            content: '✓';
+            color: var(--green);
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        /* Folder tree */
+        .folder-tree {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.55);
+            line-height: 1.9;
+            margin-top: 14px;
+        }
+
+        .folder-tree .dir { color: #60a5fa; }
+        .folder-tree .file { color: rgba(255,255,255,0.45); }
+
+        /* Back btn */
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 11px 22px; border-radius: 50px;
+            border: 1px solid rgba(59,130,246,0.25);
+            background: rgba(59,130,246,0.07);
+            color: #60a5fa; text-decoration: none;
+            font-size: 0.85rem; font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 28px;
+        }
+
+        .back-btn:hover {
+            background: rgba(59,130,246,0.18);
+            border-color: rgba(59,130,246,0.5);
+            transform: translateX(-3px);
+        }
+
+        .nav-btns {
+            display: flex;
+            gap: 12px;
+            margin-top: 28px;
+            flex-wrap: wrap;
+        }
+        .nav-btn-prev, .nav-btn-next {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 11px 22px; border-radius: 50px;
+            font-size: 0.85rem; font-weight: 600;
+            text-decoration: none; transition: all 0.3s ease;
+        }
+        .nav-btn-prev {
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.45);
+        }
+        .nav-btn-prev:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.2);
+            color: #fff;
+            transform: translateX(-3px);
+        }
+        .nav-btn-next {
+            border: 1px solid rgba(59,130,246,0.3);
+            background: rgba(59,130,246,0.08);
+            color: #60a5fa;
+            margin-left: auto;
+        }
+        .nav-btn-next:hover {
+            background: rgba(59,130,246,0.2);
+            border-color: #3b82f6;
+            color: #fff;
+            transform: translateX(3px);
+        }
+
+        /* Admin FAB */
+        .admin-fab-wrap {
+            position: fixed; bottom: 24px; right: 24px; z-index: 999;
+            display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+        }
+
+        .admin-fab {
+            padding: 10px 18px; border-radius: 50px;
+            border: 1px solid rgba(59,130,246,0.25);
+            background: rgba(59,130,246,0.1);
+            color: #60a5fa;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.82rem; font-weight: 700;
+            cursor: pointer; transition: all 0.3s ease;
+        }
+
+        .admin-fab.logged {
+            background: rgba(34,197,94,0.12);
+            border-color: rgba(34,197,94,0.3);
+            color: var(--green);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .layout { grid-template-columns: 1fr; padding-top: 100px; }
+            .sidebar { position: static; }
+        }
+    </style>
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <nav class="navbar-unified">
+        <a href="../index.html" class="nav-logo">
+            <i class="fa-solid fa-circle-user"></i> Mtruong<span>_dev</span>
+        </a>
+        <ul class="nav-links-unified">
+            <li><a href="../index.html">Trang Chủ</a></li>
+            <li><a href="about.html">Cá Nhân ▾</a>
+                <ul class="nav-dropdown">
+                    <li><a href="about.html">Về Tôi</a></li>
+                    <li><a href="education.html">Học Vấn</a></li>
+                    <li><a href="skills.html">Kỹ Năng</a></li>
+                    <li><a href="experience.html">Kinh Nghiệm</a></li>
+                </ul>
+            </li>
+            <li><a href="research_hub.html">Nghiên Cứu</a></li>
+            <li><a href="blog.html">Kiến Thức</a></li>
+            <li><a href="muctieu.html">Mục Tiêu</a></li>
+            <li><a href="cns.html">Bài Tập CNS</a></li>
+        </ul>
+        <div id="auth-controls" class="nav-auth">
+            <button class="theme-toggle" title="Chuyển chế độ"><i class="fa-solid fa-moon"></i></button>
+        </div>
+    </nav>
+
+    <div class="layout">
+        <!-- ── SIDEBAR ── -->
+        <aside class="sidebar">
+            <!-- Progress ring -->
+            <div class="sidebar-card">
+                <div class="sidebar-title">Tiến độ hoàn thành</div>
+                <div class="progress-ring-wrap">
+                    <svg class="ring-svg" width="100" height="100" viewBox="0 0 100 100">
+                        <defs>
+                            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#3b82f6"/>
+                                <stop offset="100%" stop-color="#06b6d4"/>
+                            </linearGradient>
+                        </defs>
+                        <circle class="ring-bg" cx="50" cy="50" r="40"/>
+                        <circle class="ring-fill" id="ring-fill" cx="50" cy="50" r="40"
+                            stroke-dasharray="251.2" stroke-dashoffset="251.2"/>
+                    </svg>
+                    <div class="ring-label" id="ring-pct">0%</div>
+                    <div class="ring-sub" id="ring-sub">0 / 12 bước</div>
+                </div>
+            </div>
+
+            <!-- Step nav -->
+            <div class="sidebar-card">
+                <div class="sidebar-title">Danh sách bước</div>
+                <div id="step-nav"></div>
+            </div>
+
+            <!-- Meta -->
+            <div class="sidebar-card">
+                <div class="sidebar-title">Thông tin bài</div>
+                <div class="meta-row"><i class="fa-solid fa-calendar" style="color:var(--blue)"></i> Hạn nộp: 15/03/2026</div>
+                <div class="meta-row"><i class="fa-solid fa-clock" style="color:var(--cyan)"></i> ~30 phút</div>
+                <div class="meta-row"><i class="fa-solid fa-star" style="color:#facc15"></i> Điểm: <strong style="color:var(--green);margin-left:4px;">9.5 / 10</strong></div>
+                <div class="meta-row"><i class="fa-solid fa-tag" style="color:var(--purple)"></i> File Explorer</div>
+            </div>
+        </aside>
+
+        <!-- ── MAIN ── -->
+        <main class="main-content">
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <a href="cns.html"><i class="fa-solid fa-layer-group"></i> Bài Tập CNS</a>
+                <i class="fa-solid fa-chevron-right" style="font-size:0.55rem"></i>
+                <span>Chương 1</span>
+                <i class="fa-solid fa-chevron-right" style="font-size:0.55rem"></i>
+                <span style="color:rgba(255,255,255,0.55)">Bài 1</span>
+            </div>
+
+            <!-- Hero -->
+            <div class="hero-badge"><i class="fa-solid fa-folder-open"></i> Chương 1 · Thực hành</div>
+            <h1 class="hero-title">
+                Quản Lý Tệp & Thư Mục<br>
+                <span>trên Windows</span>
+            </h1>
+            <p class="hero-desc">
+                Thực hành các thao tác cơ bản với File Explorer: tạo thư mục, tạo tệp, đổi tên, sao chép, di chuyển, xóa và khôi phục tệp từ Thùng rác.
+            </p>
+
+            <!-- Score banner -->
+            <div class="score-banner">
+                <div class="score-big">9.5</div>
+                <div class="score-info">
+                    <div class="s-label">Điểm số</div>
+                    <div class="s-val">Đã nộp · Chương 1 · Bài thực hành số 1</div>
+                </div>
+                <i class="fa-solid fa-circle-check" style="font-size:1.8rem;color:var(--green);opacity:0.7"></i>
+            </div>
+
+            <!-- Steps -->
+            <div class="section-hdr">
+                <h2><i class="fa-solid fa-list-check"></i> Các bước thực hiện</h2>
+                <button class="btn-reset-all" onclick="resetAll()">
+                    <i class="fa-solid fa-rotate-left"></i> Reset
+                </button>
+            </div>
+
+            <div id="steps-list"></div>
+
+            <!-- Folder tree result -->
+            <div class="result-box">
+                <h3><i class="fa-solid fa-circle-check"></i> Cấu trúc thư mục sau khi hoàn thành</h3>
+                <div class="folder-tree">
+<span class="dir">📁 D:\</span>
+└── <span class="dir">📁 ThucHanh_HoangManhTruong\</span>
+    ├── <span class="dir">📁 TaiLieu\</span>
+    │   └── <span class="file">📄 GhiChuQuanTrong.txt</span>  <span style="color:rgba(255,255,255,0.2)">(bản sao)</span>
+    └── <span class="file">📄 GhiChuQuanTrong.txt</span>
+                </div>
+                <ul style="margin-top:16px;">
+                    <li>Tạo thành công cấu trúc thư mục lồng nhau <code style="background:rgba(255,255,255,0.07);padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">ThucHanh_HoangManhTruong/TaiLieu/</code></li>
+                    <li>Thực hành đầy đủ 12 bước: tạo, đổi tên, sao chép, di chuyển, xóa, khôi phục</li>
+                    <li>Hiểu rõ sự khác biệt giữa <strong style="color:#fff">Delete</strong> (vào Recycle Bin) và <strong style="color:#fff">Shift+Delete</strong> (xóa vĩnh viễn)</li>
+                </ul>
+            </div>
+
+            <a href="cns.html" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i> Quay lại danh sách bài tập
+            </a>
+            <div class="nav-btns">
+                <span class="nav-btn-prev" style="opacity:0.3;cursor:default"><i class="fa-solid fa-chevron-left"></i> Bài trước</span>
+                <a href="cns_bai2.html" class="nav-btn-next">Bài 2: Tìm kiếm thông tin <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+        </main>
+    </div>
+
+    <footer class="tutor-footer">
+        <div class="footer-content">
+            <p>&copy; 2026 Hoàng Mạnh Trường. Học để hiểu, không chỉ để qua môn.</p>
+        </div>
+    </footer>
+
+    <!-- Admin Login Modal -->
+    <div id="admin-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:10001;justify-content:center;align-items:center;backdrop-filter:blur(12px);">
+        <div style="background:rgba(8,12,35,0.98);border:1px solid rgba(59,130,246,0.22);border-radius:28px;padding:2rem;width:300px;text-align:center;">
+            <i class="fa-solid fa-shield-halved" style="font-size:2rem;color:var(--blue);margin-bottom:1rem;display:block;"></i>
+            <h3 style="margin-bottom:1.2rem;font-size:0.95rem;color:#f8fafc;">Xác thực Admin</h3>
+            <input type="password" id="admin-pwd" placeholder="Mật khẩu..."
+                style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:11px;border-radius:12px;font-family:'Outfit',sans-serif;margin-bottom:12px;text-align:center;letter-spacing:5px;transition:border-color 0.3s;"
+                onkeydown="if(event.key==='Enter')checkPwd()">
+            <button onclick="checkPwd()" style="width:100%;padding:11px;border-radius:12px;border:none;background:linear-gradient(135deg,#3b82f6,#06b6d4);color:#fff;font-family:'Outfit',sans-serif;font-weight:700;cursor:pointer;margin-bottom:8px;">Xác nhận</button>
+            <button onclick="closeModal()" style="background:none;border:none;color:rgba(255,255,255,0.3);cursor:pointer;font-family:'Outfit',sans-serif;font-size:0.82rem;">Hủy</button>
+        </div>
+    </div>
+
+    <!-- Admin FAB -->
+    <div class="admin-fab-wrap">
+        <button id="admin-fab" class="admin-fab" onclick="toggleAdmin()">
+            <i class="fa-solid fa-lock"></i> Admin
+        </button>
+    </div>
+
+    <script>
+    const steps = [
+        { num:1,  title:"Mở File Explorer",           sub:"Windows + E",
+          desc:"Nhấn <span class='step-kbd'><i class='fa-brands fa-windows'></i></span> + <span class='step-kbd'>E</span> hoặc nhấp vào biểu tượng thư mục màu vàng trên thanh tác vụ.",
+          tips:[] },
+        { num:2,  title:"Truy cập ổ đĩa",             sub:"This PC → ổ D: hoặc E:",
+          desc:"Ở cột bên trái nhấp vào <strong>This PC</strong>, sau đó nhấp đúp vào ổ đĩa không phải ổ hệ thống (ví dụ: <code>D:</code> hoặc <code>E:</code>). Nếu chỉ có <code>C:</code>, vào thư mục <code>Documents</code>.",
+          tips:[] },
+        { num:3,  title:"Tạo thư mục mới",            sub:"Chuột phải → New → Folder",
+          desc:"Nhấp chuột phải vào khoảng trống → <strong>New → Folder</strong>. Đặt tên <code>ThucHanh_HoangManhTruong</code>. Nhấn <span class='step-kbd'>Enter</span>.",
+          tips:[{type:'info', icon:'fa-lightbulb', text:"Tên thư mục theo cú pháp: <code>ThucHanh_hotensinhvien</code>"}] },
+        { num:4,  title:"Vào thư mục vừa tạo",        sub:"Double-click",
+          desc:"Nhấp đúp vào thư mục <code>ThucHanh_HoangManhTruong</code> để mở.",
+          tips:[] },
+        { num:5,  title:"Tạo tệp văn bản",            sub:"New → Text Document",
+          desc:"Nhấp chuột phải → <strong>New → Text Document</strong>. Đặt tên <code>GhiChu.txt</code>. Nhấn <span class='step-kbd'>Enter</span>.",
+          tips:[] },
+        { num:6,  title:"Đổi tên tệp",                sub:"Rename → GhiChuQuanTrong.txt",
+          desc:"Nhấp chuột phải vào <code>GhiChu.txt</code> → <strong>Rename</strong>. Đổi thành <code>GhiChuQuanTrong.txt</code>. Nhấn <span class='step-kbd'>Enter</span>.",
+          tips:[{type:'info', icon:'fa-lightbulb', text:"Phím tắt: chọn file rồi nhấn <span class='step-kbd'>F2</span>"}] },
+        { num:7,  title:"Tạo thư mục con",            sub:"New → Folder → TaiLieu",
+          desc:"Trong thư mục gốc, nhấp chuột phải → <strong>New → Folder</strong>. Đặt tên <code>TaiLieu</code>.",
+          tips:[] },
+        { num:8,  title:"Sao chép tệp (Copy & Paste)", sub:"Ctrl+C → Ctrl+V",
+          desc:"Nhấp chuột phải vào <code>GhiChuQuanTrong.txt</code> → <strong>Copy</strong> (<span class='step-kbd'>Ctrl</span>+<span class='step-kbd'>C</span>). Vào thư mục <code>TaiLieu</code> → <strong>Paste</strong> (<span class='step-kbd'>Ctrl</span>+<span class='step-kbd'>V</span>). Bây giờ có bản sao trong <code>TaiLieu</code>.",
+          tips:[] },
+        { num:9,  title:"Di chuyển tệp (Cut & Paste)", sub:"Ctrl+X → Ctrl+V",
+          desc:"Quay lại thư mục gốc, tạo tệp mới tên <code>DiChuyen.txt</code>. Nhấp chuột phải → <strong>Cut</strong> (<span class='step-kbd'>Ctrl</span>+<span class='step-kbd'>X</span>). Vào <code>TaiLieu</code> → <strong>Paste</strong>. Tệp gốc biến mất khỏi vị trí cũ.",
+          tips:[{type:'warn', icon:'fa-triangle-exclamation', text:"Cut khác Copy: tệp gốc sẽ bị xóa khỏi vị trí ban đầu."}] },
+        { num:10, title:"Xóa tệp (Recycle Bin)",       sub:"Delete → vào Thùng rác",
+          desc:"Trong <code>TaiLieu</code>, nhấp chuột phải vào <code>GhiChuQuanTrong.txt</code> → <strong>Delete</strong>. Tệp chuyển vào <strong>Recycle Bin</strong>.",
+          tips:[] },
+        { num:11, title:"Xóa vĩnh viễn",               sub:"Shift + Delete",
+          desc:"Chọn <code>DiChuyen.txt</code>, nhấn <span class='step-kbd'>Shift</span>+<span class='step-kbd'>Delete</span>. Xác nhận cảnh báo — tệp bị xóa vĩnh viễn, <strong>không qua Thùng rác</strong>.",
+          tips:[{type:'danger', icon:'fa-triangle-exclamation', text:"Không thể khôi phục sau Shift+Delete!"}] },
+        { num:12, title:"Khôi phục từ Thùng rác",      sub:"Recycle Bin → Restore",
+          desc:"Mở <strong>Recycle Bin</strong> trên Desktop. Tìm <code>GhiChuQuanTrong.txt</code>, nhấp chuột phải → <strong>Restore</strong>. Tệp quay về vị trí ban đầu.",
+          tips:[{type:'info', icon:'fa-lightbulb', text:"Chỉ khôi phục được tệp xóa bằng Delete thông thường."}] }
+    ];
+
+    const STORAGE_KEY_DONE = 'cns_bai1_done';
+    const STORAGE_KEY_IMGS = 'cns_bai1_imgs';
+
+    let doneSteps = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY_DONE) || '[]'));
+    let savedImgs  = JSON.parse(localStorage.getItem(STORAGE_KEY_IMGS) || '{}');
+    let isAdmin    = sessionStorage.getItem('cns_admin') === 'true';
+
+    function saveDone() { localStorage.setItem(STORAGE_KEY_DONE, JSON.stringify([...doneSteps])); }
+    function saveImgs() { localStorage.setItem(STORAGE_KEY_IMGS, JSON.stringify(savedImgs)); }
+
+    /* ── Render ── */
+    function render() {
+        renderSteps();
+        renderSideNav();
+        updateRing();
+    }
+
+    function renderSteps() {
+        const container = document.getElementById('steps-list');
+        container.innerHTML = steps.map(s => {
+            const done = doneSteps.has(s.num);
+            const imgSrc = savedImgs[s.num];
+
+            const tipsHtml = s.tips.map(t => `
+                <div class="tip-box ${t.type}">
+                    <i class="fa-solid ${t.icon}"></i>
+                    <span>${t.text}</span>
+                </div>`).join('');
+
+            let imgSlot = '';
+            if (imgSrc) {
+                imgSlot = `
+                    <div class="step-img-wrap">
+                        <img src="${imgSrc}" class="step-img-preview" onclick="zoomImg('${imgSrc}')">
+                        ${isAdmin ? `<div class="step-img-actions">
+                            <label class="btn-img-change"><i class="fa-solid fa-image"></i> Đổi ảnh
+                                <input type="file" accept="image/*" onchange="handleImg(event,${s.num})">
+                            </label>
+                            <button class="btn-img-remove" onclick="removeImg(${s.num})"><i class="fa-solid fa-trash"></i> Xóa</button>
+                        </div>` : ''}
+                    </div>`;
+            } else if (isAdmin) {
+                imgSlot = `
+                    <div class="step-img-wrap">
+                        <label class="step-img-placeholder">
+                            <div style="font-size:1.4rem;color:rgba(59,130,246,0.35);margin-bottom:5px;"><i class="fa-solid fa-image"></i></div>
+                            <div style="font-size:0.75rem;color:rgba(255,255,255,0.25);">Nhấp để chèn ảnh minh họa</div>
+                            <input type="file" accept="image/*" onchange="handleImg(event,${s.num})">
+                        </label>
+                    </div>`;
+            }
+
+            return `
+                <div class="step-card ${done ? 'completed' : ''}" id="step-${s.num}">
+                    <div class="step-head" onclick="toggleStep(${s.num})">
+                        <div class="step-num-badge">${done ? '<i class="fa-solid fa-check" style="font-size:0.8rem"></i>' : s.num}</div>
+                        <div class="step-head-text">
+                            <div class="step-head-title">${s.title}</div>
+                            <div class="step-head-sub">${s.sub}</div>
+                        </div>
+                        <button class="step-check-btn" onclick="event.stopPropagation();toggleDone(${s.num})" title="${done ? 'Bỏ đánh dấu' : 'Đánh dấu hoàn thành'}">
+                            <i class="fa-solid fa-check" style="font-size:0.7rem"></i>
+                        </button>
+                        <i class="fa-solid fa-chevron-down step-expand-icon"></i>
+                    </div>
+                    <div class="step-body">
+                        <div class="step-body-inner">
+                            <div class="step-desc">${s.desc}</div>
+                            ${tipsHtml}
+                            ${imgSlot}
+                        </div>
+                    </div>
+                </div>`;
+        }).join('');
+    }
+
+    function renderSideNav() {
+        const nav = document.getElementById('step-nav');
+        nav.innerHTML = steps.map(s => `
+            <a class="step-nav-item ${doneSteps.has(s.num) ? 'done' : ''}" onclick="scrollToStep(${s.num})">
+                <span class="snav-dot"></span>
+                <span>${s.num}. ${s.title}</span>
+            </a>`).join('');
+    }
+
+    function updateRing() {
+        const pct = Math.round((doneSteps.size / steps.length) * 100);
+        const circ = 251.2;
+        document.getElementById('ring-fill').style.strokeDashoffset = circ - (circ * pct / 100);
+        document.getElementById('ring-pct').textContent = pct + '%';
+        document.getElementById('ring-sub').textContent = `${doneSteps.size} / ${steps.length} bước`;
+    }
+
+    /* ── Interactions ── */
+    function toggleStep(num) {
+        const card = document.getElementById('step-' + num);
+        card.classList.toggle('open');
+    }
+
+    function toggleDone(num) {
+        if (doneSteps.has(num)) doneSteps.delete(num);
+        else doneSteps.add(num);
+        saveDone();
+        render();
+        // Re-open the card if it was open
+        const card = document.getElementById('step-' + num);
+        if (card) card.classList.add('open');
+    }
+
+    function resetAll() {
+        if (!confirm('Reset toàn bộ tiến độ?')) return;
+        doneSteps.clear();
+        saveDone();
+        render();
+    }
+
+    function scrollToStep(num) {
+        const el = document.getElementById('step-' + num);
+        if (!el) return;
+        el.classList.add('open');
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    /* ── Images ── */
+    function handleImg(event, num) {
+        if (!isAdmin) return;
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => { savedImgs[num] = e.target.result; saveImgs(); render(); };
+        reader.readAsDataURL(file);
+    }
+
+    function removeImg(num) {
+        if (!isAdmin) return;
+        delete savedImgs[num]; saveImgs(); render();
+    }
+
+    function zoomImg(src) {
+        const o = document.createElement('div');
+        o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.93);z-index:99999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;backdrop-filter:blur(10px);';
+        o.innerHTML = `<img src="${src}" style="max-width:92vw;max-height:90vh;border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,0.8);">`;
+        o.onclick = () => o.remove();
+        document.body.appendChild(o);
+    }
+
+    /* ── Admin ── */
+    function toggleAdmin() {
+        if (isAdmin) {
+            if (confirm('Đăng xuất Admin?')) {
+                sessionStorage.removeItem('cns_admin');
+                isAdmin = false; updateFab(); render();
+            }
+        } else {
+            document.getElementById('admin-modal').style.display = 'flex';
+            setTimeout(() => document.getElementById('admin-pwd').focus(), 80);
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('admin-modal').style.display = 'none';
+        document.getElementById('admin-pwd').value = '';
+    }
+
+    function checkPwd() {
+        const pwd = document.getElementById('admin-pwd').value;
+        if (pwd === '1002') {
+            sessionStorage.setItem('cns_admin', 'true');
+            isAdmin = true; closeModal(); updateFab(); render();
+        } else {
+            const inp = document.getElementById('admin-pwd');
+            inp.style.borderColor = '#ef4444';
+            setTimeout(() => inp.style.borderColor = '', 800);
+            inp.value = '';
+        }
+    }
+
+    function updateFab() {
+        const fab = document.getElementById('admin-fab');
+        if (isAdmin) {
+            fab.innerHTML = '<i class="fa-solid fa-unlock"></i> Admin';
+            fab.className = 'admin-fab logged';
+        } else {
+            fab.innerHTML = '<i class="fa-solid fa-lock"></i> Admin';
+            fab.className = 'admin-fab';
+        }
+    }
+
+    // Init — open first step by default
+    updateFab();
+    render();
+    setTimeout(() => {
+        const first = document.getElementById('step-1');
+        if (first) first.classList.add('open');
+    }, 100);
+    </script>
+    <script src="../assets/js/common.js"></script>
+</body>
+</html>

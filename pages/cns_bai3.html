@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 3 — Kỹ Năng Viết Prompt Hiệu Quả | CNS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/common.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root{ --blue:#3b82f6;--cyan:#06b6d4;--green:#22c55e;--orange:#f97316;--red:#ef4444;--purple:#a855f7;--yellow:#facc15;--teal:#14b8a6; }
+        body{ background:#050810; overflow-x:hidden; }
+
+        .layout{ display:grid; grid-template-columns:260px 1fr; gap:32px; max-width:1140px; margin:0 auto; padding:120px 24px 100px; align-items:start; }
+
+        /* Sidebar */
+        .sidebar{ position:sticky; top:100px; }
+        .sidebar-card{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:20px; padding:20px; margin-bottom:16px; }
+        .sidebar-title{ font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:rgba(255,255,255,0.3); margin-bottom:14px; }
+        .ring-svg{ transform:rotate(-90deg); }
+        .ring-bg  { fill:none; stroke:rgba(255,255,255,0.06); stroke-width:8; }
+        .ring-fill{ fill:none; stroke:url(#rg3); stroke-width:8; stroke-linecap:round; transition:stroke-dashoffset 0.6s cubic-bezier(0.23,1,0.32,1); }
+        .progress-ring-wrap{ display:flex; flex-direction:column; align-items:center; padding:8px 0 4px; }
+        .ring-label{ font-size:1.8rem; font-weight:800; color:#f8fafc; margin-top:-4px; }
+        .ring-sub  { font-size:0.72rem; color:rgba(255,255,255,0.35); margin-top:2px; }
+        .sec-nav-item{ display:flex; align-items:center; gap:10px; padding:7px 10px; border-radius:10px; cursor:pointer; transition:background 0.2s; font-size:0.82rem; color:rgba(255,255,255,0.45); text-decoration:none; }
+        .sec-nav-item:hover{ background:rgba(255,255,255,0.05); color:#fff; }
+        .sec-nav-item.done{ color:var(--teal); }
+        .snav-dot{ width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.15); flex-shrink:0; }
+        .sec-nav-item.done .snav-dot{ background:var(--teal); }
+        .meta-row{ display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:0.82rem; color:rgba(255,255,255,0.45); }
+        .meta-row:last-child{ border-bottom:none; }
+        .meta-row i{ width:16px; text-align:center; }
+
+        /* Breadcrumb */
+        .breadcrumb{ display:flex; align-items:center; gap:7px; font-size:0.78rem; color:rgba(255,255,255,0.3); margin-bottom:28px; }
+        .breadcrumb a{ color:rgba(255,255,255,0.3); text-decoration:none; transition:color 0.2s; }
+        .breadcrumb a:hover{ color:var(--teal); }
+
+        /* Hero */
+        .hero-badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 14px; border-radius:50px; background:rgba(20,184,166,0.1); border:1px solid rgba(20,184,166,0.22); color:#5eead4; font-size:0.75rem; font-weight:700; letter-spacing:0.5px; margin-bottom:14px; }
+        .hero-title{ font-size:2rem; font-weight:800; color:#f8fafc; line-height:1.25; margin-bottom:12px; }
+        .hero-title span{ background:linear-gradient(135deg,var(--teal),var(--blue)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .hero-desc{ color:rgba(255,255,255,0.48); font-size:0.95rem; line-height:1.7; max-width:640px; margin-bottom:28px; }
+
+        /* Score banner */
+        .score-banner{ display:flex; align-items:center; gap:16px; padding:16px 22px; background:linear-gradient(135deg,rgba(20,184,166,0.08),rgba(59,130,246,0.04)); border:1px solid rgba(20,184,166,0.2); border-radius:16px; margin-bottom:36px; }
+        .score-big{ font-size:2.2rem; font-weight:800; color:var(--teal); line-height:1; }
+        .score-info .s-label{ font-size:0.72rem; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:1px; }
+        .score-info .s-val  { font-size:0.9rem; color:rgba(255,255,255,0.7); margin-top:2px; }
+
+        /* Section header */
+        .section-hdr{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+        .section-hdr h2{ font-size:1.05rem; font-weight:700; color:#f8fafc; display:flex; align-items:center; gap:8px; }
+        .section-hdr h2 i{ color:var(--teal); }
+
+        /* Accordion */
+        .sec-card{ background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.07); border-radius:20px; margin-bottom:14px; overflow:hidden; transition:border-color 0.3s, box-shadow 0.3s; scroll-margin-top:110px; }
+        .sec-card:hover{ border-color:rgba(20,184,166,0.25); box-shadow:0 4px 24px rgba(20,184,166,0.07); }
+        .sec-card.read{ border-color:rgba(20,184,166,0.22); background:rgba(20,184,166,0.03); }
+        .sec-head{ display:flex; align-items:center; gap:14px; padding:18px 22px; cursor:pointer; user-select:none; }
+        .sec-num-badge{ width:34px; height:34px; border-radius:10px; background:rgba(20,184,166,0.14); color:#5eead4; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.85rem; flex-shrink:0; transition:background 0.3s; }
+        .sec-card.read .sec-num-badge{ background:rgba(20,184,166,0.25); color:#2dd4bf; }
+        .sec-head-text{ flex:1; }
+        .sec-head-title{ font-size:0.92rem; font-weight:700; color:#f8fafc; }
+        .sec-head-sub  { font-size:0.72rem; color:rgba(255,255,255,0.28); margin-top:2px; }
+        .sec-read-btn{ width:28px; height:28px; border-radius:50%; border:2px solid rgba(255,255,255,0.12); background:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color:transparent; transition:all 0.25s; flex-shrink:0; }
+        .sec-read-btn:hover{ border-color:var(--teal); color:var(--teal); }
+        .sec-card.read .sec-read-btn{ background:var(--teal); border-color:var(--teal); color:#fff; }
+        .expand-icon{ color:rgba(255,255,255,0.2); font-size:0.75rem; transition:transform 0.3s, color 0.2s; flex-shrink:0; }
+        .sec-card.open .expand-icon{ transform:rotate(180deg); color:var(--teal); }
+        .sec-body{ max-height:0; overflow:hidden; transition:max-height 0.45s cubic-bezier(0.23,1,0.32,1); }
+        .sec-card.open .sec-body{ max-height:4000px; }
+        .sec-body-inner{ padding:0 22px 22px; border-top:1px solid rgba(255,255,255,0.05); padding-top:18px; }
+
+        /* Prose */
+        .prose{ font-size:0.88rem; color:rgba(255,255,255,0.55); line-height:1.75; margin-bottom:14px; }
+        .prose strong{ color:rgba(255,255,255,0.85); }
+
+        /* Task card */
+        .task-card{ background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:18px 20px; margin-bottom:16px; }
+        .task-header{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+        .task-icon{ width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
+        .task-icon.t1{ background:rgba(20,184,166,0.15); color:var(--teal); }
+        .task-icon.t2{ background:rgba(59,130,246,0.15); color:var(--blue); }
+        .task-icon.t3{ background:rgba(168,85,247,0.15); color:var(--purple); }
+        .task-title{ font-size:0.95rem; font-weight:700; color:#f8fafc; }
+        .task-sub  { font-size:0.72rem; color:rgba(255,255,255,0.3); margin-top:2px; }
+
+        .task-meta-grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:14px; }
+        .task-meta-item{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:10px 12px; }
+        .task-meta-item .tm-label{ font-size:0.68rem; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
+        .task-meta-item .tm-val  { font-size:0.82rem; color:rgba(255,255,255,0.65); line-height:1.5; }
+
+        /* Prompt level cards */
+        .prompt-levels{ display:flex; flex-direction:column; gap:10px; }
+        .prompt-level{ border-radius:14px; overflow:hidden; }
+        .pl-header{ display:flex; align-items:center; gap:10px; padding:10px 16px; }
+        .pl-badge{ padding:3px 10px; border-radius:50px; font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+        .pl-badge.basic   { background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.4); }
+        .pl-badge.improved{ background:rgba(59,130,246,0.15); color:#60a5fa; }
+        .pl-badge.advanced{ background:rgba(20,184,166,0.15); color:#2dd4bf; }
+        .pl-label{ font-size:0.8rem; font-weight:600; color:rgba(255,255,255,0.6); }
+        .pl-result-badge{ margin-left:auto; font-size:0.7rem; padding:2px 8px; border-radius:50px; }
+        .pl-result-badge.weak  { background:rgba(239,68,68,0.1);  color:#f87171; }
+        .pl-result-badge.ok    { background:rgba(249,115,22,0.1); color:#fb923c; }
+        .pl-result-badge.great { background:rgba(34,197,94,0.1);  color:#4ade80; }
+
+        .pl-body.basic   { background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:0 0 14px 14px; }
+        .pl-body.improved{ background:rgba(59,130,246,0.04);  border:1px solid rgba(59,130,246,0.12); border-radius:0 0 14px 14px; }
+        .pl-body.advanced{ background:rgba(20,184,166,0.04);  border:1px solid rgba(20,184,166,0.15); border-radius:0 0 14px 14px; }
+        .pl-header.basic   { background:rgba(255,255,255,0.03); }
+        .pl-header.improved{ background:rgba(59,130,246,0.07); }
+        .pl-header.advanced{ background:rgba(20,184,166,0.08); }
+
+        .prompt-code{ font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:rgba(255,255,255,0.65); line-height:1.7; padding:14px 16px; white-space:pre-wrap; }
+        .prompt-code .role{ color:#5eead4; font-weight:600; }
+        .prompt-code .instruction{ color:#93c5fd; }
+        .prompt-code .format{ color:#c084fc; }
+        .prompt-code .example{ color:rgba(255,255,255,0.35); font-style:italic; }
+
+        /* Comparison table */
+        .cmp-table{ width:100%; border-collapse:collapse; font-size:0.82rem; margin-bottom:14px; }
+        .cmp-table th{ text-align:left; padding:10px 14px; background:rgba(20,184,166,0.1); color:#5eead4; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid rgba(20,184,166,0.2); }
+        .cmp-table td{ padding:10px 14px; color:rgba(255,255,255,0.55); border-bottom:1px solid rgba(255,255,255,0.04); vertical-align:top; }
+        .cmp-table tr:hover td{ background:rgba(255,255,255,0.02); }
+        .cmp-table .c-weak  { color:#f87171; }
+        .cmp-table .c-ok    { color:#fb923c; }
+        .cmp-table .c-great { color:#4ade80; font-weight:600; }
+
+        /* Principle cards */
+        .principle-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
+        .principle-card{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:14px; padding:14px 16px; transition:border-color 0.3s, transform 0.3s; }
+        .principle-card:hover{ border-color:rgba(20,184,166,0.3); transform:translateY(-2px); }
+        .principle-card .pc-num{ font-size:1.4rem; font-weight:800; color:rgba(20,184,166,0.3); line-height:1; margin-bottom:6px; }
+        .principle-card .pc-title{ font-size:0.88rem; font-weight:700; color:#f8fafc; margin-bottom:4px; }
+        .principle-card .pc-desc { font-size:0.8rem; color:rgba(255,255,255,0.45); line-height:1.55; }
+        .principle-card .pc-example{ margin-top:8px; padding:6px 10px; background:rgba(20,184,166,0.07); border-radius:8px; font-size:0.75rem; color:#5eead4; font-family:'JetBrains Mono',monospace; }
+
+        /* Bullet list */
+        .bullet-list{ list-style:none; padding:0; margin:0 0 14px; }
+        .bullet-list li{ display:flex; align-items:flex-start; gap:10px; font-size:0.86rem; color:rgba(255,255,255,0.55); line-height:1.6; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+        .bullet-list li:last-child{ border-bottom:none; }
+        .bullet-list li .bi{ color:var(--teal); flex-shrink:0; margin-top:3px; font-size:0.7rem; }
+
+        /* Conclusion */
+        .conclusion-box{ background:linear-gradient(135deg,rgba(20,184,166,0.07),rgba(59,130,246,0.03)); border:1px solid rgba(20,184,166,0.18); border-radius:18px; padding:22px 24px; }
+        .conclusion-box h4{ font-size:0.9rem; font-weight:700; color:#2dd4bf; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+
+        /* Image slot */
+        .img-wrap{ margin-top:14px; }
+        .img-placeholder{ width:100%; border:2px dashed rgba(20,184,166,0.2); border-radius:12px; padding:20px; text-align:center; cursor:pointer; transition:border-color 0.3s, background 0.3s; background:rgba(20,184,166,0.02); position:relative; box-sizing:border-box; display:block; }
+        .img-placeholder:hover{ border-color:rgba(20,184,166,0.5); background:rgba(20,184,166,0.06); }
+        .img-placeholder input[type="file"]{ position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+        .img-preview{ width:100%; border-radius:12px; border:1px solid rgba(255,255,255,0.07); display:block; max-height:340px; object-fit:contain; background:rgba(0,0,0,0.25); cursor:zoom-in; }
+        .img-actions{ display:flex; gap:8px; margin-top:8px; }
+        .btn-img-change{ font-size:0.73rem; padding:5px 12px; border-radius:50px; border:1px solid rgba(20,184,166,0.28); background:rgba(20,184,166,0.07); color:#5eead4; cursor:pointer; font-family:'Outfit',sans-serif; transition:all 0.2s; position:relative; overflow:hidden; }
+        .btn-img-change input[type="file"]{ position:absolute; inset:0; opacity:0; cursor:pointer; }
+        .btn-img-change:hover{ background:rgba(20,184,166,0.18); }
+        .btn-img-remove{ font-size:0.73rem; padding:5px 12px; border-radius:50px; border:1px solid rgba(239,68,68,0.25); background:rgba(239,68,68,0.06); color:#f87171; cursor:pointer; font-family:'Outfit',sans-serif; transition:all 0.2s; }
+        .btn-img-remove:hover{ background:rgba(239,68,68,0.16); }
+
+        .back-btn{ display:inline-flex; align-items:center; gap:8px; padding:11px 22px; border-radius:50px; border:1px solid rgba(20,184,166,0.25); background:rgba(20,184,166,0.07); color:#5eead4; text-decoration:none; font-size:0.85rem; font-weight:600; transition:all 0.3s; margin-top:28px; }
+        .back-btn:hover{ background:rgba(20,184,166,0.18); border-color:rgba(20,184,166,0.5); transform:translateX(-3px); }
+
+        .nav-btns{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;}
+        .nav-btn-prev,.nav-btn-next{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:50px;font-size:0.85rem;font-weight:600;text-decoration:none;transition:all 0.3s;}
+        .nav-btn-prev{border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.45);}
+        .nav-btn-prev:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.2);color:#fff;transform:translateX(-3px);}
+        .nav-btn-next{border:1px solid rgba(20,184,166,0.3);background:rgba(20,184,166,0.08);color:#5eead4;margin-left:auto;}
+        .nav-btn-next:hover{background:rgba(20,184,166,0.2);border-color:#14b8a6;color:#fff;transform:translateX(3px);}
+        .admin-fab{ padding:10px 18px; border-radius:50px; border:1px solid rgba(20,184,166,0.25); background:rgba(20,184,166,0.1); color:#5eead4; font-family:'Outfit',sans-serif; font-size:0.82rem; font-weight:700; cursor:pointer; transition:all 0.3s; }
+        .admin-fab.logged{ background:rgba(34,197,94,0.12); border-color:rgba(34,197,94,0.3); color:var(--green); }
+
+        @media(max-width:768px){ .layout{grid-template-columns:1fr;padding-top:100px;} .sidebar{position:static;} .task-meta-grid,.principle-grid{grid-template-columns:1fr;} }
+    </style>
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <nav class="navbar-unified">
+        <a href="../index.html" class="nav-logo"><i class="fa-solid fa-circle-user"></i> Mtruong<span>_dev</span></a>
+        <ul class="nav-links-unified">
+            <li><a href="../index.html">Trang Chủ</a></li>
+            <li><a href="about.html">Cá Nhân ▾</a>
+                <ul class="nav-dropdown">
+                    <li><a href="about.html">Về Tôi</a></li>
+                    <li><a href="education.html">Học Vấn</a></li>
+                    <li><a href="skills.html">Kỹ Năng</a></li>
+                    <li><a href="experience.html">Kinh Nghiệm</a></li>
+                </ul>
+            </li>
+            <li><a href="research_hub.html">Nghiên Cứu</a></li>
+            <li><a href="blog.html">Kiến Thức</a></li>
+            <li><a href="muctieu.html">Mục Tiêu</a></li>
+            <li><a href="cns.html">Bài Tập CNS</a></li>
+        </ul>
+        <div id="auth-controls" class="nav-auth">
+            <button class="theme-toggle" title="Chuyển chế độ"><i class="fa-solid fa-moon"></i></button>
+        </div>
+    </nav>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-card">
+                <div class="sidebar-title">Tiến độ đọc</div>
+                <div class="progress-ring-wrap">
+                    <svg class="ring-svg" width="100" height="100" viewBox="0 0 100 100">
+                        <defs>
+                            <linearGradient id="rg3" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#14b8a6"/>
+                                <stop offset="100%" stop-color="#3b82f6"/>
+                            </linearGradient>
+                        </defs>
+                        <circle class="ring-bg" cx="50" cy="50" r="40"/>
+                        <circle class="ring-fill" id="ring-fill" cx="50" cy="50" r="40" stroke-dasharray="251.2" stroke-dashoffset="251.2"/>
+                    </svg>
+                    <div class="ring-label" id="ring-pct">0%</div>
+                    <div class="ring-sub" id="ring-sub">0 / 7 mục</div>
+                </div>
+            </div>
+            <div class="sidebar-card">
+                <div class="sidebar-title">Mục lục</div>
+                <div id="sec-nav"></div>
+            </div>
+            <div class="sidebar-card">
+                <div class="sidebar-title">Thông tin bài</div>
+                <div class="meta-row"><i class="fa-solid fa-calendar" style="color:var(--teal)"></i> Hạn nộp: 05/04/2026</div>
+                <div class="meta-row"><i class="fa-solid fa-clock" style="color:var(--cyan)"></i> ~45 phút</div>
+                <div class="meta-row"><i class="fa-solid fa-star" style="color:var(--yellow)"></i> Điểm: <strong style="color:var(--teal);margin-left:4px;">— / 10</strong></div>
+                <div class="meta-row"><i class="fa-solid fa-robot" style="color:var(--blue)"></i> Prompt Engineering</div>
+                <div class="meta-row"><i class="fa-solid fa-layer-group" style="color:var(--purple)"></i> 3 tác vụ · 3 cấp độ</div>
+            </div>
+        </aside>
+
+        <main>
+            <div class="breadcrumb">
+                <a href="cns.html"><i class="fa-solid fa-layer-group"></i> Bài Tập CNS</a>
+                <i class="fa-solid fa-chevron-right" style="font-size:0.55rem"></i>
+                <span>Chương 2</span>
+                <i class="fa-solid fa-chevron-right" style="font-size:0.55rem"></i>
+                <span style="color:rgba(255,255,255,0.55)">Bài 3</span>
+            </div>
+
+            <div class="hero-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> Chương 2 · Báo cáo</div>
+            <h1 class="hero-title">Phát Triển Kỹ Năng<br><span>Viết Prompt Hiệu Quả</span></h1>
+            <p class="hero-desc">Xây dựng, thử nghiệm và phân tích các loại prompt theo 3 cấp độ (cơ bản → cải tiến → nâng cao) cho 3 tác vụ học tập với AI.</p>
+
+            <div class="score-banner">
+                <div class="score-big">3</div>
+                <div class="score-info">
+                    <div class="s-label">Tác vụ thử nghiệm</div>
+                    <div class="s-val">Tóm tắt · Giải thích · Tạo câu hỏi</div>
+                </div>
+                <i class="fa-solid fa-wand-magic-sparkles" style="font-size:1.8rem;color:var(--teal);opacity:0.6"></i>
+            </div>
+
+            <div class="section-hdr">
+                <h2><i class="fa-solid fa-list"></i> Nội dung báo cáo</h2>
+                <button onclick="resetAll()" style="font-size:0.72rem;padding:5px 12px;border-radius:50px;border:1px solid rgba(255,255,255,0.1);background:none;color:rgba(255,255,255,0.3);cursor:pointer;font-family:'Outfit',sans-serif;">
+                    <i class="fa-solid fa-rotate-left"></i> Reset
+                </button>
+            </div>
+
+            <div id="sections-list"></div>
+            <a href="cns.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Quay lại danh sách bài tập</a>
+            <div class="nav-btns">
+                <a href="cns_bai2.html" class="nav-btn-prev"><i class="fa-solid fa-chevron-left"></i> Bài 2: Tìm kiếm thông tin</a>
+                <a href="cns_bai4.html" class="nav-btn-next">Bài 4: Công cụ hợp tác <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+        </main>
+    </div>
+
+    <footer class="tutor-footer">
+        <div class="footer-content"><p>&copy; 2026 Hoàng Mạnh Trường. Học để hiểu, không chỉ để qua môn.</p></div>
+    </footer>
+
+    <div id="admin-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:10001;justify-content:center;align-items:center;backdrop-filter:blur(12px);">
+        <div style="background:rgba(8,12,35,0.98);border:1px solid rgba(20,184,166,0.22);border-radius:28px;padding:2rem;width:300px;text-align:center;">
+            <i class="fa-solid fa-shield-halved" style="font-size:2rem;color:var(--teal);margin-bottom:1rem;display:block;"></i>
+            <h3 style="margin-bottom:1.2rem;font-size:0.95rem;color:#f8fafc;">Xác thực Admin</h3>
+            <input type="password" id="admin-pwd" placeholder="Mật khẩu..."
+                style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:11px;border-radius:12px;font-family:'Outfit',sans-serif;margin-bottom:12px;text-align:center;letter-spacing:5px;transition:border-color 0.3s;"
+                onkeydown="if(event.key==='Enter')checkPwd()">
+            <button onclick="checkPwd()" style="width:100%;padding:11px;border-radius:12px;border:none;background:linear-gradient(135deg,#14b8a6,#3b82f6);color:#fff;font-family:'Outfit',sans-serif;font-weight:700;cursor:pointer;margin-bottom:8px;">Xác nhận</button>
+            <button onclick="closeModal()" style="background:none;border:none;color:rgba(255,255,255,0.3);cursor:pointer;font-family:'Outfit',sans-serif;font-size:0.82rem;">Hủy</button>
+        </div>
+    </div>
+    <div style="position:fixed;bottom:24px;right:24px;z-index:999;">
+        <button id="admin-fab" class="admin-fab" onclick="toggleAdmin()"><i class="fa-solid fa-lock"></i> Admin</button>
+    </div>
+
+    <script>
+    // Helper to build prompt level block
+    function promptLevel(level, badge, label, result, resultClass, codeHtml) {
+        return `<div class="prompt-level">
+            <div class="pl-header ${level}">
+                <span class="pl-badge ${level}">${badge}</span>
+                <span class="pl-label">${label}</span>
+                <span class="pl-result-badge ${resultClass}">${result}</span>
+            </div>
+            <div class="pl-body ${level}">
+                <div class="prompt-code">${codeHtml}</div>
+            </div>
+        </div>`;
+    }
+
+    const sections = [
+      { id:1, title:"I. Giới thiệu", sub:"Bối cảnh & mục tiêu báo cáo",
+        render:()=>`
+          <div class="prose">Trong bối cảnh các mô hình ngôn ngữ lớn (LLMs) ngày càng được ứng dụng rộng rãi trong học tập, kỹ năng viết <strong>prompt</strong> (câu lệnh yêu cầu AI) đóng vai trò quan trọng trong việc khai thác tối đa hiệu quả của các công cụ này.</div>
+          <div class="prose">Báo cáo này tập trung vào việc <strong>xây dựng, thử nghiệm và phân tích</strong> các loại prompt khác nhau nhằm rút ra những nguyên tắc viết prompt hiệu quả.</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:4px;">
+            ${[
+              {icon:'fa-file-lines',color:'var(--teal)',label:'Tác vụ 1',val:'Tóm tắt tài liệu'},
+              {icon:'fa-lightbulb',color:'var(--blue)',label:'Tác vụ 2',val:'Giải thích khái niệm'},
+              {icon:'fa-circle-question',color:'var(--purple)',label:'Tác vụ 3',val:'Tạo câu hỏi ôn tập'}
+            ].map(t=>`<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;text-align:center;">
+              <i class="fa-solid ${t.icon}" style="font-size:1.4rem;color:${t.color};margin-bottom:8px;display:block;"></i>
+              <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px;">${t.label}</div>
+              <div style="font-size:0.82rem;font-weight:600;color:#f8fafc;margin-top:3px;">${t.val}</div>
+            </div>`).join('')}
+          </div>`
+      },
+      { id:2, title:"II. Phân tích tác vụ học tập", sub:"Mục tiêu, yêu cầu & thách thức",
+        render:()=>`
+          ${[
+            {cls:'t1',icon:'fa-file-lines',title:'Tác vụ 1: Tóm tắt tài liệu học thuật',
+             items:[
+               {l:'Mục tiêu',v:'Giúp người học nhanh chóng nắm được nội dung chính của tài liệu dài.'},
+               {l:'Yêu cầu',v:'Giữ lại ý chính, loại bỏ thông tin thừa, đảm bảo tính chính xác.'},
+               {l:'Thách thức',v:'AI có thể bỏ sót ý quan trọng hoặc tóm tắt quá chung chung nếu prompt không rõ ràng.'}
+             ]},
+            {cls:'t2',icon:'fa-lightbulb',title:'Tác vụ 2: Giải thích khái niệm phức tạp',
+             items:[
+               {l:'Mục tiêu',v:'Hiểu rõ bản chất của khái niệm khó (ví dụ: Blockchain, Định lý Bayes).'},
+               {l:'Yêu cầu',v:'Dễ hiểu, có ví dụ minh họa, phù hợp trình độ người học.'},
+               {l:'Thách thức',v:'AI có thể giải thích quá chuyên sâu hoặc quá đơn giản nếu không định hướng rõ.'}
+             ]},
+            {cls:'t3',icon:'fa-circle-question',title:'Tác vụ 3: Tạo câu hỏi ôn tập',
+             items:[
+               {l:'Mục tiêu',v:'Hỗ trợ ôn luyện và kiểm tra kiến thức.'},
+               {l:'Yêu cầu',v:'Đa dạng (trắc nghiệm, tự luận), bám sát nội dung.'},
+               {l:'Thách thức',v:'AI dễ tạo câu hỏi chung chung, thiếu tính phân loại mức độ.'}
+             ]}
+          ].map(t=>`
+            <div class="task-card">
+              <div class="task-header">
+                <div class="task-icon ${t.cls}"><i class="fa-solid ${t.icon}"></i></div>
+                <div><div class="task-title">${t.title}</div></div>
+              </div>
+              <div class="task-meta-grid">
+                ${t.items.map(i=>`<div class="task-meta-item"><div class="tm-label">${i.l}</div><div class="tm-val">${i.v}</div></div>`).join('')}
+              </div>
+            </div>`).join('')}`
+      },
+      { id:3, title:"III. Tác vụ 1 — Tóm tắt tài liệu", sub:"3 cấp độ prompt so sánh",
+        render:()=>`
+          <div class="prompt-levels">
+            ${promptLevel('basic','Cơ bản','Prompt đơn giản','Kết quả yếu','weak',
+              `Tóm tắt đoạn văn sau.`)}
+            ${promptLevel('improved','Cải tiến','Thêm yêu cầu định dạng','Rõ hơn','ok',
+              `Tóm tắt đoạn văn sau thành các ý chính.\n<span class="format">Trình bày dưới dạng gạch đầu dòng, giữ lại các khái niệm quan trọng và loại bỏ thông tin không cần thiết.</span>`)}
+            ${promptLevel('advanced','Nâng cao','Role + Cấu trúc + Few-shot','Xuất sắc','great',
+              `<span class="role">Bạn là một giảng viên đại học.</span> Hãy tóm tắt đoạn văn sau theo các yêu cầu:\n<span class="instruction">• Chia thành 3 phần: ý chính, khái niệm quan trọng, kết luận\n• Sử dụng ngôn ngữ dễ hiểu cho sinh viên năm nhất\n• Độ dài khoảng 150 từ</span>\n\n<span class="example">Ví dụ:\nInput: "Machine learning is a subset of AI..."\nOutput:\n  • Ý chính: ...\n  • Khái niệm: ...\n  • Kết luận: ...</span>`)}
+          </div>`
+      },
+      { id:4, title:"IV. Tác vụ 2 — Giải thích khái niệm", sub:"Blockchain qua 3 cấp độ",
+        render:()=>`
+          <div class="prompt-levels">
+            ${promptLevel('basic','Cơ bản','Không có ngữ cảnh','Chung chung','weak',
+              `Giải thích khái niệm Blockchain.`)}
+            ${promptLevel('improved','Cải tiến','Thêm yêu cầu ví dụ & so sánh','Dễ hiểu hơn','ok',
+              `Giải thích khái niệm Blockchain một cách đơn giản, dễ hiểu.\n<span class="format">Có ví dụ minh họa thực tế và so sánh với hệ thống truyền thống.</span>`)}
+            ${promptLevel('advanced','Nâng cao','Role + Cấu trúc từng bước + Đối tượng','Logic, có hệ thống','great',
+              `<span class="role">Bạn là một giáo viên dạy công nghệ.</span> Hãy giải thích Blockchain theo các bước:\n<span class="instruction">1. Định nghĩa đơn giản\n2. Cách hoạt động (từng bước)\n3. Ví dụ thực tế\n4. Ưu và nhược điểm</span>\n\n<span class="format">Hãy trình bày sao cho học sinh lớp 10 có thể hiểu được.</span>`)}
+          </div>`
+      },
+      { id:5, title:"V. Tác vụ 3 — Tạo câu hỏi ôn tập", sub:"Java qua 3 cấp độ",
+        render:()=>`
+          <div class="prompt-levels">
+            ${promptLevel('basic','Cơ bản','Không có yêu cầu cụ thể','Ít đa dạng','weak',
+              `Tạo câu hỏi ôn tập về Java.`)}
+            ${promptLevel('improved','Cải tiến','Số lượng + phân loại + đáp án','Có phân loại','ok',
+              `Tạo 10 câu hỏi ôn tập về Java, gồm:\n<span class="instruction">• 5 câu trắc nghiệm\n• 5 câu tự luận</span>\n<span class="format">Có đáp án đi kèm.</span>`)}
+            ${promptLevel('advanced','Nâng cao','Role + Phân cấp độ + Giải thích + Few-shot','Rất chi tiết','great',
+              `<span class="role">Bạn là giảng viên môn lập trình Java.</span> Hãy tạo bộ câu hỏi gồm:\n<span class="instruction">• 5 câu dễ, 5 câu trung bình, 5 câu khó\n• Bao gồm trắc nghiệm và tự luận\n• Có đáp án chi tiết và giải thích</span>\n\n<span class="example">Ví dụ:\nCâu hỏi: ...\nĐáp án: ...\nGiải thích: ...</span>`)}
+          </div>`
+      },
+      { id:6, title:"VI. So sánh & Phân tích hiệu quả", sub:"Bảng so sánh + 5 nguyên lý",
+        render:()=>`
+          <div class="prose" style="margin-bottom:16px"><strong>Bảng so sánh kết quả:</strong></div>
+          <table class="cmp-table">
+            <thead><tr><th>Tác vụ</th><th>Prompt cơ bản</th><th>Prompt cải tiến</th><th>Prompt nâng cao</th></tr></thead>
+            <tbody>
+              <tr><td style="color:#f8fafc;font-weight:600">Tóm tắt</td><td class="c-weak">Ngắn, thiếu ý</td><td class="c-ok">Rõ ràng hơn</td><td class="c-great">Có cấu trúc, đầy đủ</td></tr>
+              <tr><td style="color:#f8fafc;font-weight:600">Giải thích</td><td class="c-weak">Chung chung</td><td class="c-ok">Dễ hiểu hơn</td><td class="c-great">Logic, có hệ thống</td></tr>
+              <tr><td style="color:#f8fafc;font-weight:600">Câu hỏi</td><td class="c-weak">Ít đa dạng</td><td class="c-ok">Có phân loại</td><td class="c-great">Rất chi tiết, có giải thích</td></tr>
+            </tbody>
+          </table>
+          <div class="prose" style="margin-top:20px;margin-bottom:16px"><strong>5 yếu tố tạo nên prompt hiệu quả:</strong></div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            ${[
+              {n:'01',t:'Độ cụ thể',d:'Prompt càng cụ thể → AI càng hiểu rõ yêu cầu → kết quả chính xác hơn.'},
+              {n:'02',t:'Cấu trúc rõ ràng',d:'Prompt có cấu trúc giúp AI tổ chức thông tin tốt hơn (chia mục, bullet).'},
+              {n:'03',t:'Role Prompting',d:'Khi gán vai trò (giảng viên, giáo viên), AI tạo ra nội dung phù hợp đối tượng hơn.'},
+              {n:'04',t:'Few-shot Prompting',d:'Việc đưa ví dụ giúp AI hiểu định dạng đầu ra mong muốn.'},
+              {n:'05',t:'Kiểm soát đầu ra',d:'Chỉ định độ dài, định dạng, đối tượng người đọc → tối ưu kết quả.'}
+            ].map(p=>`
+              <div style="display:flex;gap:14px;align-items:flex-start;padding:12px 16px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);border-radius:12px;">
+                <div style="font-size:1.2rem;font-weight:800;color:rgba(20,184,166,0.35);flex-shrink:0;line-height:1;margin-top:2px;">${p.n}</div>
+                <div>
+                  <div style="font-size:0.88rem;font-weight:700;color:#f8fafc;margin-bottom:3px;">${p.t}</div>
+                  <div style="font-size:0.82rem;color:rgba(255,255,255,0.5);">${p.d}</div>
+                </div>
+              </div>`).join('')}
+          </div>`
+      },
+      { id:7, title:"VII. Nguyên tắc & Kết luận", sub:"6 nguyên tắc viết prompt + tổng kết",
+        render:()=>`
+          <div class="principle-grid">
+            ${[
+              {n:'1',t:'Rõ ràng & cụ thể',d:'Không viết mơ hồ. Nêu rõ yêu cầu, tránh câu hỏi chung chung.',ex:'"Tóm tắt thành 5 ý chính dạng bullet"'},
+              {n:'2',t:'Có cấu trúc',d:'Chia nhỏ yêu cầu thành các phần rõ ràng, dễ theo dõi.',ex:'"Bước 1: ... Bước 2: ..."'},
+              {n:'3',t:'Xác định vai trò',d:'Gán vai trò cho AI để định hướng phong cách và độ sâu.',ex:'"Bạn là giảng viên đại học..."'},
+              {n:'4',t:'Chỉ định định dạng',d:'Nêu rõ định dạng đầu ra mong muốn.',ex:'"Trình bày dạng bảng / bullet / đoạn văn"'},
+              {n:'5',t:'Đưa ví dụ (few-shot)',d:'Cung cấp ví dụ mẫu giúp AI hiểu cách trả lời.',ex:'"Input: ... → Output: ..."'},
+              {n:'6',t:'Điều chỉnh theo mục tiêu',d:'Phù hợp trình độ người học (sinh viên năm 1, học sinh lớp 10...).',ex:'"Giải thích cho người mới bắt đầu"'}
+            ].map(p=>`
+              <div class="principle-card">
+                <div class="pc-num">${p.n}</div>
+                <div class="pc-title">${p.t}</div>
+                <div class="pc-desc">${p.d}</div>
+                <div class="pc-example">${p.ex}</div>
+              </div>`).join('')}
+          </div>
+          <div class="conclusion-box" style="margin-top:8px;">
+            <h4><i class="fa-solid fa-circle-check"></i> Kết luận</h4>
+            <ul class="bullet-list">
+              <li><i class="bi fa-solid fa-circle-dot"></i> Prompt nâng cao mang lại hiệu quả tốt nhất nhờ áp dụng <strong>role prompting</strong>, cấu trúc rõ ràng và ví dụ minh họa.</li>
+              <li><i class="bi fa-solid fa-circle-dot"></i> Viết prompt không chỉ là đặt câu hỏi mà còn là một <strong>kỹ năng quan trọng</strong> giúp tối ưu hóa việc học với AI.</li>
+              <li><i class="bi fa-solid fa-circle-dot"></i> Cùng một tác vụ, prompt khác nhau cho kết quả <strong>chênh lệch rõ rệt</strong> về chất lượng và độ phù hợp.</li>
+              <li><i class="bi fa-solid fa-circle-dot"></i> Kỹ năng này ngày càng quan trọng trong bối cảnh AI được tích hợp sâu vào giáo dục.</li>
+            </ul>
+          </div>`
+      }
+    ];
+
+    const DONE_KEY = 'cns_bai3_read';
+    const IMGS_KEY = 'cns_bai3_imgs';
+    let readSecs = new Set(JSON.parse(localStorage.getItem(DONE_KEY) || '[]'));
+    let savedImgs = JSON.parse(localStorage.getItem(IMGS_KEY) || '{}');
+    let isAdmin = sessionStorage.getItem('cns_admin') === 'true';
+
+    function saveDone(){ localStorage.setItem(DONE_KEY, JSON.stringify([...readSecs])); }
+    function saveImgs(){ localStorage.setItem(IMGS_KEY, JSON.stringify(savedImgs)); }
+
+    function render(){
+        const container = document.getElementById('sections-list');
+        container.innerHTML = sections.map(s => {
+            const done = readSecs.has(s.id);
+            const imgSrc = savedImgs[s.id];
+            let imgSlot = '';
+            if(imgSrc){
+                imgSlot = `<div class="img-wrap">
+                    <img src="${imgSrc}" class="img-preview" onclick="zoomImg('${imgSrc}')">
+                    ${isAdmin ? `<div class="img-actions">
+                        <label class="btn-img-change"><i class="fa-solid fa-image"></i> Đổi ảnh<input type="file" accept="image/*" onchange="handleImg(event,${s.id})"></label>
+                        <button class="btn-img-remove" onclick="removeImg(${s.id})"><i class="fa-solid fa-trash"></i> Xóa</button>
+                    </div>` : ''}
+                </div>`;
+            } else if(isAdmin){
+                imgSlot = `<div class="img-wrap">
+                    <label class="img-placeholder">
+                        <div style="font-size:1.4rem;color:rgba(20,184,166,0.35);margin-bottom:5px;"><i class="fa-solid fa-image"></i></div>
+                        <div style="font-size:0.75rem;color:rgba(255,255,255,0.25);">Nhấp để chèn ảnh minh họa</div>
+                        <input type="file" accept="image/*" onchange="handleImg(event,${s.id})">
+                    </label>
+                </div>`;
+            }
+            return `
+                <div class="sec-card ${done?'read':''}" id="sec-${s.id}">
+                    <div class="sec-head" onclick="toggleSec(${s.id})">
+                        <div class="sec-num-badge">${done?'<i class="fa-solid fa-check" style="font-size:0.8rem"></i>':s.id}</div>
+                        <div class="sec-head-text">
+                            <div class="sec-head-title">${s.title}</div>
+                            <div class="sec-head-sub">${s.sub}</div>
+                        </div>
+                        <button class="sec-read-btn" onclick="event.stopPropagation();toggleRead(${s.id})">
+                            <i class="fa-solid fa-check" style="font-size:0.7rem"></i>
+                        </button>
+                        <i class="fa-solid fa-chevron-down expand-icon"></i>
+                    </div>
+                    <div class="sec-body">
+                        <div class="sec-body-inner">
+                            ${s.render()}
+                            ${imgSlot}
+                        </div>
+                    </div>
+                </div>`;
+        }).join('');
+
+        // Sidebar nav
+        document.getElementById('sec-nav').innerHTML = sections.map(s => `
+            <a class="sec-nav-item ${readSecs.has(s.id)?'done':''}" onclick="scrollToSec(${s.id})">
+                <span class="snav-dot"></span><span>${s.title}</span>
+            </a>`).join('');
+
+        // Ring
+        const pct = Math.round((readSecs.size / sections.length) * 100);
+        const circ = 251.2;
+        document.getElementById('ring-fill').style.strokeDashoffset = circ - (circ * pct / 100);
+        document.getElementById('ring-pct').textContent = pct + '%';
+        document.getElementById('ring-sub').textContent = `${readSecs.size} / ${sections.length} mục`;
+    }
+
+    function toggleSec(id){ document.getElementById('sec-'+id).classList.toggle('open'); }
+    function toggleRead(id){ if(readSecs.has(id)) readSecs.delete(id); else readSecs.add(id); saveDone(); render(); document.getElementById('sec-'+id).classList.add('open'); }
+    function resetAll(){ if(!confirm('Reset toàn bộ tiến độ?')) return; readSecs.clear(); saveDone(); render(); }
+    function scrollToSec(id){ const el=document.getElementById('sec-'+id); if(!el) return; el.classList.add('open'); el.scrollIntoView({behavior:'smooth',block:'start'}); }
+    function handleImg(event,id){ if(!isAdmin) return; const f=event.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=e=>{savedImgs[id]=e.target.result;saveImgs();render();}; r.readAsDataURL(f); }
+    function removeImg(id){ if(!isAdmin) return; delete savedImgs[id]; saveImgs(); render(); }
+    function zoomImg(src){ const o=document.createElement('div'); o.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.93);z-index:99999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;backdrop-filter:blur(10px);'; o.innerHTML=`<img src="${src}" style="max-width:92vw;max-height:90vh;border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,0.8);">`; o.onclick=()=>o.remove(); document.body.appendChild(o); }
+    function toggleAdmin(){ if(isAdmin){if(confirm('Đăng xuất Admin?')){sessionStorage.removeItem('cns_admin');isAdmin=false;updateFab();render();}}else{document.getElementById('admin-modal').style.display='flex';setTimeout(()=>document.getElementById('admin-pwd').focus(),80);} }
+    function closeModal(){ document.getElementById('admin-modal').style.display='none'; document.getElementById('admin-pwd').value=''; }
+    function checkPwd(){ const p=document.getElementById('admin-pwd').value; if(p==='1002'){sessionStorage.setItem('cns_admin','true');isAdmin=true;closeModal();updateFab();render();}else{const i=document.getElementById('admin-pwd');i.style.borderColor='#ef4444';setTimeout(()=>i.style.borderColor='',800);i.value='';} }
+    function updateFab(){ const f=document.getElementById('admin-fab'); if(isAdmin){f.innerHTML='<i class="fa-solid fa-unlock"></i> Admin';f.className='admin-fab logged';}else{f.innerHTML='<i class="fa-solid fa-lock"></i> Admin';f.className='admin-fab';} }
+
+    updateFab(); render();
+    setTimeout(()=>{ const f=document.getElementById('sec-1'); if(f) f.classList.add('open'); },100);
+    </script>
+    <script src="../assets/js/common.js"></script>
+</body>
+</html>
