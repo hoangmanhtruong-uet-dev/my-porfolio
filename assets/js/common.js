@@ -46,12 +46,12 @@ window.addEventListener('load', () => {
 
 // Auth and Navbar Logic
 const API_CONFIG = {
-    // Tự động nhận diện môi trường: Nếu chạy trên máy (localhost/file) thì trỏ về backend local
+    // Cách 1: Đường dẫn tương đối — production tự gọi đúng domain, local trỏ về localhost:8080
     BASE_URL: (window.location.hostname === '127.0.0.1' || 
                window.location.hostname === 'localhost' || 
                window.location.protocol === 'file:') 
         ? 'http://localhost:8080'
-        : 'https://my-porfolio-1-b1x3.onrender.com', // Thay bằng URL Render thực tế của bạn
+        : '', // Để trống → trình duyệt tự gọi đúng domain hiện tại (Render, custom domain, v.v.)
 };
 
 document.addEventListener('DOMContentLoaded', () => {
