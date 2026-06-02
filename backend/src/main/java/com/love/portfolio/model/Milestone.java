@@ -18,5 +18,7 @@ public class Milestone {
     private String description;
 
     @ElementCollection
-    private List<String> images; // Lưu danh sách đường dẫn ảnh
+    @CollectionTable(name = "milestone_images", joinColumns = @JoinColumn(name = "milestone_id"))
+    @Column(name = "images")
+    private List<String> images; // Lưu danh sách đường dẫn ảnh (Cloudinary URL)
 }
