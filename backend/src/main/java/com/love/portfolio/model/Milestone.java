@@ -17,7 +17,7 @@ public class Milestone {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "milestone_images", joinColumns = @JoinColumn(name = "milestone_id"))
     @Column(name = "images")
     private List<String> images; // Lưu danh sách đường dẫn ảnh (Cloudinary URL)
