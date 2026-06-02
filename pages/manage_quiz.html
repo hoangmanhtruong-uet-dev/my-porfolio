@@ -364,6 +364,8 @@
         let exams = [];
         let currentExamId = null;
 
+        const API = `${API_CONFIG.BASE_URL}/api/exams`;
+
         function checkPass() {
             const pass = document.getElementById('admin-pass').value;
             if (pass === DEFAULT_PASS) {
@@ -384,23 +386,16 @@
             }
         };
 
-        function init() {
-            const defaultExams = [
-                {
-                    id: Date.now(),
-                    title: "Đề thi thử Hóa học số 1",
-                    time: 15,
-                    questions: [
-                        {
-                            question: "Công thức hóa học của axit Sunfuric là gì?",
-                            options: ["H2SO3", "HCl", "H2SO4", "HNO3"],
-                            correct: 2,
-                            explanation: "Axit Sunfuric có công thức là H2SO4."
-                        }
-                    ]
-                }
-            ];
-            exams = JSON.parse(localStorage.getItem('chemistry_exams')) || defaultExams;
+        async function init() {
+            try {
+                const res = await fetch(API);
+                exams = await res.json();
+                // Normalize: đảm bảo mỗi exam có mảng questions
+                exams.forEach(e => { if (!e.questions) e.questions = []; });
+            } catch (err) {
+                console.error('Lỗi tải đề thi:', err);
+                exams = [];
+            }
             renderExams();
         }
 
@@ -455,29 +450,50 @@
             document.body.style.overflow = 'auto';
         }
 
-        document.getElementById('exam-form').onsubmit = function(e) {
+        document.getElementById('exam-form').onsubmit = async function(e) {
             e.preventDefault();
             const id = parseInt(document.getElementById('edit-exam-id').value);
             const title = document.getElementById('exam-title').value;
             const time = parseInt(document.getElementById('exam-time').value);
 
-            if (id === -1) {
-                exams.push({ id: Date.now(), title, time, questions: [] });
-            } else {
-                const idx = exams.findIndex(e => e.id === id);
-                exams[idx].title = title;
-                exams[idx].time = time;
+            try {
+                if (id === -1) {
+                    const res = await fetch(API, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ title, time, questions: [] })
+                    });
+                    const newExam = await res.json();
+                    newExam.questions = newExam.questions || [];
+                    exams.push(newExam);
+                } else {
+                    const res = await fetch(`${API}/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ title, time })
+                    });
+                    const updated = await res.json();
+                    const idx = exams.findIndex(e => e.id === id);
+                    exams[idx].title = updated.title;
+                    exams[idx].time = updated.time;
+                }
+            } catch (err) {
+                alert('Lỗi lưu đề thi: ' + err.message);
+                return;
             }
 
-            saveAndReload();
             renderExams();
             closeExamModal();
         };
 
-        function deleteExam(id) {
-            if (confirm("Xóa đề thi này sẽ xóa tất cả câu hỏi bên trong. Bạn có chắc không?")) {
+        async function deleteExam(id) {
+            if (!confirm("Xóa đề thi này sẽ xóa tất cả câu hỏi bên trong. Bạn có chắc không?")) return;
+            try {
+                await fetch(`${API}/${id}`, { method: 'DELETE' });
                 exams = exams.filter(e => e.id !== id);
-                saveAndReload();
+                renderExams();
+            } catch (err) {
+                alert('Lỗi xóa đề thi: ' + err.message);
             }
         }
 
@@ -566,13 +582,18 @@
             if (e.key === 'Enter') checkPass();
         });
 
-        document.getElementById('q-form').onsubmit = function(e) {
+        document.getElementById('q-form').onsubmit = async function(e) {
             e.preventDefault();
             const index = parseInt(document.getElementById('edit-q-index').value);
             const examIdx = exams.findIndex(e => e.id === currentExamId);
             const newQ = {
                 question: document.getElementById('q-text').value,
-                options: [document.getElementById('opt-0').value, document.getElementById('opt-1').value, document.getElementById('opt-2').value, document.getElementById('opt-3').value],
+                options: [
+                    document.getElementById('opt-0').value,
+                    document.getElementById('opt-1').value,
+                    document.getElementById('opt-2').value,
+                    document.getElementById('opt-3').value
+                ],
                 correct: parseInt(document.getElementById('q-correct').value),
                 explanation: document.getElementById('q-exp').value
             };
@@ -580,26 +601,39 @@
             if (index === -1) exams[examIdx].questions.push(newQ);
             else exams[examIdx].questions[index] = newQ;
 
-            saveAndReload();
+            await saveQuestions(currentExamId, exams[examIdx].questions);
             renderQuestions();
             closeQuestionModal();
         };
 
-        function deleteQuestion(index) {
+        async function deleteQuestion(index) {
             const examIdx = exams.findIndex(e => e.id === currentExamId);
             exams[examIdx].questions.splice(index, 1);
-            saveAndReload();
+            await saveQuestions(currentExamId, exams[examIdx].questions);
             renderQuestions();
         }
 
-        function saveAndReload() {
-            localStorage.setItem('chemistry_exams', JSON.stringify(exams));
+        async function saveQuestions(examId, questions) {
+            try {
+                const res = await fetch(`${API}/${examId}/questions`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(questions)
+                });
+                const updated = await res.json();
+                const idx = exams.findIndex(e => e.id === examId);
+                exams[idx].questions = updated.questions || [];
+            } catch (err) {
+                alert('Lỗi lưu câu hỏi: ' + err.message);
+            }
         }
 
         function resetToDefault() {
-            if (confirm("Hành động này sẽ xóa tất cả đề thi hiện tại và khôi phục dữ liệu mặc định. Bạn có chắc chắn không?")) {
-                localStorage.removeItem('chemistry_exams');
-                init();
+            if (confirm("Hành động này sẽ xóa tất cả đề thi hiện tại. Bạn có chắc chắn không?")) {
+                // Xóa tất cả exams trên DB
+                Promise.all(exams.map(e => fetch(`${API}/${e.id}`, { method: 'DELETE' })))
+                    .then(() => init())
+                    .catch(err => alert('Lỗi: ' + err.message));
             }
         }
 
@@ -627,7 +661,7 @@
                 if (questions && questions.length > 0) {
                     const examIdx = exams.findIndex(e => e.id === currentExamId);
                     exams[examIdx].questions = [...exams[examIdx].questions, ...questions];
-                    saveAndReload();
+                    await saveQuestions(currentExamId, exams[examIdx].questions);
                     renderQuestions();
                     alert(`Đã tạo thành công ${questions.length} câu hỏi mới về chủ đề: ${topic}`);
                 } else {

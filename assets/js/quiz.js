@@ -1,20 +1,4 @@
-const defaultExams = [
-    {
-        id: 1,
-        title: "Đề thi thử Hóa học số 1",
-        time: 15,
-        questions: [
-            {
-                question: "Công thức hóa học của axit Sunfuric là gì?",
-                options: ["H2SO3", "HCl", "H2SO4", "HNO3"],
-                correct: 2,
-                explanation: "Axit Sunfuric có công thức là H2SO4, là một axit mạnh và quan trọng trong công nghiệp."
-            }
-        ]
-    }
-];
-
-let exams = JSON.parse(localStorage.getItem('chemistry_exams')) || defaultExams;
+let exams = [];
 let currentExam = null;
 let currentQuestionIndex = 0;
 let score = 0;
@@ -36,8 +20,23 @@ const submitBtn = document.getElementById('submit-btn');
 const timerDisplay = document.getElementById('timer');
 
 // Initialize Exam Selection
-function init() {
+async function init() {
+    try {
+        const res = await fetch(`${API_CONFIG.BASE_URL}/api/exams`);
+        exams = await res.json();
+        exams.forEach(e => { if (!e.questions) e.questions = []; });
+    } catch (err) {
+        console.error('Lỗi tải đề thi:', err);
+        exams = [];
+    }
+
     examSelectionList.innerHTML = '';
+
+    if (exams.length === 0) {
+        examSelectionList.innerHTML = '<p style="color:#94a3b8; text-align:center;">Chưa có đề thi nào. Admin hãy tạo đề thi trước!</p>';
+        return;
+    }
+
     exams.forEach(exam => {
         const card = document.createElement('div');
         card.className = 'exam-card-pro';
