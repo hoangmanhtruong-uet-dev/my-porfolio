@@ -14,6 +14,7 @@ public class ChatMessage {
     private String sender;
     private String text;
     private LocalDateTime timestamp;
+    private String reaction;
 
     @PrePersist
     protected void onCreate() {
