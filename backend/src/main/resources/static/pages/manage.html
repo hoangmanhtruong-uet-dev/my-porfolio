@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="../assets/js/common.js"></script>
     <style>
         :root {
             --admin-primary: #a855f7;
@@ -436,12 +437,154 @@
             height: 300px;
         }
 
-        /* Modal Customization */
-        .modal-content {
-            background: #1a0b2e;
-            border: 1px solid var(--admin-primary);
-            box-shadow: 0 0 30px rgba(168, 85, 247, 0.3);
+        /* ══════════════════════════════════════════
+           MODAL — THÊM / SỬA LỚP HỌC (redesign)
+        ══════════════════════════════════════════ */
+        .cm-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,.75);
+            backdrop-filter: blur(12px);
+            display: none; justify-content: center; align-items: center;
+            z-index: 9000; padding: 20px;
         }
+        .cm-overlay.show { display: flex; }
+
+        .cm-card {
+            background: linear-gradient(145deg, #12062a, #1a0b38);
+            border: 1px solid rgba(168,85,247,.35);
+            border-radius: 24px;
+            width: 100%; max-width: 580px;
+            max-height: 92vh; overflow-y: auto;
+            box-shadow: 0 40px 100px rgba(0,0,0,.7),
+                        0 0 0 1px rgba(255,255,255,.04) inset;
+            animation: cmSlide .3s cubic-bezier(.4,0,.2,1);
+        }
+        @keyframes cmSlide {
+            from { opacity:0; transform: translateY(18px) scale(.97); }
+            to   { opacity:1; transform: translateY(0) scale(1); }
+        }
+        .cm-card::-webkit-scrollbar { width: 4px; }
+        .cm-card::-webkit-scrollbar-thumb { background: rgba(168,85,247,.4); border-radius:4px; }
+
+        /* header stripe */
+        .cm-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.4rem 1.8rem 1rem;
+            border-bottom: 1px solid rgba(255,255,255,.07);
+            position: sticky; top: 0;
+            background: linear-gradient(145deg, #12062a, #1a0b38);
+            z-index: 2;
+        }
+        .cm-header h3 {
+            font-size: 1.15rem; font-weight: 800;
+            color: #fff; margin: 0;
+            display: flex; align-items: center; gap: 9px;
+        }
+        .cm-header h3 i { color: var(--admin-primary); }
+        .cm-close {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.1);
+            color: #94a3b8; cursor: pointer; font-size: .95rem;
+            display: flex; align-items: center; justify-content: center;
+            transition: .2s;
+        }
+        .cm-close:hover { background: #ef4444; border-color: #ef4444; color: white; }
+
+        /* body */
+        .cm-body { padding: 1.4rem 1.8rem 1.6rem; }
+
+        /* section labels */
+        .cm-section {
+            font-size: .7rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: .1em;
+            color: rgba(168,85,247,.7);
+            margin: 1.2rem 0 .75rem;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .cm-section::after {
+            content: ''; flex: 1; height: 1px;
+            background: rgba(168,85,247,.18);
+        }
+
+        /* 2-col grid */
+        .cm-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: .7rem .9rem;
+        }
+        .cm-full { grid-column: 1 / -1; }
+
+        /* field */
+        .cm-field { display: flex; flex-direction: column; gap: 4px; }
+        .cm-label {
+            font-size: .72rem; font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase; letter-spacing: .05em;
+        }
+        .cm-input {
+            background: rgba(0,0,0,.25);
+            border: 1px solid rgba(255,255,255,.1);
+            border-radius: 10px;
+            color: white; font-family: 'Outfit', sans-serif;
+            font-size: .9rem; padding: 9px 12px;
+            outline: none; transition: .2s;
+            width: 100%; box-sizing: border-box;
+        }
+        .cm-input:focus {
+            border-color: rgba(168,85,247,.65);
+            background: rgba(168,85,247,.06);
+            box-shadow: 0 0 0 3px rgba(168,85,247,.12);
+        }
+        .cm-input::placeholder { color: rgba(255,255,255,.2); }
+        .cm-input option { background: #1a0b38; }
+        textarea.cm-input { resize: none; height: 72px; }
+
+        /* color row */
+        .cm-color-row {
+            display: flex; align-items: center; gap: .7rem;
+        }
+        .cm-color-row input[type=color] {
+            width: 36px; height: 36px; border-radius: 8px;
+            border: 1px solid rgba(255,255,255,.15);
+            background: none; cursor: pointer; padding: 2px;
+        }
+        .color-presets { display: flex; gap: 6px; flex-wrap: wrap; }
+        .color-dot {
+            width: 22px; height: 22px; border-radius: 50%;
+            cursor: pointer; transition: .2s;
+            border: 2px solid transparent;
+        }
+        .color-dot:hover, .color-dot.selected {
+            transform: scale(1.25);
+            border-color: white;
+        }
+
+        /* footer actions */
+        .cm-footer {
+            display: flex; gap: .7rem;
+            padding: 1rem 1.8rem 1.6rem;
+            border-top: 1px solid rgba(255,255,255,.06);
+        }
+        .cm-btn-save {
+            flex: 1; padding: 11px;
+            background: linear-gradient(135deg, var(--admin-primary), var(--admin-secondary));
+            border: none; border-radius: 12px;
+            color: white; font-weight: 800; font-size: .9rem;
+            cursor: pointer; transition: .25s;
+            box-shadow: 0 6px 18px rgba(168,85,247,.35);
+        }
+        .cm-btn-save:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        .cm-btn-cancel {
+            padding: 11px 22px;
+            border-radius: 12px; border: 1px solid rgba(255,255,255,.12);
+            background: transparent; color: rgba(255,255,255,.5);
+            font-weight: 600; cursor: pointer; transition: .25s;
+        }
+        .cm-btn-cancel:hover { border-color: rgba(255,255,255,.3); color: white; }
+
+        /* ── hide the OLD modal entirely ── */
+        #classModal { display: none !important; }
     </style>
 </head>
 <body class="admin-mode">
@@ -578,61 +721,170 @@
                     <textarea id="quick-notes" placeholder="Viết ghi chú công việc hôm nay..." style="width: 100%; height: 180px; background: rgba(0,0,0,0.2); border: 1px solid var(--admin-border); border-radius: 15px; color: white; padding: 15px; resize: none;"></textarea>
                 </div>
             </div>
-        </div>
 
-        <!-- Modal -->
-        <div id="classModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 id="modalTitle">Thông Tin Lớp Học</h2>
-                    <span class="close" onclick="closeModal()">&times;</span>
+            <!-- Website Configuration Panel -->
+            <div class="glass-panel" style="margin-top: 30px;">
+                <div class="panel-header">
+                    <h2 style="font-size: 1.4rem; font-weight: 800;"><i class="fa-solid fa-gear" style="color: var(--admin-primary); margin-right: 10px;"></i> Cấu Hình Website</h2>
                 </div>
-                <form id="classForm">
-                    <input type="hidden" id="classId">
-                    <div class="form-grid">
-                        <div class="form-group full">
-                            <label>Học sinh</label>
-                            <input type="text" id="m-name" required placeholder="Tên học sinh">
+                <div style="padding: 30px; display: flex; gap: 40px; flex-wrap: wrap; align-items: flex-start;">
+                    <div style="flex: 1; min-width: 300px;">
+                        <h3 style="font-size: 1.1rem; font-weight: 600; margin-top: 0; margin-bottom: 10px; color: #fff;">Ảnh Banner Trang Chủ</h3>
+                        <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 20px;">Tùy chỉnh hình ảnh lập trình viên hiển thị ở phần giới thiệu của trang chủ.</p>
+                        
+                        <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px;">
+                            <input type="file" id="hero-image-file" accept="image/*" style="display: none;" onchange="uploadHeroImage(event)">
+                            <button class="btn" onclick="document.getElementById('hero-image-file').click()" style="padding: 10px 20px; border-radius: 12px; font-weight: 600; background: linear-gradient(135deg, var(--admin-primary), var(--admin-secondary)); color: white; border: none; cursor: pointer;">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> Tải ảnh lên
+                            </button>
+                            <button class="btn" onclick="resetHeroImage()" style="padding: 10px 20px; border-radius: 12px; background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--admin-border); cursor: pointer;">
+                                <i class="fa-solid fa-rotate-left"></i> Khôi phục mặc định
+                            </button>
                         </div>
-                        <div class="form-group">
-                            <label>Môn học</label>
-                            <input type="text" id="m-subject" required placeholder="Toán 12, Hóa 11...">
-                        </div>
-                        <div class="form-group">
-                            <label>Trạng thái</label>
-                            <select id="m-status">
-                                <option value="active">Đang dạy</option>
-                                <option value="pending">Tạm dừng</option>
-                            </select>
-                        </div>
-                        <div class="form-group full">
-                            <label>Lịch học</label>
-                            <input type="text" id="m-schedule" required placeholder="T2, T4 (19h-21h)">
-                        </div>
-                        <div class="form-group">
-                            <label>Học phí / Buổi</label>
-                            <input type="number" id="m-price" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Lộ trình (Buổi)</label>
-                            <input type="number" id="m-total" required value="10">
-                        </div>
-                        <div class="form-group">
-                            <label>Đã hoàn thành</label>
-                            <input type="number" id="m-completed" required value="0">
-                        </div>
-                        <div class="form-group">
-                            <label>Avatar Color</label>
-                            <input type="color" id="m-color" value="#a855f7">
-                        </div>
-                        <div class="form-group full">
-                            <label>Ghi chú quan trọng</label>
-                            <textarea id="m-note" rows="3"></textarea>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <label style="font-size: 0.85rem; color: #94a3b8; font-weight: 600;">Hoặc nhập URL ảnh trực tiếp:</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="hero-image-url-input" placeholder="https://images.unsplash.com/..." style="flex: 1; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--admin-border); border-radius: 12px; color: white; outline: none;">
+                                <button class="btn" onclick="saveHeroImageUrl()" style="padding: 12px 20px; border-radius: 12px; font-weight: 600; background: linear-gradient(135deg, var(--admin-primary), var(--admin-secondary)); color: white; border: none; cursor: pointer;">
+                                    Lưu URL
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-full mt-4" style="padding: 12px; border-radius: 12px;">XÁC NHẬN LƯU</button>
-                </form>
+                    
+                    <div style="width: 250px; display: flex; flex-direction: column; align-items: center; gap: 15px;">
+                        <span style="font-size: 0.85rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Xem trước</span>
+                        <div style="width: 200px; height: 200px; border-radius: 50%; overflow: hidden; border: 4px solid var(--admin-primary); box-shadow: 0 0 20px rgba(168,85,247,0.3); background: #0b0118; display: flex; align-items: center; justify-content: center;">
+                            <img id="hero-preview" src="https://images.unsplash.com/photo-1549692520-acc6669e2f0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                    </div>
+                </div>
             </div>
+        </div>
+
+        <!-- Modal CŨ (ẩn, giữ nguyên để không vỡ JS cũ) -->
+        <div id="classModal" class="modal">
+            <div class="modal-content">
+                <form id="classForm" style="display:none"></form>
+            </div>
+        </div>
+
+        <!-- ══ Modal MỚI ══ -->
+        <div id="cm-overlay" class="cm-overlay" onclick="if(event.target===this)closeCM()">
+        <div class="cm-card">
+            <div class="cm-header">
+                <h3><i class="fa-solid fa-chalkboard-user"></i> <span id="cm-title">Thêm Lớp Mới</span></h3>
+                <button class="cm-close" onclick="closeCM()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <form id="cm-form" onsubmit="submitCM(event)">
+            <input type="hidden" id="cm-id">
+            <div class="cm-body">
+
+                <!-- THÔNG TIN CƠ BẢN -->
+                <div class="cm-section"><i class="fa-solid fa-user"></i> Thông tin cơ bản</div>
+                <div class="cm-grid">
+                    <div class="cm-field cm-full">
+                        <label class="cm-label">Tên học sinh *</label>
+                        <input id="cm-name" class="cm-input" placeholder="Nguyễn Văn A" required>
+                    </div>
+                    <div class="cm-field">
+                        <label class="cm-label">Môn học *</label>
+                        <input id="cm-subject" class="cm-input" placeholder="Toán 12, Hóa 11…" required>
+                    </div>
+                    <div class="cm-field">
+                        <label class="cm-label">Lớp / Cấp</label>
+                        <input id="cm-grade" class="cm-input" placeholder="12A1, THPT Tân Bình…">
+                    </div>
+                    <div class="cm-field">
+                        <label class="cm-label">Số điện thoại phụ huynh</label>
+                        <input id="cm-phone" class="cm-input" placeholder="0912 345 678" type="tel">
+                    </div>
+                    <div class="cm-field">
+                        <label class="cm-label">Địa chỉ học</label>
+                        <input id="cm-address" class="cm-input" placeholder="Online / 123 Đường ABC…">
+                    </div>
+                </div>
+
+                <!-- LỊCH & TIẾN ĐỘ -->
+                <div class="cm-section"><i class="fa-solid fa-calendar-days"></i> Lịch & tiến độ</div>
+                <div class="cm-grid">
+                    <div class="cm-field">
+                        <label class="cm-label">Ngày bắt đầu</label>
+                        <input id="cm-start" class="cm-input" type="date">
+                    </div>
+                    <div class="cm-field">
+                        <label class="cm-label">Lịch học *</label>
+                        <input id="cm-schedule" class="cm-input" placeholder="T2, T4 (19h–21h)" required>
+                    </div>
+                    <div class="cm-field">
+                        <label class="cm-label">Lộ trình (buổi) *</label>
+                        <input id="cm-total" class="cm-input" type="number" min="1" value="10" required>
+                    </div>
+                    <div class="cm-field">
+                        <label class="cm-label">Đã hoàn thành</label>
+                        <input id="cm-completed" class="cm-input" type="number" min="0" value="0">
+                    </div>
+                    <div class="cm-field">
+                        <label class="cm-label">Trạng thái</label>
+                        <select id="cm-status" class="cm-input">
+                            <option value="active">✅ Đang dạy</option>
+                            <option value="pending">⏸️ Tạm dừng</option>
+                            <option value="done">🎓 Hoàn thành</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- HỌC PHÍ -->
+                <div class="cm-section"><i class="fa-solid fa-money-bill-wave"></i> Học phí</div>
+                <div class="cm-grid">
+                    <div class="cm-field">
+                        <label class="cm-label">Học phí / buổi (đ) *</label>
+                        <input id="cm-price" class="cm-input" type="number" min="0" placeholder="250000" required>
+                    </div>
+                    <div class="cm-field">
+                        <label class="cm-label">Hình thức thanh toán</label>
+                        <select id="cm-payment" class="cm-input">
+                            <option value="monthly">Theo tháng</option>
+                            <option value="per-session">Theo buổi</option>
+                            <option value="full">Trọn gói</option>
+                        </select>
+                    </div>
+                    <div class="cm-field">
+                        <label class="cm-label">Đã nhận (đ)</label>
+                        <input id="cm-received" class="cm-input" type="number" min="0" value="0">
+                    </div>
+                </div>
+
+                <!-- GHI CHÚ & MÀU -->
+                <div class="cm-section"><i class="fa-solid fa-palette"></i> Tuỳ chỉnh & ghi chú</div>
+                <div class="cm-grid">
+                    <div class="cm-field">
+                        <label class="cm-label">Màu avatar</label>
+                        <div class="cm-color-row">
+                            <input type="color" id="cm-color" value="#a855f7"
+                                   oninput="syncColor(this.value)">
+                            <div class="color-presets" id="color-presets"></div>
+                        </div>
+                    </div>
+                    <div class="cm-field cm-full">
+                        <label class="cm-label">Ghi chú</label>
+                        <textarea id="cm-note" class="cm-input"
+                            placeholder="Lưu ý về học sinh, bài học cần tập trung…"></textarea>
+                    </div>
+                </div>
+
+            </div><!-- /cm-body -->
+
+            <div class="cm-footer">
+                <button type="submit" class="cm-btn-save">
+                    <i class="fa-solid fa-floppy-disk" style="margin-right:6px"></i>Lưu lớp học
+                </button>
+                <button type="button" class="cm-btn-cancel" onclick="closeCM()">Hủy</button>
+            </div>
+            </form>
+        </div>
         </div>
     </main>
 
@@ -700,6 +952,9 @@
             // Load quick notes
             document.getElementById('quick-notes').value = localStorage.getItem('adminQuickNotes') || "";
             document.getElementById('quick-notes').oninput = (e) => localStorage.setItem('adminQuickNotes', e.target.value);
+            
+            // Tải cấu hình ảnh hero
+            loadHeroImageSetting();
         }
 
         function startTime() {
@@ -918,6 +1173,104 @@
 
         window.onclick = (e) => { if (e.target == document.getElementById('classModal')) closeModal(); };
 
+        async function loadHeroImageSetting() {
+            try {
+                const response = await fetch(`${API_CONFIG.BASE_URL}/api/settings/hero_image_url`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.settingValue) {
+                        document.getElementById('hero-image-url-input').value = data.settingValue;
+                        document.getElementById('hero-preview').src = data.settingValue;
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to load hero image setting:', error);
+            }
+        }
+
+        async function uploadHeroImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const preview = document.getElementById('hero-preview');
+                preview.style.opacity = '0.5';
+
+                const response = await fetch(`${API_CONFIG.BASE_URL}/api/settings/hero_image_url/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.settingValue) {
+                        document.getElementById('hero-image-url-input').value = data.settingValue;
+                        preview.src = data.settingValue;
+                        alert('Tải ảnh lên thành công!');
+                    }
+                } else {
+                    alert('Tải ảnh lên thất bại!');
+                }
+                preview.style.opacity = '1';
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                alert('Có lỗi xảy ra khi tải ảnh lên.');
+                document.getElementById('hero-preview').style.opacity = '1';
+            }
+        }
+
+        async function saveHeroImageUrl() {
+            const url = document.getElementById('hero-image-url-input').value.trim();
+            if (!url) {
+                alert('Vui lòng nhập URL ảnh!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_CONFIG.BASE_URL}/api/settings/hero_image_url?value=${encodeURIComponent(url)}`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.settingValue) {
+                        document.getElementById('hero-preview').src = data.settingValue;
+                        alert('Lưu URL thành công!');
+                    }
+                } else {
+                    alert('Lưu URL thất bại!');
+                }
+            } catch (error) {
+                console.error('Error saving image URL:', error);
+                alert('Có lỗi xảy ra khi lưu URL.');
+            }
+        }
+
+        async function resetHeroImage() {
+            if (confirm('Khôi phục ảnh về mặc định?')) {
+                try {
+                    const response = await fetch(`${API_CONFIG.BASE_URL}/api/settings/hero_image_url?value=`, {
+                        method: 'POST'
+                    });
+
+                    if (response.ok) {
+                        const defaultUrl = 'https://images.unsplash.com/photo-1549692520-acc6669e2f0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80';
+                        document.getElementById('hero-image-url-input').value = '';
+                        document.getElementById('hero-preview').src = defaultUrl;
+                        alert('Khôi phục ảnh mặc định thành công!');
+                    } else {
+                        alert('Khôi phục thất bại!');
+                    }
+                } catch (error) {
+                    console.error('Error resetting image:', error);
+                    alert('Có lỗi xảy ra.');
+                }
+            }
+        }
+
         // --- Keyboard Support for PIN Pad ---
         document.addEventListener('keydown', (e) => {
             if (document.getElementById('login-screen').style.display !== 'none') {
@@ -930,6 +1283,120 @@
                 }
             }
         });
+
+        /* ══════════════════════════════════════════════
+           MODAL MỚI — open / close / submit
+        ══════════════════════════════════════════════ */
+        const COLOR_PRESETS = [
+            '#a855f7','#ec4899','#3b82f6','#10b981',
+            '#f59e0b','#ef4444','#14b8a6','#8b5cf6'
+        ];
+
+        // Build preset dots
+        (function buildPresets() {
+            const wrap = document.getElementById('color-presets');
+            if (!wrap) return;
+            COLOR_PRESETS.forEach(c => {
+                const d = document.createElement('div');
+                d.className = 'color-dot';
+                d.style.background = c;
+                d.title = c;
+                d.onclick = () => {
+                    document.getElementById('cm-color').value = c;
+                    syncColor(c);
+                };
+                wrap.appendChild(d);
+            });
+        })();
+
+        function syncColor(val) {
+            document.querySelectorAll('.color-dot').forEach(d => {
+                d.classList.toggle('selected', d.style.background === val ||
+                    d.style.background === hexToRgb(val));
+            });
+        }
+
+        function hexToRgb(hex) {
+            const r = parseInt(hex.slice(1,3),16),
+                  g = parseInt(hex.slice(3,5),16),
+                  b = parseInt(hex.slice(5,7),16);
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
+        // Override openModal to open the new CM modal instead
+        window.openModal = function(id = null) {
+            const overlay = document.getElementById('cm-overlay');
+            overlay.classList.add('show');
+            document.getElementById('cm-form').reset();
+
+            if (id && typeof id !== 'object') {
+                const c = classes.find(item => item.id == id);
+                if (c) {
+                    document.getElementById('cm-title').textContent  = 'Chỉnh Sửa Lớp Học';
+                    document.getElementById('cm-id').value          = c.id;
+                    document.getElementById('cm-name').value        = c.name        || '';
+                    document.getElementById('cm-subject').value     = c.subject     || '';
+                    document.getElementById('cm-grade').value       = c.grade       || '';
+                    document.getElementById('cm-phone').value       = c.phone       || '';
+                    document.getElementById('cm-address').value     = c.address     || '';
+                    document.getElementById('cm-start').value       = c.start       || '';
+                    document.getElementById('cm-schedule').value    = c.schedule    || '';
+                    document.getElementById('cm-total').value       = c.total       || 10;
+                    document.getElementById('cm-completed').value   = c.completed   || 0;
+                    document.getElementById('cm-status').value      = c.status      || 'active';
+                    document.getElementById('cm-price').value       = c.price       || '';
+                    document.getElementById('cm-payment').value     = c.payment     || 'monthly';
+                    document.getElementById('cm-received').value    = c.received    || 0;
+                    document.getElementById('cm-color').value       = c.color       || '#a855f7';
+                    document.getElementById('cm-note').value        = c.note        || '';
+                    syncColor(c.color || '#a855f7');
+                }
+            } else {
+                document.getElementById('cm-title').textContent = 'Thêm Lớp Mới';
+                document.getElementById('cm-id').value = '';
+                document.getElementById('cm-color').value = COLOR_PRESETS[0];
+                syncColor(COLOR_PRESETS[0]);
+            }
+        };
+
+        window.closeCM = () => {
+            document.getElementById('cm-overlay').classList.remove('show');
+        };
+
+        window.submitCM = function(e) {
+            e.preventDefault();
+            const id = document.getElementById('cm-id').value;
+            const classData = {
+                id:        id ? parseInt(id) : Date.now(),
+                name:      document.getElementById('cm-name').value.trim(),
+                subject:   document.getElementById('cm-subject').value.trim(),
+                grade:     document.getElementById('cm-grade').value.trim(),
+                phone:     document.getElementById('cm-phone').value.trim(),
+                address:   document.getElementById('cm-address').value.trim(),
+                start:     document.getElementById('cm-start').value,
+                schedule:  document.getElementById('cm-schedule').value.trim(),
+                total:     parseInt(document.getElementById('cm-total').value)    || 10,
+                completed: parseInt(document.getElementById('cm-completed').value)|| 0,
+                status:    document.getElementById('cm-status').value,
+                price:     parseInt(document.getElementById('cm-price').value)    || 0,
+                payment:   document.getElementById('cm-payment').value,
+                received:  parseInt(document.getElementById('cm-received').value) || 0,
+                color:     document.getElementById('cm-color').value,
+                note:      document.getElementById('cm-note').value.trim()
+            };
+
+            if (id) {
+                const idx = classes.findIndex(c => c.id == id);
+                if (idx !== -1) classes[idx] = classData;
+            } else {
+                classes.push(classData);
+            }
+
+            saveData(); loadClasses(); updateStats(); updateChart();
+            closeCM();
+        };
+
+        // editClass already calls openModal(id) — no change needed
     </script>
 </body>
 </html>

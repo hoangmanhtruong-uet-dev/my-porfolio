@@ -509,36 +509,72 @@
 
 <script>
 /* ═══════════════════════════════════════════════════════════
+   CONFIG
+═══════════════════════════════════════════════════════════ */
+const BASE_URL = (typeof API_CONFIG !== 'undefined')
+    ? API_CONFIG.BASE_URL
+    : (location.hostname === 'localhost' || location.hostname === '127.0.0.1'
+        ? 'http://localhost:8080' : '');
+
+const API = `${BASE_URL}/api/bucket`;
+
+let selectedIcon  = 'fa-heart';
+let currentCatId  = null;
+let bucketData    = [];   // source of truth từ server
+
+/* ═══════════════════════════════════════════════════════════
+   FETCH  ↔  SERVER
+═══════════════════════════════════════════════════════════ */
+async function fetchData() {
+    try {
+        const res = await fetch(API);
+        if (!res.ok) throw new Error();
+        bucketData = await res.json();
+    } catch {
+        // Fallback localStorage nếu server chưa chạy
+        bucketData = JSON.parse(localStorage.getItem('loveBucketList')) || DEFAULT_DATA;
+    }
+    renderBucketList();
+}
+
+async function apiPost(url, body) {
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+}
+
+async function apiPatch(url, body) {
+    const res = await fetch(url, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json();
+}
+
+async function apiDelete(url) {
+    await fetch(url, { method: 'DELETE' });
+}
+
+/* ═══════════════════════════════════════════════════════════
    DATA
 ═══════════════════════════════════════════════════════════ */
-let currentCatId = null;
-let selectedIcon  = 'fa-heart';
-
 const DEFAULT_DATA = [
-    {
-        id: 1, title: 'Du Lịch', icon: 'fa-plane-departure',
-        items: [
-            { text: 'Đi ngắm tuyết tại Sapa ❄️',   done: false, doneDate: '', photo: '' },
-            { text: 'Check-in Đà Lạt 🌲',            done: false, doneDate: '', photo: '' }
-        ]
-    },
-    {
-        id: 2, title: 'Ẩm Thực', icon: 'fa-utensils',
-        items: [
-            { text: 'Thử lẩu Haidilao 🍲',           done: false, doneDate: '', photo: '' },
-            { text: 'Tự nấu bữa tối 🍝',              done: false, doneDate: '', photo: '' }
-        ]
-    },
-    {
-        id: 3, title: 'Mục Tiêu', icon: 'fa-bullseye',
-        items: [
-            { text: 'Cùng tốt nghiệp UET 🎓',         done: false, doneDate: '', photo: '' },
-            { text: 'Nuôi một chú mèo 🐱',            done: false, doneDate: '', photo: '' }
-        ]
-    }
+    { id: 1, title: 'Du Lịch', icon: 'fa-plane-departure', sortOrder: 0,
+      items: [ { id:1, text:'Đi ngắm tuyết tại Sapa ❄️', done:false, doneDate:'', photo:'' },
+               { id:2, text:'Check-in Đà Lạt 🌲',        done:false, doneDate:'', photo:'' } ] },
+    { id: 2, title: 'Ẩm Thực', icon: 'fa-utensils', sortOrder: 1,
+      items: [ { id:3, text:'Thử lẩu Haidilao 🍲',  done:false, doneDate:'', photo:'' },
+               { id:4, text:'Tự nấu bữa tối 🍝',    done:false, doneDate:'', photo:'' } ] },
+    { id: 3, title: 'Mục Tiêu', icon: 'fa-bullseye', sortOrder: 2,
+      items: [ { id:5, text:'Cùng tốt nghiệp UET 🎓', done:false, doneDate:'', photo:'' },
+               { id:6, text:'Nuôi một chú mèo 🐱',   done:false, doneDate:'', photo:'' } ] }
 ];
-
-let bucketData = JSON.parse(localStorage.getItem('loveBucketList')) || DEFAULT_DATA;
 
 /* ═══════════════════════════════════════════════════════════
    RENDER
@@ -631,6 +667,7 @@ function updateOverallProgress() {
 }
 
 function save() {
+    // Data giờ lưu trên server — chỉ giữ local cache để fallback offline
     localStorage.setItem('loveBucketList', JSON.stringify(bucketData));
 }
 </script>
@@ -639,39 +676,49 @@ function save() {
 /* ═══════════════════════════════════════════════════════════
    TOGGLE ITEM  (with confetti + date stamp)
 ═══════════════════════════════════════════════════════════ */
-function toggleItem(catId, idx) {
+async function toggleItem(catId, idx) {
     const cat  = bucketData.find(c => c.id === catId);
     const item = cat.items[idx];
-    item.done = !item.done;
+    item.done  = !item.done;
 
     if (item.done) {
-        // stamp completion date
         const now = new Date();
         item.doneDate = `${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
         launchConfetti();
     } else {
         item.doneDate = '';
     }
+
+    // Optimistic UI update trước
     renderBucketList();
+
+    // Sync lên server
+    try {
+        await apiPatch(`${API}/item/${item.id}`, { done: item.done, doneDate: item.doneDate || '' });
+    } catch { /* giữ local nếu offline */ }
 }
 
-function deleteItem(catId, idx) {
-    const cat = bucketData.find(c => c.id === catId);
+async function deleteItem(catId, idx) {
+    const cat  = bucketData.find(c => c.id === catId);
+    const item = cat.items[idx];
     cat.items.splice(idx, 1);
     renderBucketList();
+    try { await apiDelete(`${API}/item/${item.id}`); } catch {}
 }
 
 /* ═══════════════════════════════════════════════════════════
-   PHOTO UPLOAD  (stores as base64 in localStorage)
+   PHOTO UPLOAD
 ═══════════════════════════════════════════════════════════ */
 function uploadPhoto(event, catId, idx) {
     const file = event.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = e => {
+    reader.onload = async e => {
         const cat  = bucketData.find(c => c.id === catId);
-        cat.items[idx].photo = e.target.result;
+        const item = cat.items[idx];
+        item.photo = e.target.result;
         renderBucketList();
+        try { await apiPatch(`${API}/item/${item.id}`, { photo: item.photo }); } catch {}
     };
     reader.readAsDataURL(file);
 }
@@ -685,11 +732,19 @@ function openItemModal(id) {
     setTimeout(() => document.getElementById('new-item-text').focus(), 80);
 }
 
-function confirmAddItem() {
+async function confirmAddItem() {
     const text = document.getElementById('new-item-text').value.trim();
     if (!text) return;
-    const cat = bucketData.find(c => c.id === currentCatId);
-    cat.items.push({ text, done: false, doneDate: '', photo: '' });
+    try {
+        const newItem = await apiPost(`${API}/category/${currentCatId}/item`,
+            { text, done: false, doneDate: '', photo: '' });
+        const cat = bucketData.find(c => c.id === currentCatId);
+        cat.items.push(newItem);
+    } catch {
+        // Fallback offline
+        const cat = bucketData.find(c => c.id === currentCatId);
+        cat.items.push({ id: Date.now(), text, done: false, doneDate: '', photo: '' });
+    }
     document.getElementById('new-item-text').value = '';
     closeModals();
     renderBucketList();
@@ -700,26 +755,35 @@ function openCategoryModal() {
     setTimeout(() => document.getElementById('new-cat-title').focus(), 80);
 }
 
-function confirmAddCategory() {
+async function confirmAddCategory() {
     const title = document.getElementById('new-cat-title').value.trim();
     if (!title) return;
-    bucketData.push({ id: Date.now(), title, icon: selectedIcon, items: [] });
+    try {
+        const newCat = await apiPost(`${API}/category`,
+            { title, icon: selectedIcon, sortOrder: bucketData.length, items: [] });
+        bucketData.push(newCat);
+    } catch {
+        bucketData.push({ id: Date.now(), title, icon: selectedIcon, items: [] });
+    }
     document.getElementById('new-cat-title').value = '';
     closeModals();
     renderBucketList();
 }
 
-function deleteCategory(id) {
+async function deleteCategory(id) {
     if (confirm('Xóa danh mục này và toàn bộ mục tiêu bên trong?')) {
         bucketData = bucketData.filter(c => c.id !== id);
         renderBucketList();
+        try { await apiDelete(`${API}/category/${id}`); } catch {}
     }
 }
 
 function resetBucketList() {
-    if (confirm('Cài lại toàn bộ danh sách về mặc định?')) {
-        localStorage.removeItem('loveBucketList');
-        location.reload();
+    if (confirm('Cài lại toàn bộ danh sách về mặc định?\n(Dữ liệu hiện tại sẽ bị xóa khỏi server)')) {
+        fetch(`${API}/seed`, { method: 'POST' })
+            .then(r => r.json())
+            .then(data => { bucketData = data; renderBucketList(); })
+            .catch(() => location.reload());
     }
 }
 
@@ -868,7 +932,19 @@ function toggleMusic() {
 }
 
 /* ── INIT ── */
-window.onload = renderBucketList;
+window.onload = async () => {
+    await fetchData();
+    // Nếu DB trống, seed dữ liệu mặc định
+    if (bucketData.length === 0) {
+        try {
+            const res = await fetch(`${API}/seed`, { method: 'POST' });
+            bucketData = await res.json();
+            renderBucketList();
+        } catch {}
+    }
+};
 </script>
+    <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/common.js"></script>
 </body>
 </html>
