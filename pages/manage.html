@@ -891,11 +891,18 @@
     <script>
         const PIN = "1002";
         let enteredPin = "";
-        let classes = JSON.parse(localStorage.getItem('myClasses')) || [
-            { id: 1, name: "Nguyễn Văn An", subject: "Toán 12", schedule: "T2, T4 (19h-21h)", price: 250000, completed: 6, total: 10, note: "Cần tập trung phần hình học không gian.", status: "active", color: "#a855f7" },
-            { id: 2, name: "Lê Thị Hoa", subject: "Hóa 11", schedule: "T7, CN (15h-17h)", price: 200000, completed: 4, total: 12, note: "Yêu phần chuỗi phản ứng hữu cơ.", status: "active", color: "#ec4899" }
-        ];
 
+        /* ══════════════════════════════════════════════
+           API CONFIG
+        ══════════════════════════════════════════════ */
+        const BASE_URL = (window.location.hostname === 'localhost' ||
+                          window.location.hostname === '127.0.0.1' ||
+                          window.location.protocol === 'file:')
+            ? 'http://localhost:8080' : '';
+        const API = `${BASE_URL}/api/classes`;
+
+        // classes[] là source of truth (mirror từ server)
+        let classes = [];
         let myChart = null;
 
         function addPin(num) {
@@ -945,16 +952,12 @@
         }
 
         function initDashboard() {
-            loadClasses();
-            updateStats();
-            initChart();
+            fetchClasses();           // load từ server
             startTime();
-            // Load quick notes
             document.getElementById('quick-notes').value = localStorage.getItem('adminQuickNotes') || "";
             document.getElementById('quick-notes').oninput = (e) => localStorage.setItem('adminQuickNotes', e.target.value);
-            
-            // Tải cấu hình ảnh hero
             loadHeroImageSetting();
+            initChart();              // khởi tạo chart trống trước
         }
 
         function startTime() {
@@ -1027,32 +1030,38 @@
         }
 
         function markAttendance(id) {
-            const index = classes.findIndex(c => c.id === id);
-            if (index !== -1) {
-                if (classes[index].completed < classes[index].total) {
-                    classes[index].completed++;
-                    saveData();
-                    loadClasses();
-                    updateStats();
-                    updateChart();
-                    
-                    if (classes[index].completed === classes[index].total) {
-                        confetti({
-                            particleCount: 150,
-                            spread: 70,
-                            origin: { y: 0.6 },
-                            colors: ['#a855f7', '#ec4899', '#3b82f6']
-                        });
-                        alert(`Chúc mừng! Học sinh ${classes[index].name} đã hoàn thành khóa học!`);
+            fetch(`${API}/${id}/attend`, { method: 'PATCH' })
+                .then(r => r.json())
+                .then(updated => {
+                    const idx = classes.findIndex(c => c.id === id);
+                    if (idx !== -1) classes[idx] = updated;
+                    loadClasses(); updateStats(); updateChart();
+
+                    if (updated.completed >= updated.total) {
+                        confetti({ particleCount:150, spread:70,
+                            origin:{y:0.6}, colors:['#a855f7','#ec4899','#3b82f6'] });
+                        alert(`Chúc mừng! ${updated.name} đã hoàn thành khóa học! 🎓`);
                     }
-                } else {
-                    alert("Lớp học đã hoàn thành lộ trình!");
-                }
-            }
+                })
+                .catch(() => alert('Lỗi điểm danh!'));
         }
 
-        function saveData() {
-            localStorage.setItem('myClasses', JSON.stringify(classes));
+        /* Không còn dùng localStorage */
+        function saveData() {}
+
+        async function fetchClasses() {
+            try {
+                const res = await fetch(API);
+                if (res.ok) {
+                    classes = await res.json();
+                } else {
+                    classes = JSON.parse(localStorage.getItem('myClasses')) || [];
+                }
+            } catch {
+                // server chưa chạy → fallback localStorage
+                classes = JSON.parse(localStorage.getItem('myClasses')) || [];
+            }
+            loadClasses(); updateStats(); updateChart();
         }
 
         function initChart() {
@@ -1131,13 +1140,14 @@
 
         window.editClass = (id) => openModal(id);
 
-        window.deleteClass = (id) => {
+        window.deleteClass = async (id) => {
             if (confirm('Xóa lớp học này? Dữ liệu sẽ không thể khôi phục.')) {
+                try {
+                    await fetch(`${API}/${id}`, { method: 'DELETE' });
+                } catch {}
+                // Cập nhật local ngay lập tức
                 classes = classes.filter(c => c.id != id);
-                saveData();
-                loadClasses();
-                updateStats();
-                updateChart();
+                loadClasses(); updateStats(); updateChart();
             }
         };
 
@@ -1339,7 +1349,7 @@
                     document.getElementById('cm-grade').value       = c.grade       || '';
                     document.getElementById('cm-phone').value       = c.phone       || '';
                     document.getElementById('cm-address').value     = c.address     || '';
-                    document.getElementById('cm-start').value       = c.start       || '';
+                    document.getElementById('cm-start').value       = c.startDate   || '';
                     document.getElementById('cm-schedule').value    = c.schedule    || '';
                     document.getElementById('cm-total').value       = c.total       || 10;
                     document.getElementById('cm-completed').value   = c.completed   || 0;
@@ -1363,17 +1373,16 @@
             document.getElementById('cm-overlay').classList.remove('show');
         };
 
-        window.submitCM = function(e) {
+        window.submitCM = async function(e) {
             e.preventDefault();
             const id = document.getElementById('cm-id').value;
             const classData = {
-                id:        id ? parseInt(id) : Date.now(),
                 name:      document.getElementById('cm-name').value.trim(),
                 subject:   document.getElementById('cm-subject').value.trim(),
                 grade:     document.getElementById('cm-grade').value.trim(),
                 phone:     document.getElementById('cm-phone').value.trim(),
                 address:   document.getElementById('cm-address').value.trim(),
-                start:     document.getElementById('cm-start').value,
+                startDate: document.getElementById('cm-start').value,
                 schedule:  document.getElementById('cm-schedule').value.trim(),
                 total:     parseInt(document.getElementById('cm-total').value)    || 10,
                 completed: parseInt(document.getElementById('cm-completed').value)|| 0,
@@ -1385,15 +1394,43 @@
                 note:      document.getElementById('cm-note').value.trim()
             };
 
-            if (id) {
-                const idx = classes.findIndex(c => c.id == id);
-                if (idx !== -1) classes[idx] = classData;
-            } else {
-                classes.push(classData);
-            }
+            try {
+                let res;
+                if (id) {
+                    // Cập nhật
+                    res = await fetch(`${API}/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(classData)
+                    });
+                } else {
+                    // Tạo mới
+                    res = await fetch(API, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(classData)
+                    });
+                }
 
-            saveData(); loadClasses(); updateStats(); updateChart();
-            closeCM();
+                if (res.ok) {
+                    await fetchClasses(); // reload từ server
+                    closeCM();
+                } else {
+                    alert('Lỗi lưu dữ liệu! Kiểm tra backend đang chạy.');
+                }
+            } catch {
+                // Fallback offline: lưu local
+                classData.id = id ? parseInt(id) : Date.now();
+                if (id) {
+                    const idx = classes.findIndex(c => c.id == id);
+                    if (idx !== -1) classes[idx] = classData;
+                } else {
+                    classes.push(classData);
+                }
+                localStorage.setItem('myClasses', JSON.stringify(classes));
+                loadClasses(); updateStats(); updateChart();
+                closeCM();
+            }
         };
 
         // editClass already calls openModal(id) — no change needed
