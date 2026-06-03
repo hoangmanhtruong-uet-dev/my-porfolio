@@ -735,6 +735,7 @@
         </div>
     </footer>
 
+    <script src="../assets/js/common.js"></script>
     <script>
         const goalsData = [
             {
@@ -842,25 +843,47 @@
         let isAdmin = sessionStorage.getItem('goal_admin') === 'true';
         let editingGoalId = null;
 
-        // Load saved progress from localStorage
-        const savedGoals = JSON.parse(localStorage.getItem('goal_progress') || '{}');
-        goalsData.forEach(g => {
-            if (savedGoals[g.id]) {
-                Object.assign(g, savedGoals[g.id]);
-            }
-        });
+        const GOAL_API = `${API_CONFIG.BASE_URL}/api/goals`;
 
-        function saveGoalData() {
-            const saved = {};
-            goalsData.forEach(g => {
-                saved[g.id] = {
-                    progress: g.progress,
-                    status: g.status,
-                    startDate: g.startDate || '',
-                    endDate: g.endDate || ''
-                };
-            });
-            localStorage.setItem('goal_progress', JSON.stringify(saved));
+        // Load tiến độ từ DB
+        async function loadGoalProgress() {
+            try {
+                const res = await fetch(GOAL_API);
+                const saved = await res.json();
+                saved.forEach(item => {
+                    const g = goalsData.find(g => g.id === item.goalId);
+                    if (g) {
+                        g.progress  = item.progress;
+                        g.status    = item.status;
+                        g.startDate = item.startDate || '';
+                        g.endDate   = item.endDate   || '';
+                    }
+                });
+            } catch (err) {
+                console.warn('Không tải được tiến độ từ DB, dùng dữ liệu mặc định:', err);
+            }
+            updateAdminUI();
+            renderGoals('all');
+        }
+
+        async function saveGoalData(goalId) {
+            const g = goalsData.find(g => g.id === goalId);
+            if (!g) return;
+            try {
+                await fetch(`${GOAL_API}/${goalId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        goalId:    g.id,
+                        progress:  g.progress,
+                        status:    g.status,
+                        startDate: g.startDate || '',
+                        endDate:   g.endDate   || ''
+                    })
+                });
+            } catch (err) {
+                console.error('Lỗi lưu tiến độ:', err);
+            }
         }
 
         function renderGoals(filter) {
@@ -943,7 +966,7 @@
             if (goal.progress === 100) goal.status = 'done';
             else if (goal.progress === 0) goal.status = 'planned';
 
-            saveGoalData();
+            saveGoalData(editingGoalId); // gọi API
             closeEditModal();
             renderGoals(currentFilter);
         }
@@ -1011,7 +1034,7 @@
 
         // Init
         updateAdminUI();
-        renderGoals('all');
+        loadGoalProgress();
     </script>
     <script src="../assets/js/common.js"></script>
 </body>

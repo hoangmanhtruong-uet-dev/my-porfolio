@@ -21,8 +21,10 @@ mvnw.cmd
 
 # Local Config & secrets (chỉ commit file .example)
 .env
+backend/.env
 # **/application.properties
 !**/application.properties.example
+**/application-local.properties
 **/ca.pem
 uploads/
 backend/uploads/

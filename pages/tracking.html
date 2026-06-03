@@ -3,290 +3,856 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vị Trí Hiện Tại ❤️</title>
+    <title>Vị Trí Của Chúng Mình ❤️</title>
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/833/833472.png" type="image/x-icon">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Outfit:wght@300;400;600;800&family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Pacifico&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
     <style>
-        .tracking-container {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 4rem 2rem;
-        }
-        .tracking-header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-        .tracking-header h2 {
-            font-family: 'Pacifico', cursive;
-            font-size: 3.5rem;
-            color: #ff4d4d;
-        }
+    /* ═══════════ LAYOUT ═══════════ */
+    .tracking-wrap {
+        max-width: 1100px; margin: 0 auto; padding: 4rem 2rem 6rem;
+    }
+    .tracking-header { text-align: center; margin-bottom: 2rem; }
+    .tracking-header h2 {
+        font-family: 'Pacifico', cursive;
+        font-size: 3rem; color: #ff4d4d; margin-bottom: .5rem;
+    }
+    .tracking-header p { opacity: .7; font-size: 1rem; }
 
-        #tracking-map {
-            height: 500px;
-            width: 100%;
-            border-radius: 35px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            border: 2px solid rgba(255, 77, 77, 0.2);
-            z-index: 1;
-        }
+    /* ═══════════ ROLE SELECTOR ═══════════ */
+    .role-selector {
+        display: flex; gap: 1rem; justify-content: center;
+        margin-bottom: 2rem; flex-wrap: wrap;
+    }
+    .role-btn {
+        padding: 10px 28px; border-radius: 100px;
+        font-weight: 700; font-size: .95rem; cursor: pointer;
+        border: 2px solid rgba(255,255,255,.15);
+        background: rgba(255,255,255,.05); color: rgba(255,255,255,.6);
+        transition: .3s; display: flex; align-items: center; gap: 8px;
+    }
+    .role-btn.active-male   { background: rgba(59,130,246,.2); border-color: #60a5fa; color: #93c5fd; }
+    .role-btn.active-female { background: rgba(255,77,77,.2);  border-color: #ff4d4d; color: #fda4af; }
+    .role-btn:hover { transform: translateY(-2px); }
 
-        /* Status Cards */
-        .status-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-        .status-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 30px;
-            padding: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            position: relative;
-        }
-        .avatar-mini {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 3px solid #ff4d4d;
-            object-fit: cover;
-        }
-        .status-info h4 { font-size: 1.3rem; margin-bottom: 5px; }
-        .status-info p { font-size: 0.9rem; opacity: 0.7; }
-        .status-badge {
-            background: #4ade80;
-            color: black;
-            font-size: 0.7rem;
-            font-weight: 800;
-            padding: 3px 10px;
-            border-radius: 100px;
-            text-transform: uppercase;
-        }
+    /* ═══════════ CONNECTION STATUS ═══════════ */
+    .conn-bar {
+        display: flex; align-items: center; justify-content: center;
+        gap: .6rem; font-size: .82rem; font-weight: 700;
+        margin-bottom: 1.2rem; opacity: .8;
+    }
+    .conn-dot {
+        width: 9px; height: 9px; border-radius: 50%;
+        background: #6b7280; /* gray = disconnected */
+        box-shadow: 0 0 6px #6b7280;
+        transition: background .4s, box-shadow .4s;
+    }
+    .conn-dot.connected    { background: #4ade80; box-shadow: 0 0 10px #4ade80; }
+    .conn-dot.connecting   { background: #fbbf24; box-shadow: 0 0 10px #fbbf24;
+                             animation: connBlink .8s infinite; }
+    @keyframes connBlink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-        /* Distance Alert */
-        .distance-info {
-            text-align: center;
-            margin-top: 2rem;
-            padding: 1rem;
-            background: rgba(255, 77, 77, 0.1);
-            border-radius: 20px;
-            color: #ff4d4d;
-            font-weight: 700;
-            display: none;
-        }
+    /* ═══════════ MAP ═══════════ */
+    #tracking-map {
+        height: 500px; width: 100%;
+        border-radius: 28px;
+        box-shadow: 0 20px 50px rgba(0,0,0,.35);
+        border: 2px solid rgba(255,77,77,.25);
+        position: relative; z-index: 1;
+    }
 
-        /* Custom Markers */
-        .map-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 3px solid white;
-            box-shadow: 0 0 15px rgba(255, 77, 77, 0.5);
-            background-size: cover;
-            background-position: center;
-        }
+    /* Avatar markers */
+    .avatar-marker {
+        width: 52px; height: 52px; border-radius: 50%;
+        border: 3px solid white;
+        background-size: cover; background-position: center;
+        box-shadow: 0 4px 14px rgba(0,0,0,.5);
+        position: relative;
+    }
+    .avatar-marker .pulse-ring {
+        position: absolute; inset: -6px; border-radius: 50%;
+        border: 2px solid;
+        animation: markerPulse 1.8s ease-out infinite;
+        opacity: 0;
+    }
+    @keyframes markerPulse {
+        0%   { transform: scale(.85); opacity: .7; }
+        100% { transform: scale(1.6); opacity: 0; }
+    }
+    .avatar-marker-male   .pulse-ring { border-color: #60a5fa; }
+    .avatar-marker-female .pulse-ring { border-color: #ff4d4d; }
 
-        .update-btn {
-            background: #ff4d4d;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 100px;
-            cursor: pointer;
-            font-weight: 700;
-            margin-top: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: 0.3s;
-        }
-        .update-btn:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(255, 77, 77, 0.4); }
+    /* ═══════════ DISTANCE BANNER ═══════════ */
+    .distance-banner {
+        display: flex; align-items: center; justify-content: center;
+        gap: .8rem; margin: 1.2rem 0;
+        background: rgba(255,77,77,.08);
+        border: 1px solid rgba(255,77,77,.2);
+        border-radius: 20px; padding: .9rem 1.6rem;
+        font-weight: 700; color: #fda4af; font-size: 1rem;
+        display: none;
+    }
 
-        .note-box {
-            margin-top: 3rem;
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 25px;
-            border: 1px dashed rgba(255, 255, 255, 0.1);
-            font-size: 0.9rem;
-            line-height: 1.6;
-            opacity: 0.8;
-        }
+    /* ═══════════ STATUS CARDS ═══════════ */
+    .status-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.6rem; margin-top: 2rem;
+    }
+    .status-card {
+        background: rgba(255,255,255,.04);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255,255,255,.1);
+        border-radius: 28px; padding: 1.8rem;
+        display: flex; align-items: center; gap: 1.2rem;
+        transition: border-color .3s;
+    }
+    .status-card.mine  { border-color: rgba(96,165,250,.35); }
+    .status-card.other { border-color: rgba(255,77,77,.35); }
+    .avatar-mini {
+        width: 72px; height: 72px; border-radius: 50%;
+        object-fit: cover; flex-shrink: 0;
+        border: 3px solid rgba(255,255,255,.2);
+    }
+    .status-card.mine  .avatar-mini { border-color: #60a5fa; }
+    .status-card.other .avatar-mini { border-color: #ff4d4d; }
+    .status-info h4 { font-size: 1.2rem; margin-bottom: 4px; }
+    .status-info .status-loc {
+        font-size: .82rem; opacity: .6; margin-bottom: .8rem;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        max-width: 200px;
+    }
+    .status-badge {
+        font-size: .68rem; font-weight: 800; padding: 3px 10px;
+        border-radius: 100px; text-transform: uppercase;
+        letter-spacing: .05em; margin-bottom: 6px; display: inline-block;
+    }
+    .badge-live    { background: #4ade80; color: #052e16; }
+    .badge-wait    { background: #fbbf24; color: #451a03; }
+    .badge-offline { background: #6b7280; color: #fff; }
+
+    /* update button */
+    .update-btn {
+        background: linear-gradient(135deg,#3b82f6,#60a5fa);
+        color: white; border: none; padding: 9px 20px;
+        border-radius: 100px; font-weight: 700; font-size: .85rem;
+        cursor: pointer; display: flex; align-items: center; gap: 8px;
+        transition: .3s;
+    }
+    .update-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(59,130,246,.4); }
+    .update-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .update-btn.loading i { animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* last seen */
+    .last-seen { font-size: .72rem; opacity: .4; margin-top: 4px; }
+
+    /* ═══════════ AUTO-SHARE TOGGLE ═══════════ */
+    .auto-toggle-row {
+        display: flex; align-items: center; gap: .8rem;
+        margin-top: .6rem; font-size: .85rem; color: rgba(255,255,255,.6);
+    }
+    .toggle-switch {
+        position: relative; width: 42px; height: 24px;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-track {
+        position: absolute; inset: 0; background: rgba(255,255,255,.15);
+        border-radius: 100px; cursor: pointer; transition: .3s;
+    }
+    .toggle-track::after {
+        content: ''; position: absolute;
+        width: 18px; height: 18px; left: 3px; top: 3px;
+        background: white; border-radius: 50%; transition: .3s;
+    }
+    input:checked + .toggle-track { background: #4ade80; }
+    input:checked + .toggle-track::after { transform: translateX(18px); }
+
+    /* ═══════════ MANUAL LOCATION MODAL ═══════════ */
+    .manual-modal-overlay {
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,.82); backdrop-filter: blur(14px);
+        display: none; justify-content: center; align-items: center;
+        z-index: 6000; padding: 20px;
+    }
+    .manual-modal-overlay.open { display: flex; }
+    .manual-modal-card {
+        background: linear-gradient(145deg,#1a0b2e,#1e1040);
+        border: 1px solid rgba(255,77,77,.35);
+        border-radius: 28px; padding: 2.2rem;
+        width: 100%; max-width: 420px;
+        box-shadow: 0 30px 80px rgba(0,0,0,.6);
+        animation: modalIn .3s ease;
+    }
+    @keyframes modalIn {
+        from { opacity:0; transform: translateY(20px) scale(.97); }
+        to   { opacity:1; transform: translateY(0) scale(1); }
+    }
+    .manual-modal-card h3 { color:#ff4d4d; font-size:1.3rem; margin-bottom:.4rem; }
+    .manual-modal-card p  { font-size:.82rem; opacity:.5; margin-bottom:1.4rem; line-height:1.5; }
+    .mm-label { display:block; font-size:.72rem; font-weight:700; text-transform:uppercase;
+        letter-spacing:.07em; color:rgba(255,255,255,.4); margin-bottom:5px; }
+    .mm-input {
+        width:100%; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.13);
+        color:#fff; padding:11px 14px; border-radius:12px; font-size:.95rem;
+        box-sizing:border-box; outline:none; margin-bottom:1rem; transition:.2s;
+    }
+    .mm-input:focus { border-color:rgba(255,77,77,.6); background:rgba(255,77,77,.06); }
+    .mm-input::placeholder { color:rgba(255,255,255,.2); }
+    .mm-row { display:flex; gap:.8rem; }
+    .mm-row .mm-input { margin-bottom:0; }
+    .mm-actions { display:flex; gap:.8rem; margin-top:1.3rem; }
+    .mm-btn-send {
+        flex:1; padding:11px; border:none; border-radius:12px;
+        background:linear-gradient(135deg,#3b82f6,#60a5fa);
+        color:#fff; font-weight:700; cursor:pointer; transition:.25s;
+    }
+    .mm-btn-send:hover { filter:brightness(1.1); transform:translateY(-1px); }
+    .mm-btn-cancel {
+        flex:1; padding:11px; border-radius:12px;
+        border:1px solid rgba(255,255,255,.13); background:transparent;
+        color:rgba(255,255,255,.5); font-weight:600; cursor:pointer; transition:.25s;
+    }
+    .mm-btn-cancel:hover { border-color:rgba(255,255,255,.3); color:#fff; }
+
+    /* GPS warning banner */
+    .gps-warn {
+        display:none; align-items:center; gap:.8rem;
+        background:rgba(251,191,36,.08); border:1px solid rgba(251,191,36,.25);
+        border-radius:16px; padding:.8rem 1.2rem;
+        font-size:.83rem; color:#fde68a; font-weight:600;
+        margin-bottom:1.2rem;
+    }
+    .gps-warn i { color:#fbbf24; font-size:1rem; flex-shrink:0; }
+    .gps-warn a { color:#fbbf24; cursor:pointer; text-decoration:underline; }
+
+    /* map click hint */
+    .map-hint {
+        text-align:center; font-size:.78rem; opacity:.4;
+        margin-top:.5rem; margin-bottom:-.4rem;
+    }
     </style>
 </head>
 <body class="love-page-body">
-    <!-- Global Widgets -->
-    <div class="dark-mode-toggle" onclick="toggleDarkMode()">
-        <i class="fa-solid fa-moon" id="dark-mode-icon"></i>
+
+<!-- Widgets -->
+<div class="dark-mode-toggle" onclick="toggleDarkMode()">
+    <i class="fa-solid fa-moon" id="dark-mode-icon"></i>
+</div>
+<div class="music-player">
+    <i class="fa-solid fa-play music-btn" id="play-pause" onclick="toggleMusic()"></i>
+    <span id="song-title">Perfect - Ed Sheeran ❤️</span>
+    <audio id="bg-music" loop>
+        <source src="https://github.com/hoangtran0410/Pretty-In-Love/blob/master/music/perfect.mp3?raw=true" type="audio/mpeg">
+    </audio>
+</div>
+<div class="back-nav">
+    <a href="love.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Quay lại</a>
+</div>
+
+<main class="tracking-wrap">
+    <div class="tracking-header">
+        <h2>Vị Trí Của Chúng Mình</h2>
+        <p>Luôn biết đối phương đang ở đâu ❤️</p>
     </div>
 
-    <div class="music-player">
-        <i class="fa-solid fa-play music-btn" id="play-pause" onclick="toggleMusic()"></i>
-        <span id="song-title">Perfect - Ed Sheeran ❤️</span>
-        <audio id="bg-music" loop>
-            <source src="https://files.catbox.moe/979u74.mp3" type="audio/mpeg">
-        </audio>
+    <!-- Role selector: mỗi người chọn mình là ai -->
+    <div style="text-align:center;margin-bottom:.6rem;font-size:.85rem;opacity:.55">
+        <i class="fa-solid fa-circle-info" style="margin-right:5px"></i>
+        Chọn vai của bạn — mỗi người chọn một vai khác nhau
+    </div>
+    <div class="role-selector">
+        <button class="role-btn" id="btn-male"   onclick="setRole('male')">
+            <i class="fa-solid fa-mars"  style="color:#60a5fa"></i> Tôi là anh
+        </button>
+        <button class="role-btn" id="btn-female" onclick="setRole('female')">
+            <i class="fa-solid fa-venus" style="color:#fda4af"></i> Tôi là em
+        </button>
     </div>
 
-    <div class="back-nav">
-        <a href="love.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Quay lại trang chủ</a>
+    <!-- WebSocket status -->
+    <div class="conn-bar">
+        <div class="conn-dot" id="conn-dot"></div>
+        <span id="conn-label">Đang kết nối...</span>
     </div>
 
-    <main class="tracking-container">
-        <div class="tracking-header">
-            <h2>Vị Trí Của Chúng Mình</h2>
-            <p>Luôn biết đối phương đang ở đâu để thêm phần an tâm ❤️</p>
-        </div>
+    <!-- Map -->
+    <div id="gps-warn" class="gps-warn">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>GPS bị chặn (cần HTTPS hoặc localhost).
+            <a onclick="openManualModal()">Nhập tọa độ thủ công</a>
+            hoặc <a onclick="useMapClick()">click trên bản đồ</a> để chia sẻ vị trí.
+        </span>
+    </div>
+    <div id="tracking-map"></div>
+    <div class="map-hint" id="map-hint" style="display:none">
+        <i class="fa-solid fa-hand-pointer" style="margin-right:5px"></i>Click vào bản đồ để chọn vị trí của bạn
+    </div>
 
-        <div id="tracking-map"></div>
+    <!-- Distance banner -->
+    <div class="distance-banner" id="dist-banner">
+        <i class="fa-solid fa-route"></i>
+        <span>Khoảng cách: <strong id="dist-val">--</strong> km</span>
+        <span style="opacity:.5">|</span>
+        <span id="dist-msg">...</span>
+    </div>
 
-        <div id="distance-alert" class="distance-info">
-            <i class="fa-solid fa-location-arrow"></i> Khoảng cách hiện tại: <span id="distance-val">0</span> km
-        </div>
-
-        <div class="status-grid">
-            <!-- Male Status -->
-            <div class="status-card">
-                <img id="status-img-male" src="" class="avatar-mini">
-                <div class="status-info">
-                    <span class="status-badge">Đang ở đây</span>
-                    <h4 id="status-name-male">Bạn Trai</h4>
-                    <p id="status-loc-male">Đang cập nhật...</p>
-                    <button class="update-btn" onclick="updateMyLocation('male')">
-                        <i class="fa-solid fa-crosshairs"></i> Cập nhật vị trí
-                    </button>
+    <!-- Status cards -->
+    <div class="status-grid">
+        <!-- MY card -->
+        <div class="status-card mine">
+            <img id="my-avatar" class="avatar-mini" src="" alt="">
+            <div class="status-info">
+                <span class="status-badge badge-wait" id="my-badge">Chưa chia sẻ</span>
+                <h4 id="my-name">--</h4>
+                <div class="status-loc" id="my-loc">Nhấn nút bên dưới để chia sẻ</div>
+                <div class="last-seen" id="my-last"></div>
+                <button class="update-btn" id="update-btn" onclick="shareLocation()">
+                    <i class="fa-solid fa-crosshairs"></i> Chia sẻ vị trí của tôi
+                </button>
+                <!-- Manual fallback -->
+                <button class="update-btn" id="manual-btn"
+                    style="margin-top:.5rem;background:linear-gradient(135deg,#7c3aed,#a855f7);display:none"
+                    onclick="openManualModal()">
+                    <i class="fa-solid fa-keyboard"></i> Nhập tọa độ thủ công
+                </button>
+                <!-- Auto-share toggle -->
+                <div class="auto-toggle-row">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="auto-toggle" onchange="toggleAuto(this.checked)">
+                        <span class="toggle-track"></span>
+                    </label>
+                    <span>Tự động cập nhật</span>
                 </div>
             </div>
-
-            <!-- Female Status -->
-            <div class="status-card">
-                <img id="status-img-female" src="" class="avatar-mini">
-                <div class="status-info">
-                    <span class="status-badge" style="background: #fda4af;">Đang ở đây</span>
-                    <h4 id="status-name-female">Bạn Gái</h4>
-                    <p id="status-loc-female">Đang cập nhật...</p>
-                    <button class="update-btn" style="background: #f43f5e;" onclick="updateMyLocation('female')">
-                        <i class="fa-solid fa-crosshairs"></i> Cập nhật vị trí
-                    </button>
-                </div>
+        </div>
+        <!-- PARTNER card -->
+        <div class="status-card other">
+            <img id="other-avatar" class="avatar-mini" src="" alt="">
+            <div class="status-info">
+                <span class="status-badge badge-offline" id="other-badge">Chưa kết nối</span>
+                <h4 id="other-name">--</h4>
+                <div class="status-loc" id="other-loc">Đang chờ đối phương...</div>
+                <div class="last-seen" id="other-last"></div>
             </div>
         </div>
+    </div>
+</main>
 
-        <div class="note-box">
-            <i class="fa-solid fa-circle-info"></i> <strong>Lưu ý Full-stack:</strong> Hiện tại vị trí đang được lưu trong trình duyệt của bạn (LocalStorage). Để chia sẻ vị trí thực tế giữa hai điện thoại khác nhau, bạn cần kết nối ứng dụng này với một Backend (ví dụ: Spring Boot + PostgreSQL) và sử dụng WebSocket hoặc Firebase để cập nhật tọa độ liên tục.
+<!-- Manual location modal -->
+<div id="manual-modal" class="manual-modal-overlay">
+    <div class="manual-modal-card">
+        <h3><i class="fa-solid fa-map-pin" style="margin-right:8px"></i>Nhập vị trí thủ công</h3>
+        <p>GPS bị chặn do trang chưa dùng HTTPS.<br>
+           Bạn có thể tìm tọa độ trên <a href="https://maps.google.com" target="_blank" style="color:#60a5fa">Google Maps</a>
+           (chuột phải → "What's here?") hoặc click vào bản đồ bên dưới.</p>
+        <div class="mm-row">
+            <div style="flex:1">
+                <label class="mm-label">Vĩ độ (Latitude)</label>
+                <input type="number" id="mm-lat" class="mm-input" placeholder="21.028511" step="any">
+            </div>
+            <div style="flex:1">
+                <label class="mm-label">Kinh độ (Longitude)</label>
+                <input type="number" id="mm-lng" class="mm-input" placeholder="105.854196" step="any">
+            </div>
         </div>
-    </main>
+        <div class="mm-actions">
+            <button class="mm-btn-send" onclick="submitManual()">
+                <i class="fa-solid fa-paper-plane"></i> Chia sẻ
+            </button>
+            <button class="mm-btn-cancel" onclick="closeManualModal()">Hủy</button>
+        </div>
+    </div>
+</div>
 
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        const config = JSON.parse(localStorage.getItem('inLoveConfig')) || {
-            nameMale: "Hoàng Mạnh Trường",
-            nameFemale: "Nguyễn Thị Anh Thư",
-            imgMale: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80",
-            imgFemale: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80"
-        };
+<!-- SockJS + STOMP client -->
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="../assets/js/config.js"></script>
 
-        let map, markerMale, markerFemale;
-        let positions = JSON.parse(localStorage.getItem('lovePositions')) || {
-            male: { lat: 21.0285, lng: 105.8542 },
-            female: { lat: 21.0333, lng: 105.8333 }
-        };
+<script>
+/* ═══════════════════════════════════════════════════════════
+   CONFIG & STATE
+═══════════════════════════════════════════════════════════ */
+const BASE_URL = (typeof API_CONFIG !== 'undefined')
+    ? API_CONFIG.BASE_URL
+    : 'http://localhost:8080';
 
-        function initTracking() {
-            document.getElementById('status-name-male').innerText = config.nameMale;
-            document.getElementById('status-name-female').innerText = config.nameFemale;
-            document.getElementById('status-img-male').src = config.imgMale;
-            document.getElementById('status-img-female').src = config.imgFemale;
+const loveCfg = JSON.parse(localStorage.getItem('inLoveConfig')) || {
+    nameMale:   'Anh',
+    nameFemale: 'Em',
+    imgMale:    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&q=80',
+    imgFemale:  'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&q=80'
+};
 
-            map = L.map('tracking-map').setView([21.0285, 105.8542], 13);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+let myRole      = localStorage.getItem('trackingRole') || null; // 'male' | 'female'
+let stompClient = null;
+let wsConnected = false;
+let autoWatchId = null;  // watchPosition id
+let mapClickMode = false;
+let map, markerMale, markerFemale, lineBetween;
 
-            const iconMale = L.divIcon({
-                html: `<div class="map-avatar" style="background-image: url('${config.imgMale}')"></div>`,
-                className: 'custom-div-icon', iconSize: [50, 50], iconAnchor: [25, 25]
+const positions = {
+    male:   null,   // { lat, lng, timestamp }
+    female: null
+};
+
+/* ═══════════════════════════════════════════════════════════
+   ROLE SETUP
+═══════════════════════════════════════════════════════════ */
+function setRole(role) {
+    myRole = role;
+    localStorage.setItem('trackingRole', role);
+    document.getElementById('btn-male').className   = 'role-btn' + (role === 'male'   ? ' active-male'   : '');
+    document.getElementById('btn-female').className = 'role-btn' + (role === 'female' ? ' active-female' : '');
+    refreshUI();
+}
+
+function partnerRole() { return myRole === 'male' ? 'female' : 'male'; }
+
+function myName()      { return myRole === 'male' ? loveCfg.nameMale   : loveCfg.nameFemale; }
+function partnerName() { return myRole === 'male' ? loveCfg.nameFemale : loveCfg.nameMale; }
+function myImg()       { return myRole === 'male' ? loveCfg.imgMale    : loveCfg.imgFemale; }
+function partnerImg()  { return myRole === 'male' ? loveCfg.imgFemale  : loveCfg.imgMale; }
+
+function refreshUI() {
+    if (!myRole) return;
+    document.getElementById('my-name').textContent    = myName();
+    document.getElementById('other-name').textContent = partnerName();
+    document.getElementById('my-avatar').src          = myImg();
+    document.getElementById('other-avatar').src       = partnerImg();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MAP INIT
+═══════════════════════════════════════════════════════════ */
+function initMap() {
+    map = L.map('tracking-map', { zoomControl: true }).setView([21.028, 105.854], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // Map click → set position (khi GPS không có)
+    map.on('click', function(e) {
+        if (!mapClickMode) return;
+        if (!myRole) { showToast('Chọn vai trước đã! 👆', '#fbbf24'); return; }
+        sendPosition(e.latlng.lat, e.latlng.lng);
+        mapClickMode = false;
+        document.getElementById('map-hint').style.display = 'none';
+        showToast('Đã đặt vị trí trên bản đồ ✓', '#4ade80');
+    });
+
+    setTimeout(() => map.invalidateSize(), 400);
+    window.addEventListener('resize', () => map.invalidateSize());
+}
+
+function makeAvatarIcon(imgUrl, role) {
+    const borderColor = role === 'male' ? '#60a5fa' : '#ff4d4d';
+    return L.divIcon({
+        html: `<div class="avatar-marker avatar-marker-${role}"
+                    style="background-image:url('${imgUrl}');border-color:${borderColor}">
+                   <div class="pulse-ring"></div>
+               </div>`,
+        className: '',
+        iconSize:   [52, 52],
+        iconAnchor: [26, 26],
+        popupAnchor:[0, -30]
+    });
+}
+
+function placeOrMoveMarker(role, lat, lng) {
+    const imgUrl = role === 'male' ? loveCfg.imgMale : loveCfg.imgFemale;
+    const name   = role === 'male' ? loveCfg.nameMale : loveCfg.nameFemale;
+    const icon   = makeAvatarIcon(imgUrl, role);
+
+    if (role === 'male') {
+        if (markerMale) { markerMale.setLatLng([lat, lng]); markerMale.setIcon(icon); }
+        else markerMale = L.marker([lat, lng], { icon }).addTo(map).bindPopup(`<b>${name}</b>`);
+    } else {
+        if (markerFemale) { markerFemale.setLatLng([lat, lng]); markerFemale.setIcon(icon); }
+        else markerFemale = L.marker([lat, lng], { icon }).addTo(map).bindPopup(`<b>${name}</b>`);
+    }
+    drawLine();
+    fitBothMarkers();
+    updateDistanceBanner();
+}
+
+function drawLine() {
+    if (!positions.male || !positions.female) return;
+    const pts = [
+        [positions.male.lat,   positions.male.lng],
+        [positions.female.lat, positions.female.lng]
+    ];
+    if (lineBetween) { lineBetween.setLatLngs(pts); return; }
+    lineBetween = L.polyline(pts, {
+        color: '#ff4d4d', weight: 2.5, opacity: .55,
+        dashArray: '8,6'
+    }).addTo(map);
+}
+
+function fitBothMarkers() {
+    const markers = [markerMale, markerFemale].filter(Boolean);
+    if (markers.length < 2) return;
+    const grp = new L.featureGroup(markers);
+    map.fitBounds(grp.getBounds().pad(0.45));
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DISTANCE
+═══════════════════════════════════════════════════════════ */
+function haversine(la1, lo1, la2, lo2) {
+    const R = 6371, r = d => d * Math.PI / 180;
+    const a = Math.sin(r(la2-la1)/2)**2 + Math.cos(r(la1))*Math.cos(r(la2))*Math.sin(r(lo2-lo1)/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function updateDistanceBanner() {
+    if (!positions.male || !positions.female) return;
+    const d   = haversine(positions.male.lat, positions.male.lng, positions.female.lat, positions.female.lng);
+    const km  = d.toFixed(2);
+    let msg = d < 0.1 ? '🥰 Đang ở cạnh nhau!' : d < 1 ? '😊 Gần nhau rồi!' : d < 5 ? '🏃 Đang trên đường...' : '💌 Nhớ nhau không?';
+    document.getElementById('dist-banner').style.display = 'flex';
+    document.getElementById('dist-val').textContent = km;
+    document.getElementById('dist-msg').textContent = msg;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   WEBSOCKET / STOMP
+═══════════════════════════════════════════════════════════ */
+let wsRetryCount = 0;
+let heartbeatInterval = null;
+
+function connectWS() {
+    setConnStatus('connecting');
+    try {
+        const sock   = new SockJS(`${BASE_URL}/ws-location`);
+        stompClient  = Stomp.over(sock);
+        stompClient.debug = null;
+        // Heartbeat 25s để giữ kết nối qua Render / proxy
+        stompClient.heartbeat.outgoing = 25000;
+        stompClient.heartbeat.incoming = 25000;
+
+        stompClient.connect({}, () => {
+            wsConnected  = true;
+            wsRetryCount = 0;
+            setConnStatus('connected');
+
+            // Subscribe nhận vị trí realtime
+            stompClient.subscribe('/topic/location', msg => {
+                const update = JSON.parse(msg.body);
+                handleIncoming(update);
             });
 
-            const iconFemale = L.divIcon({
-                html: `<div class="map-avatar" style="background-image: url('${config.imgFemale}'); border-color: #f43f5e;"></div>`,
-                className: 'custom-div-icon', iconSize: [50, 50], iconAnchor: [25, 25]
-            });
+            // Tải vị trí hiện có từ server ngay khi connect
+            loadExistingPositions();
 
-            markerMale = L.marker([positions.male.lat, positions.male.lng], {icon: iconMale}).addTo(map);
-            markerFemale = L.marker([positions.female.lat, positions.female.lng], {icon: iconFemale}).addTo(map);
+            // Ping REST mỗi 20s để Render không sleep
+            clearInterval(heartbeatInterval);
+            heartbeatInterval = setInterval(() => {
+                fetch(`${BASE_URL}/api/location/all`).catch(() => {});
+            }, 20000);
 
-            updateDistance();
-            
-            // Re-center to show both
-            const group = new L.featureGroup([markerMale, markerFemale]);
-            map.fitBounds(group.getBounds().pad(0.5));
+        }, err => {
+            wsConnected = false;
+            clearInterval(heartbeatInterval);
+            setConnStatus('disconnected');
+            // Exponential backoff: 3s, 6s, 12s, tối đa 30s
+            const delay = Math.min(3000 * Math.pow(2, wsRetryCount), 30000);
+            wsRetryCount++;
+            setTimeout(connectWS, delay);
+        });
+
+        // Khi socket đóng (tab ẩn, mạng mất)
+        sock.onclose = () => {
+            wsConnected = false;
+            clearInterval(heartbeatInterval);
+        };
+
+    } catch (e) {
+        setConnStatus('disconnected');
+        setTimeout(connectWS, 5000);
+    }
+}
+
+function setConnStatus(status) {
+    const dot   = document.getElementById('conn-dot');
+    const label = document.getElementById('conn-label');
+    dot.className = 'conn-dot';
+    if (status === 'connected')    { dot.classList.add('connected');  label.textContent = 'Đã kết nối realtime ✓'; }
+    if (status === 'connecting')   { dot.classList.add('connecting'); label.textContent = 'Đang kết nối...'; }
+    if (status === 'disconnected') { label.textContent = 'Mất kết nối — đang thử lại...'; }
+}
+
+async function loadExistingPositions() {
+    try {
+        const res  = await fetch(`${BASE_URL}/api/location/all`);
+        const data = await res.json(); // { male: {...}, female: {...} }
+        Object.entries(data).forEach(([role, loc]) => {
+            if (loc) handleIncoming(loc, true);
+        });
+    } catch (e) { /* server chưa có data — bỏ qua */ }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HANDLE INCOMING UPDATE
+═══════════════════════════════════════════════════════════ */
+function handleIncoming(update, silent = false) {
+    const { role, lat, lng, timestamp } = update;
+    positions[role] = { lat, lng, timestamp };
+    placeOrMoveMarker(role, lat, lng);
+
+    const isMe = role === myRole;
+    const nameEl  = isMe ? 'my-loc'    : 'other-loc';
+    const badgeEl = isMe ? 'my-badge'  : 'other-badge';
+    const lastEl  = isMe ? 'my-last'   : 'other-last';
+
+    // Reverse geocode để hiện tên đường
+    reverseGeocode(lat, lng).then(addr => {
+        document.getElementById(nameEl).textContent = addr;
+    });
+
+    document.getElementById(badgeEl).textContent  = 'Đang live';
+    document.getElementById(badgeEl).className    = 'status-badge badge-live';
+    document.getElementById(lastEl).textContent   = 'Cập nhật: ' + fmtTime(timestamp || Date.now());
+
+    if (!isMe && !silent) {
+        showToast(`${partnerName()} vừa cập nhật vị trí 📍`, '#4ade80');
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SHARE MY LOCATION
+═══════════════════════════════════════════════════════════ */
+function shareLocation() {
+    if (!myRole) {
+        showToast('Hãy chọn vai của bạn trước! 👆', '#fbbf24'); return;
+    }
+
+    // Kiểm tra GPS có khả dụng không (cần HTTPS hoặc localhost)
+    const isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    if (!isSecure || !navigator.geolocation) {
+        showGpsWarn();
+        return;
+    }
+
+    const btn = document.getElementById('update-btn');
+    btn.disabled = true;
+    btn.classList.add('loading');
+    btn.querySelector('i').className = 'fa-solid fa-spinner';
+
+    navigator.geolocation.getCurrentPosition(pos => {
+        sendPosition(pos.coords.latitude, pos.coords.longitude);
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        btn.querySelector('i').className = 'fa-solid fa-crosshairs';
+    }, err => {
+        // GPS bị từ chối runtime → hiện fallback
+        showGpsWarn();
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        btn.querySelector('i').className = 'fa-solid fa-crosshairs';
+    }, { enableHighAccuracy: true, timeout: 10000 });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   GPS WARNING + FALLBACK
+═══════════════════════════════════════════════════════════ */
+function showGpsWarn() {
+    document.getElementById('gps-warn').style.display   = 'flex';
+    document.getElementById('manual-btn').style.display = 'flex';
+    showToast('GPS không khả dụng — dùng nhập thủ công hoặc click bản đồ 📍', '#fbbf24');
+}
+
+// ── Manual input modal ──
+function openManualModal() {
+    document.getElementById('manual-modal').classList.add('open');
+    // Pre-fill Hà Nội nếu chưa có gì
+    if (!document.getElementById('mm-lat').value) {
+        document.getElementById('mm-lat').value = '21.0285';
+        document.getElementById('mm-lng').value = '105.8542';
+    }
+}
+function closeManualModal() {
+    document.getElementById('manual-modal').classList.remove('open');
+}
+function submitManual() {
+    const lat = parseFloat(document.getElementById('mm-lat').value);
+    const lng = parseFloat(document.getElementById('mm-lng').value);
+    if (isNaN(lat) || isNaN(lng)) {
+        showToast('Tọa độ không hợp lệ!', '#ef4444'); return;
+    }
+    if (!myRole) {
+        showToast('Chọn vai trước đã! 👆', '#fbbf24'); return;
+    }
+    sendPosition(lat, lng);
+    closeManualModal();
+    showToast('Đã chia sẻ vị trí thủ công ✓', '#4ade80');
+}
+
+// ── Map click mode ──
+let mapClickMode = false;
+function useMapClick() {
+    document.getElementById('map-hint').style.display = 'block';
+    mapClickMode = true;
+    showToast('Click vào bản đồ để đặt vị trí của bạn 🗺️', '#60a5fa');
+    // Đóng warning để không che bản đồ
+    document.getElementById('gps-warn').style.display = 'none';
+}
+
+function sendPosition(lat, lng) {
+    if (!myRole) return;
+    const payload = { role: myRole, lat, lng, timestamp: Date.now() };
+
+    if (wsConnected && stompClient) {
+        // Gửi qua WebSocket
+        stompClient.send('/app/location.update', {}, JSON.stringify(payload));
+    } else {
+        // Fallback REST nếu WS chưa kết nối
+        fetch(`${BASE_URL}/api/location/update`, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(payload)
+        }).catch(() => {});
+    }
+    // Cập nhật UI của mình ngay lập tức (không chờ echo)
+    handleIncoming(payload, true);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   AUTO-SHARE (watchPosition)
+═══════════════════════════════════════════════════════════ */
+function toggleAuto(enabled) {
+    if (enabled) {
+        if (!myRole) {
+            showToast('Chọn vai trước đã! 👆', '#fbbf24');
+            document.getElementById('auto-toggle').checked = false;
+            return;
         }
-
-        function updateMyLocation(role) {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition((position) => {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    
-                    positions[role] = { lat, lng };
-                    localStorage.setItem('lovePositions', JSON.stringify(positions));
-                    
-                    if (role === 'male') {
-                        markerMale.setLatLng([lat, lng]);
-                        document.getElementById('status-loc-male').innerText = `Vừa cập nhật: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-                    } else {
-                        markerFemale.setLatLng([lat, lng]);
-                        document.getElementById('status-loc-female').innerText = `Vừa cập nhật: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-                    }
-
-                    map.setView([lat, lng], 15);
-                    updateDistance();
-                    alert('Đã cập nhật vị trí của bạn lên bản đồ! ❤️');
-                }, () => {
-                    alert('Không thể truy cập GPS. Vui lòng kiểm tra quyền truy cập vị trí của trình duyệt.');
-                });
-            } else {
-                alert('Trình duyệt của bạn không hỗ trợ định vị GPS.');
-            }
+        const isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        if (!isSecure || !navigator.geolocation) {
+            showGpsWarn();
+            document.getElementById('auto-toggle').checked = false;
+            return;
         }
-
-        function updateDistance() {
-            const d = map.distance(
-                [positions.male.lat, positions.male.lng],
-                [positions.female.lat, positions.female.lng]
-            );
-            const km = (d / 1000).toFixed(2);
-            document.getElementById('distance-alert').style.display = 'block';
-            document.getElementById('distance-val').innerText = km;
+        autoWatchId = navigator.geolocation.watchPosition(pos => {
+            sendPosition(pos.coords.latitude, pos.coords.longitude);
+        }, err => {
+            showGpsWarn();
+            document.getElementById('auto-toggle').checked = false;
+        }, { enableHighAccuracy: true });
+        showToast('Đang tự động chia sẻ vị trí 🔄', '#4ade80');
+    } else {
+        if (autoWatchId !== null) {
+            navigator.geolocation.clearWatch(autoWatchId);
+            autoWatchId = null;
         }
+        showToast('Đã tắt tự động chia sẻ', '#6b7280');
+    }
+}
 
-        function toggleDarkMode() {
-            document.body.classList.toggle('light-mode');
-            const icon = document.getElementById('dark-mode-icon');
-            icon.className = document.body.classList.contains('light-mode') ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+/* ═══════════════════════════════════════════════════════════
+   REVERSE GEOCODE (Nominatim)
+═══════════════════════════════════════════════════════════ */
+const geocodeCache = {};
+async function reverseGeocode(lat, lng) {
+    const key = `${lat.toFixed(4)},${lng.toFixed(4)}`;
+    if (geocodeCache[key]) return geocodeCache[key];
+    try {
+        const res  = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+        const data = await res.json();
+        const addr = data.address;
+        const result = [addr.road || addr.suburb, addr.city_district || addr.city || addr.town]
+            .filter(Boolean).join(', ') || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+        geocodeCache[key] = result;
+        return result;
+    } catch { return `${lat.toFixed(4)}, ${lng.toFixed(4)}`; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════════════════ */
+function fmtTime(ts) {
+    const d = new Date(ts);
+    return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+}
+
+let toastTimer;
+function showToast(msg, color = '#ff4d4d') {
+    let t = document.getElementById('track-toast');
+    if (!t) {
+        t = document.createElement('div');
+        t.id = 'track-toast';
+        Object.assign(t.style, {
+            position:'fixed', bottom:'110px', left:'50%',
+            transform:'translateX(-50%)',
+            background:color, color:'#fff',
+            padding:'11px 22px', borderRadius:'100px',
+            fontWeight:'700', fontSize:'.88rem',
+            zIndex:'9999', pointerEvents:'none',
+            opacity:'0', transition:'opacity .3s, bottom .3s',
+            whiteSpace:'nowrap', maxWidth:'90vw', textAlign:'center'
+        });
+        document.body.appendChild(t);
+    }
+    t.textContent  = msg;
+    t.style.background = color;
+    t.style.opacity    = '1';
+    t.style.bottom     = '120px';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+        t.style.opacity = '0';
+        t.style.bottom  = '110px';
+    }, 3000);
+}
+
+function toggleDarkMode() {
+    document.body.classList.toggle('light-mode');
+    document.getElementById('dark-mode-icon').className =
+        document.body.classList.contains('light-mode') ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+}
+const audio = document.getElementById('bg-music');
+function toggleMusic() {
+    if (audio.paused) {
+        audio.play();
+        document.getElementById('play-pause').className = 'fa-solid fa-pause music-btn';
+    } else {
+        audio.pause();
+        document.getElementById('play-pause').className = 'fa-solid fa-play music-btn';
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════ */
+window.onload = () => {
+    initMap();
+    refreshUI();
+    if (myRole) setRole(myRole);
+    connectWS();
+
+    // Reconnect khi tab active lại (phone lock/unlock, switch tab)
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && !wsConnected) {
+            wsRetryCount = 0;
+            connectWS();
         }
+    });
 
-        const audio = document.getElementById('bg-music');
-        function toggleMusic() {
-            if (audio.paused) { 
-                audio.play(); 
-                document.getElementById('play-pause').className = 'fa-solid fa-pause music-btn'; 
-            } else { 
-                audio.pause(); 
-                document.getElementById('play-pause').className = 'fa-solid fa-play music-btn'; 
-            }
-        }
+    // Close manual modal khi click overlay
+    document.getElementById('manual-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeManualModal();
+    });
 
-        window.onload = initTracking;
-    </script>
+    // Tự động kiểm tra GPS ngay khi load
+    const isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    if (!isSecure || !navigator.geolocation) {
+        document.getElementById('gps-warn').style.display   = 'flex';
+        document.getElementById('manual-btn').style.display = 'flex';
+    }
+};
+</script>
 </body>
 </html>

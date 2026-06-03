@@ -50,10 +50,20 @@ CREATE TABLE IF NOT EXISTS chat_message (
 CREATE TABLE IF NOT EXISTS love_location (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
     name        VARCHAR(255),
-    description VARCHAR(255),
+    description TEXT,
     lat         DOUBLE NOT NULL,
-    lon         DOUBLE NOT NULL
+    lon         DOUBLE NOT NULL,
+    category    VARCHAR(50)  DEFAULT 'date',
+    visit_date  VARCHAR(20),
+    photo_url   TEXT,
+    sort_order  INT          DEFAULT 0
 );
+
+-- Migration: nếu bảng đã tồn tại, thêm cột mới
+ALTER TABLE love_location ADD COLUMN IF NOT EXISTS category   VARCHAR(50) DEFAULT 'date';
+ALTER TABLE love_location ADD COLUMN IF NOT EXISTS visit_date VARCHAR(20);
+ALTER TABLE love_location ADD COLUMN IF NOT EXISTS photo_url  TEXT;
+ALTER TABLE love_location ADD COLUMN IF NOT EXISTS sort_order INT DEFAULT 0;
 
 -- 6. Reviews (đánh giá gia sư)
 CREATE TABLE IF NOT EXISTS review (

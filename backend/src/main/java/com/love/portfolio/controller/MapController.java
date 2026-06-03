@@ -17,7 +17,7 @@ public class MapController {
 
     @GetMapping
     public List<LoveLocation> getAllLocations() {
-        return loveLocationRepository.findAll();
+        return loveLocationRepository.findAllByOrderBySortOrderAscIdAsc();
     }
 
     @PostMapping
