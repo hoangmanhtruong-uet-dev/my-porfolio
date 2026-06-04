@@ -831,15 +831,29 @@
           tips:[{type:'info', icon:'fa-lightbulb', text:"Chỉ khôi phục được tệp xóa bằng Delete thông thường."}] }
     ];
 
-    const STORAGE_KEY_DONE = 'cns_bai1_done';
-    const STORAGE_KEY_IMGS = 'cns_bai1_imgs';
-
-    let doneSteps = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY_DONE) || '[]'));
-    let savedImgs  = JSON.parse(localStorage.getItem(STORAGE_KEY_IMGS) || '{}');
+    const lessonId = 'bai1';
+    let doneSteps = new Set();
+    let savedImgs  = {};
     let isAdmin    = sessionStorage.getItem('cns_admin') === 'true';
 
-    function saveDone() { localStorage.setItem(STORAGE_KEY_DONE, JSON.stringify([...doneSteps])); }
-    function saveImgs() { localStorage.setItem(STORAGE_KEY_IMGS, JSON.stringify(savedImgs)); }
+    async function loadProgress() {
+        try {
+            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}`);
+            if (res.ok) {
+                const data = await res.json();
+                doneSteps = new Set(data.filter(x => x.done).map(x => x.stepNum));
+                savedImgs = {};
+                data.forEach(x => {
+                    if (x.imageUrl) savedImgs[x.stepNum] = x.imageUrl;
+                });
+            }
+        } catch (e) {
+            console.error("Failed to load progress from server, falling back to LocalStorage:", e);
+            doneSteps = new Set(JSON.parse(localStorage.getItem('cns_bai1_done') || '[]'));
+            savedImgs = JSON.parse(localStorage.getItem('cns_bai1_imgs') || '{}');
+        }
+        render();
+    }
 
     /* ── Render ── */
     function render() {
@@ -937,21 +951,41 @@
         card.classList.toggle('open');
     }
 
-    function toggleDone(num) {
-        if (doneSteps.has(num)) doneSteps.delete(num);
-        else doneSteps.add(num);
-        saveDone();
+    async function toggleDone(num) {
+        const isDone = !doneSteps.has(num);
+        if (isDone) doneSteps.add(num); else doneSteps.delete(num);
         render();
-        // Re-open the card if it was open
         const card = document.getElementById('step-' + num);
         if (card) card.classList.add('open');
+
+        try {
+            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}/${num}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ done: isDone })
+            });
+            if (!res.ok) throw new Error("Server error");
+        } catch (e) {
+            console.error("Failed to save progress to server, falling back to LocalStorage:", e);
+            localStorage.setItem('cns_bai1_done', JSON.stringify([...doneSteps]));
+        }
     }
 
-    function resetAll() {
+    async function resetAll() {
         if (!confirm('Reset toàn bộ tiến độ?')) return;
         doneSteps.clear();
-        saveDone();
+        savedImgs = {};
         render();
+
+        try {
+            await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}`, {
+                method: 'DELETE'
+            });
+            localStorage.removeItem('cns_bai1_done');
+            localStorage.removeItem('cns_bai1_imgs');
+        } catch (e) {
+            console.error("Failed to reset progress on server:", e);
+        }
     }
 
     function scrollToStep(num) {
@@ -962,16 +996,63 @@
     }
 
     /* ── Images ── */
-    function handleImg(event, num) {
+    async function handleImg(event, num) {
         const file = event.target.files[0];
         if (!file) return;
+
+        const card = document.getElementById('step-' + num);
+        if (card) card.classList.add('open');
+
+        // Optimistic local preview
         const reader = new FileReader();
-        reader.onload = e => { savedImgs[num] = e.target.result; saveImgs(); render(); };
+        reader.onload = e => {
+            if (!savedImgs[num]) {
+                savedImgs[num] = e.target.result;
+                render();
+                const card = document.getElementById('step-' + num);
+                if (card) card.classList.add('open');
+            }
+        };
         reader.readAsDataURL(file);
+
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}/${num}/image`, {
+                method: 'POST',
+                body: formData
+            });
+            if (res.ok) {
+                const data = await res.json();
+                savedImgs[num] = data.imageUrl;
+                localStorage.setItem('cns_bai1_imgs', JSON.stringify(savedImgs));
+                render();
+                const card = document.getElementById('step-' + num);
+                if (card) card.classList.add('open');
+            } else {
+                throw new Error("Upload failed");
+            }
+        } catch (e) {
+            alert("Không thể tải ảnh lên server!");
+            console.error(e);
+        }
     }
 
-    function removeImg(num) {
-        delete savedImgs[num]; saveImgs(); render();
+    async function removeImg(num) {
+        if (!confirm("Bạn muốn xóa ảnh minh chứng này?")) return;
+        delete savedImgs[num];
+        render();
+        const card = document.getElementById('step-' + num);
+        if (card) card.classList.add('open');
+
+        try {
+            await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}/${num}/image`, {
+                method: 'DELETE'
+            });
+            localStorage.setItem('cns_bai1_imgs', JSON.stringify(savedImgs));
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     function zoomImg(src) {
@@ -1024,9 +1105,9 @@
         }
     }
 
-    // Init — open first step by default
+    // Init
     updateFab();
-    render();
+    loadProgress();
     setTimeout(() => {
         const first = document.getElementById('step-1');
         if (first) first.classList.add('open');

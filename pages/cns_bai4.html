@@ -242,51 +242,128 @@
     </div>
 
     <script>
-    /* ── Image helpers ── */
-    const IMGS_KEY = 'cns_bai4_imgs';
-    let savedImgs = JSON.parse(localStorage.getItem(IMGS_KEY) || '{}');
-    function saveImgs(){ localStorage.setItem(IMGS_KEY, JSON.stringify(savedImgs)); }
-    function initImgSlot(slotId){
+    const lessonId = 'bai4';
+    const slotToStep = { 'img-notion': 101, 'img-docs': 102, 'img-drive': 103 };
+    const stepToSlot = { 101: 'img-notion', 102: 'img-docs', 103: 'img-drive' };
+
+    let readSet = new Set();
+    let savedImgs = {};
+
+    async function loadProgress() {
+        try {
+            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}`);
+            if (res.ok) {
+                const data = await res.json();
+                readSet = new Set(data.filter(x => x.done && x.stepNum < 100).map(x => x.stepNum));
+                savedImgs = {};
+                data.forEach(x => {
+                    if (x.imageUrl) savedImgs[x.stepNum] = x.imageUrl;
+                });
+            }
+        } catch (e) {
+            console.error("Failed to load progress, falling back to LocalStorage:", e);
+            readSet = new Set(JSON.parse(localStorage.getItem('cns_bai4_read') || '[]'));
+            savedImgs = {};
+            ['img-notion', 'img-docs', 'img-drive'].forEach(slotId => {
+                const val = localStorage.getItem('img4_' + slotId);
+                if (val) savedImgs[slotToStep[slotId]] = val;
+            });
+        }
+        renderSections();
+    }
+
+    function initImgSlot(slotId) {
         const wrap = document.getElementById(slotId); if(!wrap) return;
-        const key = 'img4_' + slotId;
-        const saved = localStorage.getItem(key);
-        if(saved) showPreview(wrap, saved, key);
+        const stepNum = slotToStep[slotId];
+        const saved = savedImgs[stepNum];
+        if(saved) {
+            showPreview(wrap, saved, slotId);
+        } else {
+            wrap.innerHTML = '<label class="img-placeholder"><input type="file" accept="image/*">'
+                +'<i class="fa-solid fa-image" style="font-size:1.5rem;color:rgba(245,158,11,0.4);margin-bottom:8px;display:block;"></i>'
+                +'<span style="font-size:0.8rem;color:rgba(255,255,255,0.3);">Nhấn để tải ảnh lên</span></label>';
+        }
         wrap.querySelector('input[type="file"]')?.addEventListener('change', function(e){
-            const file = e.target.files[0]; if(!file) return;
-            const reader = new FileReader();
-            reader.onload = ev => { localStorage.setItem(key, ev.target.result); showPreview(wrap, ev.target.result, key); };
-            reader.readAsDataURL(file);
+            handleImgUpload(e, slotId);
         });
     }
-    function showPreview(wrap, src, key){
-        wrap.innerHTML = '<img src="'+src+'" class="img-preview" onclick="openLightbox(\''+key+'\')">'
+
+    function showPreview(wrap, src, slotId){
+        wrap.innerHTML = '<img src="'+src+'" class="img-preview" onclick="openLightbox(\''+slotId+'\')">'
             +'<div class="img-actions">'
             +'<label class="btn-img-change"><input type="file" accept="image/*"> Đổi ảnh</label>'
-            +'<button class="btn-img-remove" onclick="removeImg(\''+key+'\',\''+wrap.id+'\')">Xóa</button>'
+            +'<button class="btn-img-remove" onclick="removeImg(\''+slotId+'\')">Xóa</button>'
             +'</div>';
         wrap.querySelector('input')?.addEventListener('change', function(e){
-            const file = e.target.files[0]; if(!file) return;
-            const reader = new FileReader();
-            reader.onload = ev => { localStorage.setItem(key, ev.target.result); showPreview(wrap, ev.target.result, key); };
-            reader.readAsDataURL(file);
+            handleImgUpload(e, slotId);
         });
     }
-    function removeImg(key, slotId){
-        localStorage.removeItem(key);
+
+    async function handleImgUpload(e, slotId) {
+        const file = e.target.files[0]; if(!file) return;
+        const stepNum = slotToStep[slotId];
+        const wrap = document.getElementById(slotId);
+
+        const reader = new FileReader();
+        reader.onload = ev => {
+            if (!savedImgs[stepNum]) {
+                showPreview(wrap, ev.target.result, slotId);
+            }
+        };
+        reader.readAsDataURL(file);
+
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}/${stepNum}/image`, {
+                method: 'POST',
+                body: formData
+            });
+            if (res.ok) {
+                const data = await res.json();
+                savedImgs[stepNum] = data.imageUrl;
+                localStorage.setItem('img4_' + slotId, data.imageUrl);
+                showPreview(wrap, data.imageUrl, slotId);
+            } else {
+                throw new Error("Upload failed");
+            }
+        } catch (err) {
+            alert("Không thể tải ảnh lên server!");
+            console.error(err);
+        }
+    }
+
+    async function removeImg(slotId){
+        if (!confirm("Bạn muốn xóa ảnh minh chứng này?")) return;
+        const stepNum = slotToStep[slotId];
+        delete savedImgs[stepNum];
+        localStorage.removeItem('img4_' + slotId);
+
         const wrap = document.getElementById(slotId);
         wrap.innerHTML = '<label class="img-placeholder"><input type="file" accept="image/*">'
             +'<i class="fa-solid fa-image" style="font-size:1.5rem;color:rgba(245,158,11,0.4);margin-bottom:8px;display:block;"></i>'
             +'<span style="font-size:0.8rem;color:rgba(255,255,255,0.3);">Nhấn để tải ảnh lên</span></label>';
         initImgSlot(slotId);
+
+        try {
+            await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}/${stepNum}/image`, {
+                method: 'DELETE'
+            });
+        } catch (err) {
+            console.error(err);
+        }
     }
-    function openLightbox(key){
-        const src = localStorage.getItem(key); if(!src) return;
+
+    function openLightbox(slotId){
+        const stepNum = slotToStep[slotId];
+        const src = savedImgs[stepNum]; if(!src) return;
         const lb = document.createElement('div');
         lb.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:20000;display:flex;align-items:center;justify-content:center;cursor:zoom-out;';
         lb.innerHTML = '<img src="'+src+'" style="max-width:90vw;max-height:90vh;border-radius:12px;">';
         lb.onclick = () => lb.remove();
         document.body.appendChild(lb);
     }
+
     function imgSlot(id, label){
         return '<div class="img-wrap"><div id="'+id+'"><label class="img-placeholder"><input type="file" accept="image/*">'
             +'<i class="fa-solid fa-image" style="font-size:1.5rem;color:rgba(245,158,11,0.4);margin-bottom:8px;display:block;"></i>'
@@ -373,10 +450,6 @@
       }
     ];
 
-    /* ── Engine ── */
-    const STORAGE_KEY = 'cns_bai4_read';
-    let readSet = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'));
-    function saveRead(){ localStorage.setItem(STORAGE_KEY, JSON.stringify([...readSet])); }
     function updateRing(){
         const pct = Math.round((readSet.size / sections.length) * 100), circ = 251.2;
         document.getElementById('ring-fill').style.strokeDashoffset = circ - (circ * pct / 100);
@@ -410,16 +483,47 @@
     }
     function toggleSec(id){ document.getElementById('sec-' + id).classList.toggle('open'); }
     function openSec(id){ document.getElementById('sec-' + id).classList.add('open'); }
-    function toggleRead(id){
+    async function toggleRead(id){
+        const isDone = !readSet.has(id);
         if(readSet.has(id)) readSet.delete(id); else readSet.add(id);
-        saveRead();
         document.getElementById('sec-' + id).classList.toggle('read', readSet.has(id));
         updateRing();
+
+        try {
+            await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ done: isDone })
+            });
+        } catch (e) {
+            console.error(e);
+            localStorage.setItem('cns_bai4_read', JSON.stringify([...readSet]));
+        }
     }
-    function resetAll(){
-        readSet.clear(); saveRead();
+    async function resetAll(){
+        if(!confirm('Reset toàn bộ tiến độ?')) return;
+        readSet.clear();
+        savedImgs = {};
         document.querySelectorAll('.sec-card').forEach(c => c.classList.remove('read'));
         updateRing();
+        ['img-notion','img-docs','img-drive'].forEach(slotId => {
+            const wrap = document.getElementById(slotId);
+            if (wrap) {
+                wrap.innerHTML = '<label class="img-placeholder"><input type="file" accept="image/*">'
+                    +'<i class="fa-solid fa-image" style="font-size:1.5rem;color:rgba(245,158,11,0.4);margin-bottom:8px;display:block;"></i>'
+                    +'<span style="font-size:0.8rem;color:rgba(255,255,255,0.3);">Nhấn để tải ảnh lên</span></label>';
+                initImgSlot(slotId);
+            }
+            localStorage.removeItem('img4_' + slotId);
+        });
+
+        try {
+            await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}`, {
+                method: 'DELETE'
+            });
+        } catch (e) {
+            console.error(e);
+        }
     }
     let isAdmin = false;
     const ADMIN_PASS = 'mtruong2026';

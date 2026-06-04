@@ -448,14 +448,29 @@
       }
     ];
 
-    const DONE_KEY = 'cns_bai3_read';
-    const IMGS_KEY = 'cns_bai3_imgs';
-    let readSecs = new Set(JSON.parse(localStorage.getItem(DONE_KEY) || '[]'));
-    let savedImgs = JSON.parse(localStorage.getItem(IMGS_KEY) || '{}');
+    const lessonId = 'bai3';
+    let readSecs = new Set();
+    let savedImgs = {};
     let isAdmin = sessionStorage.getItem('cns_admin') === 'true';
 
-    function saveDone(){ localStorage.setItem(DONE_KEY, JSON.stringify([...readSecs])); }
-    function saveImgs(){ localStorage.setItem(IMGS_KEY, JSON.stringify(savedImgs)); }
+    async function loadProgress() {
+        try {
+            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}`);
+            if (res.ok) {
+                const data = await res.json();
+                readSecs = new Set(data.filter(x => x.done).map(x => x.stepNum));
+                savedImgs = {};
+                data.forEach(x => {
+                    if (x.imageUrl) savedImgs[x.stepNum] = x.imageUrl;
+                });
+            }
+        } catch (e) {
+            console.error("Failed to load progress from server, falling back to LocalStorage:", e);
+            readSecs = new Set(JSON.parse(localStorage.getItem('cns_bai3_read') || '[]'));
+            savedImgs = JSON.parse(localStorage.getItem('cns_bai3_imgs') || '{}');
+        }
+        render();
+    }
 
     function render(){
         const container = document.getElementById('sections-list');
@@ -517,18 +532,109 @@
     }
 
     function toggleSec(id){ document.getElementById('sec-'+id).classList.toggle('open'); }
-    function toggleRead(id){ if(readSecs.has(id)) readSecs.delete(id); else readSecs.add(id); saveDone(); render(); document.getElementById('sec-'+id).classList.add('open'); }
-    function resetAll(){ if(!confirm('Reset toàn bộ tiến độ?')) return; readSecs.clear(); saveDone(); render(); }
+    
+    async function toggleRead(id){
+        const isDone = !readSecs.has(id);
+        if(isDone) readSecs.add(id); else readSecs.delete(id);
+        render();
+        document.getElementById('sec-'+id).classList.add('open');
+
+        try {
+            await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ done: isDone })
+            });
+        } catch (e) {
+            console.error("Failed to save progress to server, falling back to LocalStorage:", e);
+            localStorage.setItem('cns_bai3_read', JSON.stringify([...readSecs]));
+        }
+    }
+
+    async function resetAll(){
+        if(!confirm('Reset toàn bộ tiến độ?')) return;
+        readSecs.clear();
+        savedImgs = {};
+        render();
+
+        try {
+            await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}`, {
+                method: 'DELETE'
+            });
+            localStorage.removeItem('cns_bai3_read');
+            localStorage.removeItem('cns_bai3_imgs');
+        } catch (e) {
+            console.error("Failed to reset progress on server:", e);
+        }
+    }
+
     function scrollToSec(id){ const el=document.getElementById('sec-'+id); if(!el) return; el.classList.add('open'); el.scrollIntoView({behavior:'smooth',block:'start'}); }
-    function handleImg(event,id){ const f=event.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=e=>{savedImgs[id]=e.target.result;saveImgs();render();}; r.readAsDataURL(f); }
-    function removeImg(id){ delete savedImgs[id]; saveImgs(); render(); }
+    
+    async function handleImg(event,id){
+        const file = event.target.files[0]; if(!file) return;
+
+        const card = document.getElementById('sec-' + id);
+        if (card) card.classList.add('open');
+
+        const reader = new FileReader();
+        reader.onload = e => {
+            if (!savedImgs[id]) {
+                savedImgs[id] = e.target.result;
+                render();
+                const card = document.getElementById('sec-' + id);
+                if (card) card.classList.add('open');
+            }
+        };
+        reader.readAsDataURL(file);
+
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}/${id}/image`, {
+                method: 'POST',
+                body: formData
+            });
+            if (res.ok) {
+                const data = await res.json();
+                savedImgs[id] = data.imageUrl;
+                localStorage.setItem('cns_bai3_imgs', JSON.stringify(savedImgs));
+                render();
+                const card = document.getElementById('sec-' + id);
+                if (card) card.classList.add('open');
+            } else {
+                throw new Error("Upload failed");
+            }
+        } catch (e) {
+            alert("Không thể tải ảnh lên server!");
+            console.error(e);
+        }
+    }
+
+    async function removeImg(id){
+        if (!confirm("Bạn muốn xóa ảnh minh chứng này?")) return;
+        delete savedImgs[id];
+        render();
+        const card = document.getElementById('sec-' + id);
+        if (card) card.classList.add('open');
+
+        try {
+            await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}/${id}/image`, {
+                method: 'DELETE'
+            });
+            localStorage.setItem('cns_bai3_imgs', JSON.stringify(savedImgs));
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     function zoomImg(src){ const o=document.createElement('div'); o.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.93);z-index:99999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;backdrop-filter:blur(10px);'; o.innerHTML=`<img src="${src}" style="max-width:92vw;max-height:90vh;border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,0.8);">`; o.onclick=()=>o.remove(); document.body.appendChild(o); }
     function toggleAdmin(){ if(isAdmin){if(confirm('Đăng xuất Admin?')){sessionStorage.removeItem('cns_admin');isAdmin=false;updateFab();render();}}else{document.getElementById('admin-modal').style.display='flex';setTimeout(()=>document.getElementById('admin-pwd').focus(),80);} }
     function closeModal(){ document.getElementById('admin-modal').style.display='none'; document.getElementById('admin-pwd').value=''; }
     function checkPwd(){ const p=document.getElementById('admin-pwd').value; if(p==='1002'){sessionStorage.setItem('cns_admin','true');isAdmin=true;closeModal();updateFab();render();}else{const i=document.getElementById('admin-pwd');i.style.borderColor='#ef4444';setTimeout(()=>i.style.borderColor='',800);i.value='';} }
     function updateFab(){ const f=document.getElementById('admin-fab'); if(isAdmin){f.innerHTML='<i class="fa-solid fa-unlock"></i> Admin';f.className='admin-fab logged';}else{f.innerHTML='<i class="fa-solid fa-lock"></i> Admin';f.className='admin-fab';} }
 
-    updateFab(); render();
+    updateFab();
+    loadProgress();
     setTimeout(()=>{ const f=document.getElementById('sec-1'); if(f) f.classList.add('open'); },100);
     </script>
     <script src="../assets/js/common.js"></script>

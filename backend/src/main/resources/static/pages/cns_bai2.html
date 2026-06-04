@@ -609,14 +609,29 @@
       }
     ];
 
-    const DONE_KEY = 'cns_bai2_read';
-    const IMGS_KEY = 'cns_bai2_imgs';
-    let readSecs = new Set(JSON.parse(localStorage.getItem(DONE_KEY) || '[]'));
-    let savedImgs = JSON.parse(localStorage.getItem(IMGS_KEY) || '{}');
+    const lessonId = 'bai2';
+    let readSecs = new Set();
+    let savedImgs = {};
     let isAdmin = sessionStorage.getItem('cns_admin') === 'true';
 
-    function saveDone(){ localStorage.setItem(DONE_KEY, JSON.stringify([...readSecs])); }
-    function saveImgs(){ localStorage.setItem(IMGS_KEY, JSON.stringify(savedImgs)); }
+    async function loadProgress() {
+        try {
+            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}`);
+            if (res.ok) {
+                const data = await res.json();
+                readSecs = new Set(data.filter(x => x.done).map(x => x.stepNum));
+                savedImgs = {};
+                data.forEach(x => {
+                    if (x.imageUrl) savedImgs[x.stepNum] = x.imageUrl;
+                });
+            }
+        } catch (e) {
+            console.error("Failed to load progress from server, falling back to LocalStorage:", e);
+            readSecs = new Set(JSON.parse(localStorage.getItem('cns_bai2_read') || '[]'));
+            savedImgs = JSON.parse(localStorage.getItem('cns_bai2_imgs') || '{}');
+        }
+        render();
+    }
 
     function render(){
         renderSections();
@@ -691,15 +706,39 @@
         card.classList.toggle('open');
     }
 
-    function toggleRead(id){
-        if(readSecs.has(id)) readSecs.delete(id); else readSecs.add(id);
-        saveDone(); render();
+    async function toggleRead(id){
+        const isDone = !readSecs.has(id);
+        if(isDone) readSecs.add(id); else readSecs.delete(id);
+        render();
         document.getElementById('sec-'+id).classList.add('open');
+
+        try {
+            await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ done: isDone })
+            });
+        } catch (e) {
+            console.error("Failed to save progress to server, falling back to LocalStorage:", e);
+            localStorage.setItem('cns_bai2_read', JSON.stringify([...readSecs]));
+        }
     }
 
-    function resetAll(){
+    async function resetAll(){
         if(!confirm('Reset toàn bộ tiến độ?')) return;
-        readSecs.clear(); saveDone(); render();
+        readSecs.clear();
+        savedImgs = {};
+        render();
+
+        try {
+            await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}`, {
+                method: 'DELETE'
+            });
+            localStorage.removeItem('cns_bai2_read');
+            localStorage.removeItem('cns_bai2_imgs');
+        } catch (e) {
+            console.error("Failed to reset progress on server:", e);
+        }
     }
 
     function scrollToSec(id){
@@ -709,14 +748,62 @@
         el.scrollIntoView({behavior:'smooth', block:'start'});
     }
 
-    function handleImg(event, id){
+    async function handleImg(event, id){
         const file = event.target.files[0]; if(!file) return;
+
+        const card = document.getElementById('sec-' + id);
+        if (card) card.classList.add('open');
+
         const reader = new FileReader();
-        reader.onload = e => { savedImgs[id] = e.target.result; saveImgs(); render(); };
+        reader.onload = e => {
+            if (!savedImgs[id]) {
+                savedImgs[id] = e.target.result;
+                render();
+                const card = document.getElementById('sec-' + id);
+                if (card) card.classList.add('open');
+            }
+        };
         reader.readAsDataURL(file);
+
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}/${id}/image`, {
+                method: 'POST',
+                body: formData
+            });
+            if (res.ok) {
+                const data = await res.json();
+                savedImgs[id] = data.imageUrl;
+                localStorage.setItem('cns_bai2_imgs', JSON.stringify(savedImgs));
+                render();
+                const card = document.getElementById('sec-' + id);
+                if (card) card.classList.add('open');
+            } else {
+                throw new Error("Upload failed");
+            }
+        } catch (e) {
+            alert("Không thể tải ảnh lên server!");
+            console.error(e);
+        }
     }
 
-    function removeImg(id){ delete savedImgs[id]; saveImgs(); render(); }
+    async function removeImg(id){
+        if (!confirm("Bạn muốn xóa ảnh minh chứng này?")) return;
+        delete savedImgs[id];
+        render();
+        const card = document.getElementById('sec-' + id);
+        if (card) card.classList.add('open');
+
+        try {
+            await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}/${id}/image`, {
+                method: 'DELETE'
+            });
+            localStorage.setItem('cns_bai2_imgs', JSON.stringify(savedImgs));
+        } catch (e) {
+            console.error(e);
+        }
+    }
 
     function zoomImg(src){
         const o = document.createElement('div');
@@ -742,7 +829,8 @@
         else { fab.innerHTML='<i class="fa-solid fa-lock"></i> Admin'; fab.className='admin-fab'; }
     }
 
-    updateFab(); render();
+    updateFab();
+    loadProgress();
     setTimeout(()=>{ const f=document.getElementById('sec-1'); if(f) f.classList.add('open'); },100);
     </script>
     <script src="../assets/js/common.js"></script>
