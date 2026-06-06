@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 5 — Sáng Tạo Nội Dung Số Bằng AI | CNS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/common.css">
+    <link rel="stylesheet" href="../assets/css/cns-enhanced.css">
+        <link rel="stylesheet" href="../assets/css/cns-scifi.css">
+        <link rel="stylesheet" href="../assets/css/cns-patch.css">
+        <!-- Removed cns-polish.css to keep Sci‑Fi theme consistent -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --blue:#3b82f6;--cyan:#06b6d4;--green:#22c55e;
+            --orange:#f97316;--red:#ef4444;--purple:#a855f7;--yellow:#facc15;
+            --accent:#10b981;
+        }
+        body{background:#050810;overflow-x:hidden;}
+        .layout{display:grid;grid-template-columns:260px 1fr;gap:32px;max-width:1140px;margin:0 auto;padding:120px 24px 100px;align-items:start;}
+        .sidebar{position:sticky;top:100px;}
+        .sidebar-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:20px;margin-bottom:16px;}
+        .sidebar-title{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,0.3);margin-bottom:14px;}
+        .progress-ring-wrap{display:flex;flex-direction:column;align-items:center;padding:8px 0 4px;}
+        .ring-svg{transform:rotate(-90deg);}
+        .ring-bg{fill:none;stroke:rgba(255,255,255,0.06);stroke-width:8;}
+        .ring-fill{fill:none;stroke:url(#ringGrad5);stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 0.6s cubic-bezier(0.23,1,0.32,1);}
+        .ring-label{font-size:1.8rem;font-weight:800;color:#f8fafc;margin-top:-4px;}
+        .ring-sub{font-size:0.72rem;color:rgba(255,255,255,0.35);margin-top:2px;}
+        .sec-nav-item{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:10px;cursor:pointer;transition:background 0.2s;font-size:0.82rem;color:rgba(255,255,255,0.45);text-decoration:none;}
+        .sec-nav-item:hover{background:rgba(255,255,255,0.05);color:#fff;}
+        .sec-nav-item.done{color:var(--accent);}
+        .snav-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.15);flex-shrink:0;transition:background 0.3s;}
+        .sec-nav-item.done .snav-dot{background:var(--accent);}
+        .meta-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:0.82rem;color:rgba(255,255,255,0.45);}
+        .meta-row:last-child{border-bottom:none;}
+        .meta-row i{width:16px;text-align:center;}
+        .breadcrumb{display:flex;align-items:center;gap:7px;font-size:0.78rem;color:rgba(255,255,255,0.3);margin-bottom:28px;}
+        .breadcrumb a{color:rgba(255,255,255,0.3);text-decoration:none;transition:color 0.2s;}
+        .breadcrumb a:hover{color:var(--accent);}
+        .hero-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 14px;border-radius:50px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.22);color:#34d399;font-size:0.75rem;font-weight:700;letter-spacing:0.5px;margin-bottom:14px;}
+        .hero-title{font-size:2rem;font-weight:800;color:#f8fafc;line-height:1.25;margin-bottom:12px;}
+        .hero-title span{background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .hero-desc{color:rgba(255,255,255,0.48);font-size:0.95rem;line-height:1.7;max-width:640px;margin-bottom:28px;}
+        .score-banner{display:flex;align-items:center;gap:16px;padding:16px 22px;background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(6,182,212,0.04));border:1px solid rgba(16,185,129,0.2);border-radius:16px;margin-bottom:36px;}
+        .score-big{font-size:2.2rem;font-weight:800;color:var(--accent);line-height:1;}
+        .score-info .s-label{font-size:0.72rem;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:1px;}
+        .score-info .s-val{font-size:0.9rem;color:rgba(255,255,255,0.7);margin-top:2px;}
+        .section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+        .section-hdr h2{font-size:1.05rem;font-weight:700;color:#f8fafc;display:flex;align-items:center;gap:8px;}
+        .section-hdr h2 i{color:var(--accent);}
+        .sec-card{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:20px;margin-bottom:14px;overflow:hidden;transition:border-color 0.3s,box-shadow 0.3s;scroll-margin-top:110px;}
+        .sec-card:hover{border-color:rgba(16,185,129,0.25);box-shadow:0 4px 24px rgba(16,185,129,0.07);}
+        .sec-card.read{border-color:rgba(16,185,129,0.22);background:rgba(16,185,129,0.03);}
+        .sec-head{display:flex;align-items:center;gap:14px;padding:18px 22px;cursor:pointer;user-select:none;}
+        .sec-num-badge{width:34px;height:34px;border-radius:10px;background:rgba(16,185,129,0.14);color:#34d399;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;flex-shrink:0;transition:background 0.3s,color 0.3s;}
+        .sec-card.read .sec-num-badge{background:rgba(16,185,129,0.25);color:#6ee7b7;}
+        .sec-head-text{flex:1;}
+        .sec-head-title{font-size:0.92rem;font-weight:700;color:#f8fafc;}
+        .sec-head-sub{font-size:0.72rem;color:rgba(255,255,255,0.28);margin-top:2px;}
+        .sec-read-btn{width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,0.12);background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:transparent;transition:all 0.25s;flex-shrink:0;}
+        .sec-read-btn:hover{border-color:var(--accent);color:var(--accent);}
+        .sec-card.read .sec-read-btn{background:var(--accent);border-color:var(--accent);color:#fff;}
+        .expand-icon{color:rgba(255,255,255,0.2);font-size:0.75rem;transition:transform 0.3s,color 0.2s;flex-shrink:0;}
+        .sec-card.open .expand-icon{transform:rotate(180deg);color:var(--accent);}
+        .sec-body{max-height:0;overflow:hidden;transition:max-height 0.45s cubic-bezier(0.23,1,0.32,1);}
+        .sec-card.open .sec-body{max-height:5000px;}
+        .sec-body-inner{padding:18px 22px 22px;border-top:1px solid rgba(255,255,255,0.05);}
+        .prose{font-size:0.88rem;color:rgba(255,255,255,0.55);line-height:1.75;margin-bottom:14px;}
+        .prose strong{color:rgba(255,255,255,0.85);}
+        .prose em{color:#34d399;font-style:italic;}
+        .topic-box{background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(6,182,212,0.04));border:1px solid rgba(16,185,129,0.2);border-radius:14px;padding:16px 20px;margin-bottom:16px;text-align:center;}
+        .topic-box .topic-label{font-size:0.72rem;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+        .topic-box .topic-text{font-size:1rem;font-weight:700;color:#34d399;font-style:italic;}
+        .bullet-list{list-style:none;padding:0;margin:0 0 14px;}
+        .bullet-list li{display:flex;align-items:flex-start;gap:10px;font-size:0.86rem;color:rgba(255,255,255,0.55);line-height:1.6;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+        .bullet-list li:last-child{border-bottom:none;}
+        .bullet-list li .bi{color:var(--accent);flex-shrink:0;margin-top:3px;font-size:0.7rem;}
+        .kw-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+        .kw-chip{padding:5px 14px;border-radius:50px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.22);color:#34d399;font-size:0.78rem;font-family:'JetBrains Mono',monospace;}
+        .tool-table{width:100%;border-collapse:collapse;font-size:0.82rem;margin-bottom:14px;}
+        .tool-table th{text-align:left;padding:10px 14px;background:rgba(16,185,129,0.1);color:#34d399;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid rgba(16,185,129,0.2);}
+        .tool-table td{padding:10px 14px;color:rgba(255,255,255,0.55);border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:top;}
+        .tool-table tr:hover td{background:rgba(255,255,255,0.02);}
+        .badge-fast{color:var(--green);font-weight:700;}
+        .badge-medium{color:var(--yellow);font-weight:700;}
+        .stage-card{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:18px 20px;margin-bottom:14px;transition:border-color 0.3s;}
+        .stage-card:hover{border-color:rgba(16,185,129,0.25);}
+        .stage-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+        .stage-num{width:32px;height:32px;border-radius:10px;background:rgba(16,185,129,0.15);color:#34d399;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.82rem;flex-shrink:0;}
+        .stage-title{font-size:0.92rem;font-weight:700;color:#f8fafc;}
+        .stage-tool{font-size:0.72rem;color:rgba(255,255,255,0.3);margin-left:auto;font-family:'JetBrains Mono',monospace;}
+        .prompt-box{background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px 16px;margin-bottom:12px;font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:rgba(255,255,255,0.6);line-height:1.6;}
+        .prompt-box .prompt-label{font-size:0.65rem;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-family:'Outfit',sans-serif;}
+        .pro-con-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+        .pro-box,.con-box{border-radius:10px;padding:10px 14px;font-size:0.8rem;line-height:1.6;}
+        .pro-box{background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.15);color:rgba(255,255,255,0.55);}
+        .pro-box .pc-label{color:var(--green);font-weight:700;font-size:0.72rem;text-transform:uppercase;margin-bottom:5px;}
+        .con-box{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);color:rgba(255,255,255,0.55);}
+        .con-box .pc-label{color:#f87171;font-weight:700;font-size:0.72rem;text-transform:uppercase;margin-bottom:5px;}
+        .edit-note{display:flex;align-items:flex-start;gap:8px;padding:10px 14px;border-radius:10px;background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.15);font-size:0.8rem;color:rgba(255,255,255,0.6);}
+        .edit-note i{color:var(--accent);flex-shrink:0;margin-top:2px;}
+        .ethics-card{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:16px 18px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start;transition:border-color 0.3s;}
+        .ethics-card:hover{border-color:rgba(16,185,129,0.25);}
+        .ethics-icon{width:36px;height:36px;border-radius:10px;background:rgba(16,185,129,0.12);color:#34d399;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+        .ethics-title{font-size:0.88rem;font-weight:700;color:#f8fafc;margin-bottom:4px;}
+        .ethics-desc{font-size:0.82rem;color:rgba(255,255,255,0.5);line-height:1.6;}
+        .conclusion-box{background:linear-gradient(135deg,rgba(16,185,129,0.07),rgba(6,182,212,0.03));border:1px solid rgba(16,185,129,0.18);border-radius:18px;padding:22px 24px;margin-top:8px;}
+        .conclusion-box h4{font-size:0.9rem;font-weight:700;color:#34d399;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+        .img-wrap{margin-top:14px;}
+        .img-placeholder{width:100%;border:2px dashed rgba(16,185,129,0.2);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:border-color 0.3s,background 0.3s;background:rgba(16,185,129,0.02);position:relative;box-sizing:border-box;display:block;}
+        .img-placeholder:hover{border-color:rgba(16,185,129,0.5);background:rgba(16,185,129,0.06);}
+        .img-placeholder input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+        .img-preview{width:100%;border-radius:12px;border:1px solid rgba(255,255,255,0.07);display:block;max-height:340px;object-fit:contain;background:rgba(0,0,0,0.25);cursor:zoom-in;}
+        .img-actions{display:flex;gap:8px;margin-top:8px;}
+        .btn-img-change{font-size:0.73rem;padding:5px 12px;border-radius:50px;border:1px solid rgba(16,185,129,0.28);background:rgba(16,185,129,0.07);color:#34d399;cursor:pointer;font-family:'Outfit',sans-serif;transition:all 0.2s;position:relative;overflow:hidden;}
+        .btn-img-change input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+        .btn-img-change:hover{background:rgba(16,185,129,0.18);}
+        .btn-img-remove{font-size:0.73rem;padding:5px 12px;border-radius:50px;border:1px solid rgba(239,68,68,0.25);background:rgba(239,68,68,0.06);color:#f87171;cursor:pointer;font-family:'Outfit',sans-serif;transition:all 0.2s;}
+        .btn-img-remove:hover{background:rgba(239,68,68,0.16);}
+        .back-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:50px;border:1px solid rgba(16,185,129,0.25);background:rgba(16,185,129,0.07);color:#34d399;text-decoration:none;font-size:0.85rem;font-weight:600;transition:all 0.3s;margin-top:28px;}
+        .back-btn:hover{background:rgba(16,185,129,0.18);border-color:rgba(16,185,129,0.5);transform:translateX(-3px);}
+
+        .nav-btns{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;}
+        .nav-btn-prev,.nav-btn-next{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:50px;font-size:0.85rem;font-weight:600;text-decoration:none;transition:all 0.3s;}
+        .nav-btn-prev{border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.45);}
+        .nav-btn-prev:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.2);color:#fff;transform:translateX(-3px);}
+        .nav-btn-next{border:1px solid rgba(16,185,129,0.3);background:rgba(16,185,129,0.08);color:#34d399;margin-left:auto;}
+        .nav-btn-next:hover{background:rgba(16,185,129,0.2);border-color:#10b981;color:#fff;transform:translateX(3px);}
+        .admin-fab{padding:10px 18px;border-radius:50px;border:1px solid rgba(16,185,129,0.25);background:rgba(16,185,129,0.1);color:#34d399;font-family:'Outfit',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;transition:all 0.3s;}
+        .admin-fab.logged{background:rgba(34,197,94,0.12);border-color:rgba(34,197,94,0.3);color:var(--green);}
+        @media(max-width:768px){.layout{grid-template-columns:1fr;padding-top:100px;}.sidebar{position:static;}.pro-con-grid{grid-template-columns:1fr;}}
+    </style>
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <nav class="navbar-unified">
+        <a href="../index.html" class="nav-logo"><i class="fa-solid fa-circle-user"></i> Mtruong<span>_dev</span></a>
+        <ul class="nav-links-unified">
+            <li><a href="../index.html">Trang Chủ</a></li>
+            <li><a href="cns.html">Bài Tập Công Nghệ Số</a></li>
+            <li><a href="muctieu.html">Mục Tiêu Cá Nhân</a></li>
+            <li>
+                <a href="about.html">Tìm Hiểu Thêm ▾</a>
+                <ul class="nav-dropdown">
+                    <li><a href="about.html">Cá Nhân</a></li>
+                    <li><a href="teaching.html">Giảng Dạy</a></li>
+                    <li><a href="research_hub.html">Nghiên Cứu</a></li>
+                    <li><a href="blog.html">Kiến Thức</a></li>
+                    <li><a href="muctieu.html">Mục Tiêu Cá Nhân</a></li>
+                </ul>
+            </li>
+        </ul>
+        <div id="auth-controls" class="nav-auth">
+            <button class="theme-toggle" title="Chuyển chế độ"><i class="fa-solid fa-moon"></i></button>
+        </div>
+    </nav>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-card">
+                <div class="sidebar-title">Tiến độ đọc</div>
+                <div class="progress-ring-wrap">
+                    <svg class="ring-svg" width="100" height="100" viewBox="0 0 100 100">
+                        <defs>
+                            <linearGradient id="ringGrad5" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#10b981"/>
+                                <stop offset="100%" stop-color="#06b6d4"/>
+                            </linearGradient>
+                        </defs>
+                        <circle class="ring-bg" cx="50" cy="50" r="40"/>
+                        <circle class="ring-fill" id="ring-fill" cx="50" cy="50" r="40" stroke-dasharray="251.2" stroke-dashoffset="251.2"/>
+                    </svg>
+                    <div class="ring-label" id="ring-pct">0%</div>
+                    <div class="ring-sub" id="ring-sub">0 / 5 mục</div>
+                </div>
+            </div>
+            <div class="sidebar-card">
+                <div class="sidebar-title">Mục lục</div>
+                <div id="sec-nav"></div>
+            </div>
+            <div class="sidebar-card">
+                <div class="sidebar-title">Thông tin bài</div>
+                <div class="meta-row"><i class="fa-solid fa-calendar" style="color:var(--accent)"></i> Dự án cá nhân</div>
+                <div class="meta-row"><i class="fa-solid fa-clock" style="color:var(--cyan)"></i> ~45 phút</div>
+                <div class="meta-row"><i class="fa-solid fa-star" style="color:var(--yellow)"></i> Điểm: <strong style="color:var(--accent);margin-left:4px;">— / 10</strong></div>
+                <div class="meta-row"><i class="fa-solid fa-tag" style="color:var(--blue)"></i> Báo cáo sáng tạo</div>
+                <div class="meta-row"><i class="fa-solid fa-robot" style="color:var(--green)"></i> 3 công cụ AI</div>
+            </div>
+        </aside>
+
+        <main>
+            <div class="breadcrumb">
+                <a href="cns.html"><i class="fa-solid fa-layer-group"></i> Portfolio CNS</a>
+                <i class="fa-solid fa-chevron-right" style="font-size:0.55rem"></i>
+                <span>Dự án</span>
+                <i class="fa-solid fa-chevron-right" style="font-size:0.55rem"></i>
+                <span style="color:rgba(255,255,255,0.55)">Bài 5</span>
+            </div>
+
+            <div class="hero-badge"><i class="fa-solid fa-leaf"></i> Dự án · Báo cáo sáng tạo</div>
+            <h1 class="hero-title">
+                Sáng Tạo Nội Dung Số<br>
+                <span>Bằng Trí Tuệ Nhân Tạo</span>
+            </h1>
+            <p class="hero-desc">
+                Báo cáo dự án <em>"Sống xanh trong kỷ nguyên số"</em> — ứng dụng AI để sản xuất Blog Post, Infographic và Video ngắn về chủ đề Digital Minimalism và giảm dấu chân carbon kỹ thuật số.
+            </p>
+
+            <div class="mission-compact" style="max-width:900px;margin:12px auto 6px;padding:12px 14px;border:1px solid rgba(255,255,255,0.04);border-radius:12px;background:rgba(255,255,255,0.01);">
+                <div style="font-weight:700;margin-bottom:8px;color:rgba(255,255,255,0.85)">Quy trình thực hiện (các bước)</div>
+                <div id="mission-steps-list"></div>
+            </div>
+
+            <!-- Outline: hierarchical checklist like other chapters -->
+            <div id="outline-wrap" style="max-width:900px;margin:8px auto 18px;padding:12px 14px;border:1px solid rgba(255,255,255,0.04);border-radius:12px;background:rgba(255,255,255,0.01);">
+                <div style="font-weight:700;margin-bottom:8px;color:rgba(255,255,255,0.85)">Mục lục chi tiết</div>
+                <div id="outline-list"></div>
+            </div>
+
+            <div class="score-banner">
+                <div class="score-big">3</div>
+                <div class="score-info">
+                    <div class="s-label">Định dạng sản phẩm</div>
+                    <div class="s-val">Blog Post · Infographic · Video ngắn</div>
+                </div>
+                <i class="fa-solid fa-wand-magic-sparkles" style="font-size:1.8rem;color:var(--accent);opacity:0.6"></i>
+            </div>
+
+            <div class="section-hdr">
+                <h2><i class="fa-solid fa-list"></i> Nội dung báo cáo</h2>
+                <button onclick="resetAll()" style="font-size:0.72rem;padding:5px 12px;border-radius:50px;border:1px solid rgba(255,255,255,0.1);background:none;color:rgba(255,255,255,0.3);cursor:pointer;font-family:'Outfit',sans-serif;">
+                    <i class="fa-solid fa-rotate-left"></i> Reset
+                </button>
+            </div>
+
+            <div id="sections-list"></div>
+
+            <a href="cns.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Quay lại danh sách bài tập</a>
+            <div class="nav-btns">
+                <a href="cns_bai4.html" class="nav-btn-prev"><i class="fa-solid fa-chevron-left"></i> Bài 4: Công cụ hợp tác</a>
+                <a href="cns_bai6.html" class="nav-btn-next">Bài 6: AI có trách nhiệm <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+        </main>
+    </div>
+
+    <footer class="tutor-footer">
+        <div class="footer-content">
+            <p>&copy; 2026 Hoàng Mạnh Trường. Học để hiểu, không chỉ để qua môn.</p>
+        </div>
+    </footer>
+
+    <div id="admin-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:10001;justify-content:center;align-items:center;backdrop-filter:blur(12px);">
+        <div style="background:rgba(8,12,35,0.98);border:1px solid rgba(16,185,129,0.22);border-radius:28px;padding:2rem;width:300px;text-align:center;">
+            <i class="fa-solid fa-shield-halved" style="font-size:2rem;color:var(--accent);margin-bottom:1rem;display:block;"></i>
+            <h3 style="margin-bottom:1.2rem;font-size:0.95rem;color:#f8fafc;">Xác thực Admin</h3>
+            <input type="password" id="admin-pwd" placeholder="Mật khẩu..."
+                style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:11px;border-radius:12px;font-family:'Outfit',sans-serif;margin-bottom:12px;text-align:center;letter-spacing:5px;"
+                onkeydown="if(event.key==='Enter')checkPwd()">
+            <button onclick="checkPwd()" style="width:100%;padding:11px;border-radius:12px;border:none;background:linear-gradient(135deg,#10b981,#06b6d4);color:#fff;font-family:'Outfit',sans-serif;font-weight:700;cursor:pointer;margin-bottom:8px;">Xác nhận</button>
+            <button onclick="closeModal()" style="background:none;border:none;color:rgba(255,255,255,0.3);cursor:pointer;font-family:'Outfit',sans-serif;font-size:0.82rem;">Hủy</button>
+        </div>
+    </div>
+    <div style="position:fixed;bottom:24px;right:24px;z-index:999;">
+        <button id="admin-fab" class="admin-fab" onclick="toggleAdmin()"><i class="fa-solid fa-lock"></i> Admin</button>
+    </div>
+
+    <script>
+    const lessonId = 'bai5';
+    const slotToStep = { 'img-s1': 101, 'img-s2': 102, 'img-s3': 103, 'img-s5': 105 };
+    const stepToSlot = { 101: 'img-s1', 102: 'img-s2', 103: 'img-s3', 105: 'img-s5' };
+
+    let readSet = new Set();
+    let savedImgs = {};
+
+    async function fetchImgsWithRetry(maxRetries = 5, delayMs = 3000) {
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}`, {
+                    signal: AbortSignal.timeout(8000)
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    readSet = new Set(data.filter(x => x.done && x.stepNum < 100).map(x => x.stepNum));
+                    savedImgs = {};
+                    data.forEach(x => { if (x.imageUrl) savedImgs[x.stepNum] = x.imageUrl; });
+                    hideImgLoading(); renderSections(); return;
+                }
+            } catch (e) { console.warn(`Lần thử ${attempt}/${maxRetries}:`, e.message); }
+            if (attempt < maxRetries) { showImgLoading(attempt, maxRetries); await new Promise(r => setTimeout(r, delayMs)); }
+        }
+        hideImgLoading(); renderSections();
+    }
+    function showImgLoading(attempt, max) {
+        let el = document.getElementById('img-loading-banner');
+        if (!el) { el = document.createElement('div'); el.id = 'img-loading-banner';
+            el.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.4);backdrop-filter:blur(12px);border-radius:50px;padding:10px 22px;color:rgba(255,255,255,0.85);font-size:0.82rem;z-index:9999;display:flex;align-items:center;gap:10px;';
+            document.body.appendChild(el); }
+        el.innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="color:#a855f7"></i> Server đang khởi động, đang tải ảnh... (${attempt}/${max})`;
+    }
+    function hideImgLoading() { const el = document.getElementById('img-loading-banner'); if (el) el.remove(); }
+
+    async function loadProgress() {
+        readSet = new Set(JSON.parse(localStorage.getItem('cns_bai5_read') || '[]'));
+        renderSections();
+        fetchImgsWithRetry();
+    }
+
+    function initImgSlot(slotId) {
+        const wrap = document.getElementById(slotId);
+        if (!wrap) return;
+        const stepNum = slotToStep[slotId];
+        const saved = savedImgs[stepNum];
+        if (saved) {
+            showPreview(wrap, saved, slotId);
+        } else {
+            wrap.innerHTML = `<label class="img-placeholder"><input type="file" accept="image/*">
+                <i class="fa-solid fa-image" style="font-size:1.5rem;color:rgba(16,185,129,0.4);margin-bottom:8px;display:block;"></i>
+                <span style="font-size:0.8rem;color:rgba(255,255,255,0.3);">Nhấn để tải ảnh lên</span></label>`;
+        }
+        wrap.querySelector('input[type="file"]')?.addEventListener('change', function(e) {
+            handleImgUpload(e, slotId);
+        });
+    }
+
+    function showPreview(wrap, src, slotId) {
+        wrap.innerHTML = `<img src="${src}" class="img-preview" onclick="openLightbox('${slotId}')">
+            <div class="img-actions">
+                <label class="btn-img-change"><input type="file" accept="image/*"> Đổi ảnh</label>
+                <button class="btn-img-remove" onclick="removeImg('${slotId}')">Xóa</button>
+            </div>`;
+        wrap.querySelector('input')?.addEventListener('change', function(e) {
+            handleImgUpload(e, slotId);
+        });
+    }
+
+    async function handleImgUpload(e, slotId) {
+        const file = e.target.files[0]; if (!file) return;
+        const stepNum = slotToStep[slotId];
+        const wrap = document.getElementById(slotId);
+
+        const reader = new FileReader();
+        reader.onload = ev => {
+            if (!savedImgs[stepNum]) {
+                showPreview(wrap, ev.target.result, slotId);
+            }
+        };
+        reader.readAsDataURL(file);
+
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}/${stepNum}/image`, {
+                method: 'POST',
+                body: formData
+            });
+            if (res.ok) {
+                const data = await res.json();
+                savedImgs[stepNum] = data.imageUrl;
+                localStorage.setItem('img_' + slotId, data.imageUrl);
+                showPreview(wrap, data.imageUrl, slotId);
+            } else {
+                throw new Error("Upload failed");
+            }
+        } catch (err) {
+            alert("Không thể tải ảnh lên server!");
+            console.error(err);
+        }
+    }
+
+    async function removeImg(slotId) {
+        if (!confirm("Bạn muốn xóa ảnh minh chứng này?")) return;
+        const stepNum = slotToStep[slotId];
+        delete savedImgs[stepNum];
+        localStorage.removeItem('img_' + slotId);
+
+        const wrap = document.getElementById(slotId);
+        wrap.innerHTML = `<label class="img-placeholder"><input type="file" accept="image/*">
+            <i class="fa-solid fa-image" style="font-size:1.5rem;color:rgba(16,185,129,0.4);margin-bottom:8px;display:block;"></i>
+            <span style="font-size:0.8rem;color:rgba(255,255,255,0.3);">Nhấn để tải ảnh lên</span></label>`;
+        initImgSlot(slotId);
+
+        try {
+            await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}/${stepNum}/image`, {
+                method: 'DELETE'
+            });
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    function openLightbox(slotId) {
+        const stepNum = slotToStep[slotId];
+        const src = savedImgs[stepNum]; if (!src) return;
+        const lb = document.createElement('div');
+        lb.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:20000;display:flex;align-items:center;justify-content:center;cursor:zoom-out;';
+        lb.innerHTML = `<img src="${src}" style="max-width:90vw;max-height:90vh;border-radius:12px;">`;
+        lb.onclick = () => lb.remove();
+        document.body.appendChild(lb);
+    }
+
+    /* ── Sections ── */
+    const sections = [
+      { id:1, title:"I. Giới thiệu dự án", sub:"Bối cảnh & mục tiêu chiến dịch",
+        render: () => `
+          <div class="prose">Trong bối cảnh rác thải công nghệ và sự quá tải thông tin đang gây áp lực lên cả môi trường lẫn tâm lý giới trẻ, dự án <strong>"Sống xanh trong kỷ nguyên số"</strong> được thực hiện nhằm cung cấp các giải pháp thực tiễn để tối giản hóa đời sống số.</div>
+          <div class="topic-box">
+            <div class="topic-label">Tên chiến dịch</div>
+            <div class="topic-text">"Green Digital Living — Sống xanh trong kỷ nguyên số"</div>
+          </div>
+          <div class="prose"><strong>Mục tiêu dự án:</strong></div>
+          <ul class="bullet-list">
+            <li><i class="bi fa-solid fa-circle-dot"></i> Chuyển tải thông điệp về Digital Minimalism đến Gen Z một cách sinh động, dễ tiếp cận</li>
+            <li><i class="bi fa-solid fa-circle-dot"></i> Giúp giới trẻ giảm stress từ mạng xã hội và giảm dấu chân carbon kỹ thuật số</li>
+            <li><i class="bi fa-solid fa-circle-dot"></i> Ứng dụng sức mạnh AI để tăng tốc quy trình sáng tạo nội dung</li>
+          </ul>
+          <div class="prose"><strong>Định dạng sản phẩm:</strong></div>
+          <div class="kw-chips">
+            <span class="kw-chip">Blog Post</span>
+            <span class="kw-chip">Infographic</span>
+            <span class="kw-chip">Video ngắn</span>
+          </div>`
+      },
+      { id:2, title:"II. Quá trình sử dụng AI", sub:"3 giai đoạn sáng tạo với AI",
+            <!-- VI: PDF -->
+            <div>
+                <div class="sec-header">
+                    <span class="sec-index">06</span>
+                    <span class="sec-title"><i class="fa-solid fa-file-pdf" style="color:var(--amber);"></i> File Bài Tập (PDF)</span>
+                    <span class="sec-line"></span>
+                </div>
+                <div class="sci-panel" style="padding:22px 24px;">
+                    <div class="sweep"></div>
+                    <div style="font-size:0.82rem;font-weight:700;color:var(--white);margin-bottom:4px;display:flex;align-items:center;gap:8px;">
+                        <i class="fa-solid fa-folder-open" style="color:var(--amber);"></i> Tất Cả Bài Nộp — Môn Công Nghệ Số
+                    </div>
+                    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:16px;">Admin upload file PDF của từng bài. Giáo viên click vào bài tương ứng để xem hoặc tải về.</div>
+                    <div class="pdf-modules" id="pdf-grid"></div>
+                </div>
+            </div>
+        render: () => `
+          <div class="stage-card">
+            <div class="stage-header">
+              <div class="stage-num">1</div>
+              <div class="stage-title">Xây dựng nội dung văn bản</div>
+              <div class="stage-tool">Gemini 1.5 Pro</div>
+            </div>
+            <div class="prose"><strong>Mục tiêu:</strong> Lên ý tưởng và dàn ý chi tiết cho bài viết chuyên sâu.</div>
+            <div class="prompt-box">
+              <div class="prompt-label">Prompt đã sử dụng</div>
+              "Hãy đóng vai một chuyên gia chiến lược nội dung. Hãy lập một dàn ý chi tiết cho bài blog 1500 chữ về chủ đề 'Digital Minimalism'. Mục tiêu: Giúp Gen Z giảm stress từ mạng xã hội và giảm dấu chân carbon kỹ thuật số. Giọng văn: Truyền cảm hứng, có dẫn chứng số liệu."
+            </div>
+            <div class="pro-con-grid">
+              <div class="pro-box"><div class="pc-label">Kết quả AI</div>Cấu trúc 5 phần logic từ thực trạng đến giải pháp, phản hồi tức thì.</div>
+              <div class="con-box"><div class="pc-label">Hạn chế</div>Văn phong hơi trang trọng quá mức, thiếu sắc thái văn hóa địa phương.</div>
+            </div>
+            <div class="edit-note"><i class="fa-solid fa-pen-to-square"></i> <span><strong>Đóng góp cá nhân (~50%):</strong> Viết lại toàn bộ phần mở đầu và kết luận bằng trải nghiệm thực tế về "cai nghiện" thông báo điện thoại; bổ sung ví dụ về ứng dụng phổ biến tại Việt Nam.</span></div>
+            <div class="img-wrap"><div id="img-s1"><label class="img-placeholder"><input type="file" accept="image/*">
+              <i class="fa-solid fa-image" style="font-size:1.5rem;color:rgba(16,185,129,0.4);margin-bottom:8px;display:block;"></i>
+              <span style="font-size:0.8rem;color:rgba(255,255,255,0.3);">Tải ảnh minh họa giai đoạn 1</span></label></div></div>
+          </div>
+          <div class="stage-card">
+            <div class="stage-header">
+              <div class="stage-num">2</div>
+              <div class="stage-title">Sáng tạo hình ảnh minh họa</div>
+              <div class="stage-tool">Gemini 3 Flash Image</div>
+            </div>
+            <div class="prose"><strong>Mục tiêu:</strong> Tạo ảnh bìa mang tính nghệ thuật và trừu tượng.</div>
+            <div class="prompt-box">
+              <div class="prompt-label">Prompt đã sử dụng</div>
+              "A cinematic 3D render of a smartphone sprout a small green tree from its screen, soft natural sunlight, bokeh background of a clean forest, high detail, 8k."
+            </div>
+            <div class="pro-con-grid">
+              <div class="pro-box"><div class="pc-label">Kết quả AI</div>Hình ảnh đẹp, concept độc bản, tạo ra trong ~10–20 giây.</div>
+              <div class="con-box"><div class="pc-label">Hạn chế</div>Phần mầm cây trông hơi giả, đôi khi bị lỗi chi tiết nhỏ (biến dạng vật thể).</div>
+            </div>
+            <div class="edit-note"><i class="fa-solid fa-pen-to-square"></i> <span><strong>Chỉnh sửa cá nhân:</strong> Dùng công cụ Edit để thêm hiệu ứng ánh sáng ban mai và điều chỉnh màu sắc sang tone xanh dịu mắt hơn.</span></div>
+            <div class="img-wrap"><div id="img-s2"><label class="img-placeholder"><input type="file" accept="image/*">
+              <i class="fa-solid fa-image" style="font-size:1.5rem;color:rgba(16,185,129,0.4);margin-bottom:8px;display:block;"></i>
+              <span style="font-size:0.8rem;color:rgba(255,255,255,0.3);">Tải ảnh bìa AI tạo ra</span></label></div></div>
+          </div>
+          <div class="stage-card">
+            <div class="stage-header">
+              <div class="stage-num">3</div>
+              <div class="stage-title">Thiết kế Infographic</div>
+              <div class="stage-tool">Canva AI</div>
+            </div>
+            <div class="prose"><strong>Công cụ:</strong> Canva Magic Design để tạo layout Infographic.</div>
+            <div class="prose"><strong>Quy trình:</strong> Đưa nội dung đã tinh chỉnh ở bước 1 vào Canva → AI tự động đề xuất bố cục → Tùy chỉnh thủ công.</div>
+            <div class="pro-con-grid">
+              <div class="pro-box"><div class="pc-label">Kết quả AI</div>Bố cục cơ bản tốt, hỗ trợ sắp xếp dữ liệu khoa học.</div>
+              <div class="con-box"><div class="pc-label">Hạn chế</div>Cần chỉnh sửa thủ công nhiều, icon và font mặc định chưa phù hợp thương hiệu.</div>
+            </div>
+            <div class="edit-note"><i class="fa-solid fa-pen-to-square"></i> <span><strong>Đóng góp cá nhân:</strong> Thay đổi toàn bộ hệ thống icon và font chữ để đảm bảo tính đồng bộ với thương hiệu cá nhân.</span></div>
+            <div class="img-wrap"><div id="img-s3"><label class="img-placeholder"><input type="file" accept="image/*">
+              <i class="fa-solid fa-image" style="font-size:1.5rem;color:rgba(16,185,129,0.4);margin-bottom:8px;display:block;"></i>
+              <span style="font-size:0.8rem;color:rgba(255,255,255,0.3);">Tải ảnh Infographic</span></label></div></div>
+          </div>`
+      },
+      { id:3, title:"III. So sánh & phân tích công cụ", sub:"Đánh giá 3 công cụ AI theo tiêu chí",
+        render: () => `
+          <table class="tool-table">
+            <thead><tr><th>Tiêu chí</th><th>Gemini 1.5 Pro</th><th>Gemini 3 Flash</th><th>Canva AI</th></tr></thead>
+            <tbody>
+              <tr><td style="color:#f8fafc;font-weight:600">Tốc độ</td><td><span class="badge-fast">Cực nhanh</span>, tức thì</td><td><span class="badge-medium">~10–20s</span></td><td>Nhanh, cần chỉnh nhiều</td></tr>
+              <tr><td style="color:#f8fafc;font-weight:600">Độ chính xác</td><td>Cao về logic, cần fact-check số liệu</td><td>Đôi khi lỗi chi tiết nhỏ</td><td>Tốt về bố cục cơ bản</td></tr>
+              <tr><td style="color:#f8fafc;font-weight:600">Sáng tạo</td><td>Vượt rào cản ý tưởng ban đầu</td><td>Concept độc bản, ấn tượng</td><td>Hỗ trợ sắp xếp dữ liệu</td></tr>
+              <tr><td style="color:#f8fafc;font-weight:600">Vai trò</td><td>"Người cố vấn" hệ thống hóa kiến thức</td><td>Hiện thực hóa ý tưởng siêu thực</td><td>Trình bày dữ liệu trực quan</td></tr>
+            </tbody>
+          </table>
+          <div class="conclusion-box">
+            <h4><i class="fa-solid fa-lightbulb"></i> Phân tích sâu</h4>
+            <p class="prose">Gemini 1.5 Pro đóng vai trò <strong>"người cố vấn"</strong>, giúp hệ thống hóa kiến thức. Các công cụ hình ảnh giúp hiện thực hóa những ý tưởng siêu thực mà nếu làm thủ công sẽ mất hàng tuần. Tuy nhiên, AI vẫn gặp hạn chế trong việc hiểu các <em>sắc thái văn hóa địa phương đặc thù</em> — đây là lúc vai trò của người sáng tạo trở nên quan trọng nhất.</p>
+          </div>`
+      },
+      { id:4, title:"IV. Vai trò AI & Đạo đức sáng tạo", sub:"Thay đổi quy trình & trách nhiệm người dùng",
+        render: () => `
+          <div class="prose">AI đã biến quy trình từ <em>"sản xuất tuyến tính"</em> sang <em>"điều phối thông minh"</em>. Thay vì dành 80% thời gian cho những việc lặp đi lặp lại, nay dành 80% thời gian để <strong>tư duy chiến lược, đặt câu hỏi (prompting) và kiểm chứng chất lượng</strong> — nâng cao hiệu suất làm việc lên gấp 3–4 lần.</div>
+          <div class="ethics-card">
+            <div class="ethics-icon"><i class="fa-solid fa-eye"></i></div>
+            <div><div class="ethics-title">Tính minh bạch</div><div class="ethics-desc">Luôn dán nhãn <strong>"AI-Assisted"</strong> cho các phần có sự hỗ trợ của máy móc để tôn trọng độc giả.</div></div>
+          </div>
+          <div class="ethics-card">
+            <div class="ethics-icon"><i class="fa-solid fa-check-double"></i></div>
+            <div><div class="ethics-title">Kiểm chứng sự thật (Fact-check)</div><div class="ethics-desc">Kiểm chứng chéo tất cả số liệu về môi trường qua các báo cáo chính thống của Liên Hợp Quốc để tránh <em>"hallucination"</em> của AI.</div></div>
+          </div>
+          <div class="ethics-card">
+            <div class="ethics-icon"><i class="fa-solid fa-copyright"></i></div>
+            <div><div class="ethics-title">Bản quyền & dấu ấn cá nhân</div><div class="ethics-desc">Chỉ sử dụng AI như công cụ hỗ trợ. Sản phẩm cuối cùng mang đậm dấu ấn cá nhân, không sao chép nguyên bản từ bất kỳ nguồn nào.</div></div>
+          </div>`
+      },
+      { id:5, title:"V. Kết luận", sub:"Bài học & định hướng phát triển",
+        render: () => `
+          <div class="conclusion-box">
+            <h4><i class="fa-solid fa-flag-checkered"></i> Kết luận dự án</h4>
+            <p class="prose">Dự án đã chứng minh rằng <strong>AI không thay thế con người</strong> mà là một <em>"siêu công cụ"</em> giúp khuếch đại sự sáng tạo. Để đạt mức độ xuất sắc, người dùng cần có khả năng phê phán và kỹ năng biên tập lại những gì AI tạo ra để biến nó thành một tác phẩm có giá trị thực sự.</p>
+          </div>
+          <ul class="bullet-list" style="margin-top:16px">
+            <li><i class="bi fa-solid fa-circle-dot"></i> Kỹ năng <strong>prompting</strong> là yếu tố quyết định chất lượng đầu ra của AI</li>
+            <li><i class="bi fa-solid fa-circle-dot"></i> Luôn cần <strong>tư duy phản biện</strong> để kiểm chứng và tinh chỉnh nội dung AI tạo ra</li>
+            <li><i class="bi fa-solid fa-circle-dot"></i> AI giỏi nhất ở phần <strong>cấu trúc và hình thức</strong>, con người giỏi nhất ở phần <strong>cảm xúc và văn hóa</strong></li>
+            <li><i class="bi fa-solid fa-circle-dot"></i> Minh bạch về việc sử dụng AI là trách nhiệm đạo đức của người sáng tạo nội dung</li>
+          </ul>
+          <div class="img-wrap"><div id="img-s5"><label class="img-placeholder"><input type="file" accept="image/*">
+            <i class="fa-solid fa-image" style="font-size:1.5rem;color:rgba(16,185,129,0.4);margin-bottom:8px;display:block;"></i>
+            <span style="font-size:0.8rem;color:rgba(255,255,255,0.3);">Tải ảnh sản phẩm hoàn chỉnh</span></label></div></div>`
+      }
+    ];
+
+    /* ── Engine ── */
+    function updateRing() {
+        const pct = Math.round((readSet.size / sections.length) * 100);
+        const circ = 251.2;
+        document.getElementById('ring-fill').style.strokeDashoffset = circ - (circ * pct / 100);
+        document.getElementById('ring-pct').textContent = pct + '%';
+        document.getElementById('ring-sub').textContent = readSet.size + ' / ' + sections.length + ' mục';
+        document.querySelectorAll('.sec-nav-item').forEach(el => {
+            const id = parseInt(el.dataset.id);
+            el.classList.toggle('done', readSet.has(id));
+            el.querySelector('.snav-dot').style.background = readSet.has(id) ? 'var(--accent)' : 'rgba(255,255,255,0.15)';
+        });
+    }
+    function renderSections() {
+        const list = document.getElementById('sections-list');
+        const nav  = document.getElementById('sec-nav');
+        list.innerHTML = sections.map(s => `
+          <div class="sec-card ${readSet.has(s.id) ? 'read' : ''}" id="sec-${s.id}">
+            <div class="sec-head" onclick="toggleSec(${s.id})">
+              <div class="sec-num-badge">${s.id}</div>
+              <div class="sec-head-text">
+                <div class="sec-head-title">${s.title}</div>
+                <div class="sec-head-sub">${s.sub}</div>
+              </div>
+              <button class="sec-read-btn" onclick="event.stopPropagation();toggleRead(${s.id})" title="Đánh dấu đã đọc">
+                <i class="fa-solid fa-check" style="font-size:0.7rem"></i>
+              </button>
+              <i class="fa-solid fa-chevron-down expand-icon"></i>
+            </div>
+            <div class="sec-body"><div class="sec-body-inner">${s.render()}</div></div>
+          </div>`).join('');
+        nav.innerHTML = sections.map(s => `
+          <a class="sec-nav-item ${readSet.has(s.id) ? 'done' : ''}" data-id="${s.id}" href="#sec-${s.id}" onclick="openSec(${s.id})">
+            <span class="snav-dot"></span>${s.title}
+          </a>`).join('');
+        ['img-s1','img-s2','img-s3','img-s5'].forEach(initImgSlot);
+        updateRing();
+    }
+    function toggleSec(id) { document.getElementById('sec-'+id).classList.toggle('open'); }
+    function openSec(id)   { document.getElementById('sec-'+id).classList.add('open'); }
+    async function toggleRead(id) {
+        const isDone = !readSet.has(id);
+        if (readSet.has(id)) readSet.delete(id); else readSet.add(id);
+        document.getElementById('sec-'+id).classList.toggle('read', readSet.has(id));
+        updateRing();
+
+        try {
+            await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ done: isDone })
+            });
+        } catch (e) {
+            console.error(e);
+            localStorage.setItem('cns_bai5_read', JSON.stringify([...readSet]));
+        }
+    }
+    async function resetAll() {
+        if (!confirm('Reset toàn bộ tiến độ?')) return;
+        readSet.clear();
+        savedImgs = {};
+        document.querySelectorAll('.sec-card').forEach(c => c.classList.remove('read'));
+        updateRing();
+        ['img-s1','img-s2','img-s3','img-s5'].forEach(slotId => {
+            const wrap = document.getElementById(slotId);
+            if (wrap) {
+                wrap.innerHTML = `<label class="img-placeholder"><input type="file" accept="image/*">
+                    <i class="fa-solid fa-image" style="font-size:1.5rem;color:rgba(16,185,129,0.4);margin-bottom:8px;display:block;"></i>
+                    <span style="font-size:0.8rem;color:rgba(255,255,255,0.3);">Tải ảnh minh họa</span></label>`;
+                initImgSlot(slotId);
+            }
+            localStorage.removeItem('img_' + slotId);
+        });
+
+        try {
+            await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}`, {
+                method: 'DELETE'
+            });
+        } catch (e) {
+            console.error(e);
+        }
+    }
+    /* ── Admin ── */
+    let isAdmin = false;
+    const ADMIN_PASS = 'mtruong2026';
+    function toggleAdmin() {
+        if (isAdmin) { isAdmin=false; document.getElementById('admin-fab').classList.remove('logged'); document.getElementById('admin-fab').innerHTML='<i class="fa-solid fa-lock"></i> Admin'; return; }
+        document.getElementById('admin-modal').style.display='flex';
+        setTimeout(()=>document.getElementById('admin-pwd').focus(),100);
+    }
+    function checkPwd() {
+        if (document.getElementById('admin-pwd').value===ADMIN_PASS) {
+            isAdmin=true; closeModal();
+            document.getElementById('admin-fab').classList.add('logged');
+            document.getElementById('admin-fab').innerHTML='<i class="fa-solid fa-unlock"></i> Admin';
+        } else {
+            document.getElementById('admin-pwd').style.borderColor='#ef4444';
+            setTimeout(()=>document.getElementById('admin-pwd').style.borderColor='',1000);
+        }
+    }
+    function closeModal() { document.getElementById('admin-modal').style.display='none'; document.getElementById('admin-pwd').value=''; }
+
+    loadProgress();
+    </script>
+    <script>
+    // Mission steps (interactive checklist) for Bài 5
+    const MISSION_STEPS_B5 = [
+        'Xem video 1 — Khái niệm & mục tiêu học tập',
+        'Xem video 2 — Công cụ hỗ trợ sáng tạo nội dung',
+        'Xem video 3 — Ứng dụng AI sinh nội dung',
+        'Soạn dàn ý & thu thập tài liệu',
+        'Xuất bản draft & chỉnh sửa cá nhân'
+    ];
+    let doneMissionB5 = new Set(JSON.parse(localStorage.getItem('cns_bai5_done')||'[]'));
+    function renderMissionB5(){
+        const el=document.getElementById('mission-steps-list'); if(!el) return;
+        el.innerHTML = MISSION_STEPS_B5.map((t,i)=>{
+            const id=i+1, done=doneMissionB5.has(id);
+            return `<div style="display:flex;align-items:center;gap:12px;padding:8px 6px;border-radius:8px;margin-bottom:6px;background:${done? 'rgba(16,185,129,0.06)':'transparent'}">
+                <button onclick="toggleMissionB5(${id})" style="width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,0.06);background:${done?'linear-gradient(135deg,#10b981,#06b6d4)':'transparent'};color:${done?'#fff':'rgba(255,255,255,0.6)'};display:inline-flex;align-items:center;justify-content:center;cursor:pointer">${done?'<i class="fa-solid fa-check"></i>':id}</button>
+                <div style="flex:1;color:rgba(255,255,255,0.8);">${t}</div>
+            </div>`;
+        }).join('');
+    }
+    function toggleMissionB5(id){ if(doneMissionB5.has(id)) doneMissionB5.delete(id); else doneMissionB5.add(id); localStorage.setItem('cns_bai5_done', JSON.stringify([...doneMissionB5])); renderMissionB5(); }
+    renderMissionB5();
+    </script>
+    <script>
+    // Outline (5.1 - 5.6) for Bài 5 — persistent via localStorage
+    const OUTLINE_B5 = [
+        { id:'5.1', title:'Thông tin về bài học', children:[] },
+        { id:'5.2', title:'Bài giảng - Sáng tạo nội dung số', children:[ 'Video 1 — Khái niệm', 'Video 2 — Công cụ', 'Video 3 — Áp dụng AI', 'Bài giảng tổng hợp' ] },
+        { id:'5.3', title:'Hoạt động thực hành', children:[] },
+        { id:'5.4', title:'Bài tập', children:[] },
+        { id:'5.5', title:'Học liệu mở rộng', children:[] },
+        { id:'5.6', title:'Trắc nghiệm Bài 5', children:[] }
+    ];
+
+    function renderOutline() {
+        const wrap = document.getElementById('outline-list');
+        const store = JSON.parse(localStorage.getItem('cns_bai5_outline')||'{}');
+        wrap.innerHTML = OUTLINE_B5.map(item=>{
+            const done = !!store[item.id];
+            const childrenHtml = (item.children && item.children.length)?
+                `<ul style="margin:6px 0 0 18px;list-style:none;padding:0">${item.children.map((c,i)=>{
+                    const kid = item.id+'-'+(i+1);
+                    const kdone = !!store[kid];
+                    return `<li style="padding:6px 0;display:flex;gap:10px;align-items:flex-start"><button onclick="toggleOutline('${kid}')" style="width:26px;height:26px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);background:${kdone?'linear-gradient(135deg,#10b981,#06b6d4)':'transparent'};color:${kdone?'#fff':'rgba(255,255,255,0.6)'}">${kdone?'<i class="fa-solid fa-check"></i>':(i+1)}</button><div style="color:rgba(255,255,255,0.8)">${c}</div></li>`;
+                }).join('')}</ul>` : '';
+            return `<div style="padding:8px 0;border-bottom:1px dashed rgba(255,255,255,0.03);display:flex;flex-direction:column"><div style="display:flex;align-items:center;gap:10px"><button onclick="toggleOutline('${item.id}')" style="width:34px;height:34px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:${done?'linear-gradient(135deg,#10b981,#06b6d4)':'transparent'};color:${done?'#fff':'rgba(255,255,255,0.7)'};font-weight:800">${done?'<i class=\"fa-solid fa-check\"></i>':item.id}</button><div style="font-weight:700;color:rgba(255,255,255,0.85)">${item.title}</div></div>${childrenHtml}</div>`;
+        }).join('');
+    }
+    function toggleOutline(id){ const store = JSON.parse(localStorage.getItem('cns_bai5_outline')||'{}'); store[id]=!store[id]; localStorage.setItem('cns_bai5_outline', JSON.stringify(store)); renderOutline(); }
+    renderOutline();
+    </script>
+    <script src="../assets/js/cns-enhanced.js"></script>
+    <script src="../assets/js/common.js"></script>
+    <script src="../assets/js/cns-upload.js"></script>
+    <script>
+    const PDF_SLOTS = [
+        { id:'bai1', label:'Bài 1', sub:'Máy Tính & Ngoại Vi', icon:'fa-microchip' },
+        { id:'bai2', label:'Bài 2', sub:'Khai Thác Dữ Liệu', icon:'fa-magnifying-glass' },
+        { id:'bai3', label:'Bài 3', sub:'Tổng Quan AI', icon:'fa-robot' },
+        { id:'bai4', label:'Bài 4', sub:'Giao Tiếp & Hợp Tác', icon:'fa-users' },
+        { id:'bai5', label:'Bài 5', sub:'Sáng Tạo Nội Dung Số', icon:'fa-wand-magic-sparkles' },
+        { id:'bai6', label:'Bài 6', sub:'An Toàn & Liêm Chính', icon:'fa-shield-halved' },
+    ];
+
+    let pdfData = JSON.parse(localStorage.getItem('cns_pdf_data') || '{}');
+
+    function renderPDF() {
+        const el = document.getElementById('pdf-grid');
+        if (!el) return;
+        el.innerHTML = PDF_SLOTS.map(slot => {
+            const saved = pdfData[slot.id];
+            if (saved) return `<div class="pdf-mod has-file" id="slot-${slot.id}">
+                <span class="pdf-mod-icon"><i class="fa-solid fa-file-pdf"></i></span>
+                <div class="pdf-mod-label">${slot.label}</div>
+                <div class="pdf-mod-sub">${slot.sub}</div>
+                <a href="${saved.url||saved.fileUrl}" target="_blank" class="pdf-mod-btn"><i class="fa-solid fa-eye"></i> Xem</a>
+                ${isAdmin?`<button class="pdf-mod-del" onclick="removePDF('${slot.id}')"><i class="fa-solid fa-trash"></i> Xóa</button>`:''}
+            </div>`;
+            return `<div class="pdf-mod" id="slot-${slot.id}">
+                <span class="pdf-mod-icon"><i class="fa-solid fa-${slot.icon}"></i></span>
+                <div class="pdf-mod-label">${slot.label}</div>
+                <div class="pdf-mod-sub">${isAdmin?'Upload PDF':slot.sub}</div>
+                ${isAdmin?`<input type="file" accept="application/pdf" onchange="handlePDF(event,'${slot.id}')">` :''}
+            </div>`;
+        }).join('');
+    }
+
+    async function handlePDF(event, slotId) {
+        const file = event.target.files[0];
+        if (!file || file.type !== 'application/pdf') { alert('Chỉ chấp nhận file PDF!'); return; }
+        pdfData[slotId] = { name:file.name, url:URL.createObjectURL(file) }; renderPDF();
+        try {
+            const fd = new FormData(); fd.append('file', file); fd.append('slotId', slotId);
+            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf/${slotId}`, {method:'POST',body:fd});
+            if (res.ok) { const d = await res.json(); pdfData[slotId] = {name:file.name, fileUrl:d.fileUrl}; }
+        } catch(e) { console.warn('Upload PDF loi:', e); }
+        localStorage.setItem('cns_pdf_data', JSON.stringify(pdfData)); renderPDF();
+    }
+
+    function removePDF(slotId) {
+        if (!confirm('Xóa file PDF này?')) return;
+        delete pdfData[slotId]; localStorage.setItem('cns_pdf_data', JSON.stringify(pdfData)); renderPDF();
+        fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf/${slotId}`, {method:'DELETE'}).catch(()=>{});
+    }
+
+    async function loadPDFFromServer() {
+        try {
+            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf`, {signal:AbortSignal.timeout(8000)});
+            if (res.ok) { const data = await res.json(); if (data && typeof data === 'object') { Object.assign(pdfData, data); localStorage.setItem('cns_pdf_data', JSON.stringify(pdfData)); renderPDF(); } }
+        } catch (e) { console.warn('Không load PDF:', e.message); }
+    }
+
+    // initial render
+    renderPDF(); loadPDFFromServer();
+    </script>
+</body>
+</html>
