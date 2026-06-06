@@ -68,7 +68,7 @@ body::after {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 320px 1fr; /* wider sidebar to match mockup */
   grid-template-rows: auto 1fr auto;
   min-height: 100vh;
   gap: 0;
@@ -140,7 +140,7 @@ body::after {
   grid-column: 1;
   grid-row: 2;
   border-right: 1px solid var(--border);
-  background: rgba(4,12,22,0.7);
+  background: rgba(4,12,22,0.72);
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -148,10 +148,11 @@ body::after {
   max-height: calc(100vh - 60px);
   position: sticky;
   top: 60px;
+  padding-left: 6px; /* small offset to align blocks visually */
 }
 
 .sidebar-block {
-  padding: 18px 20px;
+  padding: 20px 22px; /* slightly increased padding for readability */
   border-bottom: 1px solid rgba(0,210,255,0.07);
 }
 
@@ -234,8 +235,8 @@ body::after {
 
 .hud-pct {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 1.8rem;
-  font-weight: 700;
+  font-size: 2rem; /* slightly larger for better visibility */
+  font-weight: 800;
   color: var(--cyan);
   text-shadow: none;
   line-height: 1;
@@ -348,12 +349,12 @@ body::after {
 .dash-main {
   grid-column: 2;
   grid-row: 2;
-  padding: 28px 32px;
+  padding: 36px 40px; /* more breathing room for main content */
   overflow-y: auto;
   max-height: calc(100vh - 60px);
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 36px;
 }
 
 /* ── Breadcrumb ── */
@@ -396,16 +397,17 @@ body::after {
 }
 
 .sci-title {
-  font-size: 2rem;
-  font-weight: 800;
+  font-size: 2.8rem; /* larger title to match mockup */
+  font-weight: 900;
   color: var(--white);
-  line-height: 1.15;
-  letter-spacing: -0.5px;
+  line-height: 1.05;
+  letter-spacing: -0.6px;
+  text-wrap: balance;
 }
 
 .sci-title .accent {
   color: var(--cyan);
-  text-shadow: var(--glow-c);
+  text-shadow: 0 6px 18px rgba(0,210,255,0.18), 0 2px 8px rgba(0,210,255,0.08);
 }
 
 .sci-desc {
