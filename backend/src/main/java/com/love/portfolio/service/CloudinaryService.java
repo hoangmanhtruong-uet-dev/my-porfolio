@@ -42,10 +42,31 @@ public class CloudinaryService {
     }
 
     /**
+     * Upload file raw (PDF, doc...) lên Cloudinary, trả về URL.
+     */
+    public String uploadRaw(MultipartFile file, String folder, String publicId) throws IOException {
+        Map<?, ?> result = cloudinary.uploader().upload(
+                file.getBytes(),
+                ObjectUtils.asMap(
+                    "folder", folder,
+                    "public_id", publicId,
+                    "resource_type", "raw",
+                    "overwrite", true
+                )
+        );
+        return (String) result.get("secure_url");
+    }
+
+    /**
+     * Xóa file raw trên Cloudinary theo public_id
+     */
+    public void deleteRaw(String publicId) throws IOException {
+        cloudinary.uploader().destroy(publicId,
+                ObjectUtils.asMap("resource_type", "raw"));
+    }
+
+    /**
      * Xóa ảnh trên Cloudinary theo public_id
-     * (Dùng khi cần xóa ảnh cũ khi update hoặc delete record)
-     *
-     * @param publicId public_id của ảnh trên Cloudinary
      */
     public void deleteImage(String publicId) throws IOException {
         cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());

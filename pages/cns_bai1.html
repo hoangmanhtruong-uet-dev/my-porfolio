@@ -3,636 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bài 1 — Quản Lý Tệp & Thư Mục | CNS</title>
+    <title>Bài 1 — Máy Tính Và Các Thiết Bị Ngoại Vi | CNS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/common.css">
-    <link rel="stylesheet" href="../assets/css/cns-enhanced.css">
+    <link rel="stylesheet" href="../assets/css/cns-scifi.css">
+    <link rel="stylesheet" href="../assets/css/cns-patch.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --blue: #3b82f6;
-            --cyan: #06b6d4;
-            --green: #22c55e;
-            --orange: #f97316;
-            --red: #ef4444;
-            --purple: #a855f7;
-        }
-
-        body { background: #050810; overflow-x: hidden; }
-
-        /* ── Layout ── */
-        .layout {
-            display: grid;
-            grid-template-columns: 260px 1fr;
-            gap: 32px;
-            max-width: 1140px;
-            margin: 0 auto;
-            padding: 120px 24px 100px;
-            align-items: start;
-        }
-
-        /* ── Sidebar ── */
-        .sidebar {
-            position: sticky;
-            top: 100px;
-        }
-
-        .sidebar-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 16px;
-        }
-
-        .sidebar-title {
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: rgba(255,255,255,0.3);
-            margin-bottom: 14px;
-        }
-
-        /* Progress ring */
-        .progress-ring-wrap {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 8px 0 4px;
-        }
-
-        .ring-svg { transform: rotate(-90deg); }
-
-        .ring-bg { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 8; }
-        .ring-fill {
-            fill: none;
-            stroke: url(#ringGrad);
-            stroke-width: 8;
-            stroke-linecap: round;
-            transition: stroke-dashoffset 0.6s cubic-bezier(0.23,1,0.32,1);
-        }
-
-        .ring-label {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: #f8fafc;
-            margin-top: -4px;
-        }
-
-        .ring-sub {
-            font-size: 0.72rem;
-            color: rgba(255,255,255,0.35);
-            margin-top: 2px;
-        }
-
-        /* Step nav list */
-        .step-nav-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 7px 10px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-size: 0.82rem;
-            color: rgba(255,255,255,0.45);
-            text-decoration: none;
-        }
-
-        .step-nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
-
-        .step-nav-item.done { color: var(--green); }
-        .step-nav-item.done .snav-dot { background: var(--green); }
-
-        .snav-dot {
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.15);
-            flex-shrink: 0;
-            transition: background 0.3s;
-        }
-
-        /* Meta card */
-        .meta-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            font-size: 0.82rem;
-            color: rgba(255,255,255,0.45);
-        }
-        .meta-row:last-child { border-bottom: none; }
-        .meta-row i { width: 16px; text-align: center; }
-
-        /* Breadcrumb */
-        .breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            font-size: 0.78rem;
-            color: rgba(255,255,255,0.3);
-            margin-bottom: 28px;
-        }
-        .breadcrumb a { color: rgba(255,255,255,0.3); text-decoration: none; transition: color 0.2s; }
-        .breadcrumb a:hover { color: var(--blue); }
-
-        /* Hero */
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 14px;
-            border-radius: 50px;
-            background: rgba(59,130,246,0.1);
-            border: 1px solid rgba(59,130,246,0.22);
-            color: #60a5fa;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 14px;
-        }
-
-        .hero-title {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #f8fafc;
-            line-height: 1.25;
-            margin-bottom: 12px;
-        }
-
-        .hero-title span {
-            background: linear-gradient(135deg, var(--blue), var(--cyan));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero-desc {
-            color: rgba(255,255,255,0.48);
-            font-size: 0.95rem;
-            line-height: 1.7;
-            max-width: 640px;
-            margin-bottom: 28px;
-        }
-
-        /* Score banner */
-        .score-banner {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 16px 22px;
-            background: linear-gradient(135deg, rgba(34,197,94,0.08), rgba(6,182,212,0.04));
-            border: 1px solid rgba(34,197,94,0.2);
-            border-radius: 16px;
-            margin-bottom: 36px;
-        }
-
-        .score-big {
-            font-size: 2.2rem;
-            font-weight: 800;
-            color: var(--green);
-            line-height: 1;
-        }
-
-        .score-info { flex: 1; }
-        .score-info .s-label { font-size: 0.72rem; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 1px; }
-        .score-info .s-val { font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-top: 2px; }
-
-        /* Section header */
-        .section-hdr {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
-        .section-hdr h2 {
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: #f8fafc;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .section-hdr h2 i { color: var(--blue); }
-
-        .btn-reset-all {
-            font-size: 0.72rem;
-            padding: 5px 12px;
-            border-radius: 50px;
-            border: 1px solid rgba(255,255,255,0.1);
-            background: none;
-            color: rgba(255,255,255,0.3);
-            cursor: pointer;
-            font-family: 'Outfit', sans-serif;
-            transition: all 0.2s;
-        }
-        .btn-reset-all:hover { border-color: rgba(239,68,68,0.4); color: #f87171; }
-
-        /* ── Step Card ── */
-        .step-card {
-            background: rgba(255,255,255,0.025);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 20px;
-            margin-bottom: 14px;
-            overflow: hidden;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-            scroll-margin-top: 110px;
-        }
-
-        .step-card:hover {
-            border-color: rgba(59,130,246,0.28);
-            box-shadow: 0 4px 24px rgba(59,130,246,0.08);
-        }
-
-        .step-card.completed {
-            border-color: rgba(34,197,94,0.25);
-            background: rgba(34,197,94,0.03);
-        }
-
-        .step-card.completed:hover {
-            border-color: rgba(34,197,94,0.45);
-            box-shadow: 0 4px 24px rgba(34,197,94,0.1);
-        }
-
-        /* Card header row */
-        .step-head {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 18px 22px;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .step-num-badge {
-            width: 34px; height: 34px;
-            border-radius: 10px;
-            background: rgba(59,130,246,0.14);
-            color: #60a5fa;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 0.85rem;
-            flex-shrink: 0;
-            transition: background 0.3s, color 0.3s;
-        }
-
-        .step-card.completed .step-num-badge {
-            background: rgba(34,197,94,0.15);
-            color: var(--green);
-        }
-
-        .step-head-text { flex: 1; }
-
-        .step-head-title {
-            font-size: 0.92rem;
-            font-weight: 700;
-            color: #f8fafc;
-            transition: color 0.3s;
-        }
-
-        .step-card.completed .step-head-title { color: rgba(255,255,255,0.6); }
-
-        .step-head-sub {
-            font-size: 0.72rem;
-            color: rgba(255,255,255,0.28);
-            margin-top: 2px;
-        }
-
-        .step-check-btn {
-            width: 28px; height: 28px;
-            border-radius: 50%;
-            border: 2px solid rgba(255,255,255,0.12);
-            background: none;
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            color: transparent;
-            transition: all 0.25s ease;
-            flex-shrink: 0;
-        }
-
-        .step-check-btn:hover {
-            border-color: var(--green);
-            color: var(--green);
-        }
-
-        .step-card.completed .step-check-btn {
-            background: var(--green);
-            border-color: var(--green);
-            color: #fff;
-        }
-
-        .step-expand-icon {
-            color: rgba(255,255,255,0.2);
-            font-size: 0.75rem;
-            transition: transform 0.3s ease, color 0.2s;
-            flex-shrink: 0;
-        }
-
-        .step-card.open .step-expand-icon { transform: rotate(180deg); color: var(--blue); }
-
-        /* Card body (collapsible) */
-        .step-body {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s cubic-bezier(0.23,1,0.32,1);
-        }
-
-        .step-card.open .step-body { max-height: 1200px; }
-
-        .step-body-inner {
-            padding: 0 22px 22px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            padding-top: 18px;
-        }
-
-        .step-desc {
-            font-size: 0.88rem;
-            color: rgba(255,255,255,0.55);
-            line-height: 1.75;
-            margin-bottom: 14px;
-        }
-
-        .step-desc code {
-            background: rgba(59,130,246,0.12);
-            color: #93c5fd;
-            padding: 1px 7px;
-            border-radius: 5px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-        }
-
-        .step-kbd {
-            display: inline-flex; align-items: center; gap: 3px;
-            background: rgba(255,255,255,0.07);
-            border: 1px solid rgba(255,255,255,0.14);
-            border-bottom-width: 2px;
-            border-radius: 6px;
-            padding: 1px 8px;
-            font-size: 0.76rem;
-            color: rgba(255,255,255,0.75);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        /* Tip / Warning boxes */
-        .tip-box {
-            display: flex;
-            gap: 10px;
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-size: 0.8rem;
-            line-height: 1.55;
-            margin-bottom: 14px;
-        }
-
-        .tip-box.info {
-            background: rgba(59,130,246,0.07);
-            border-left: 3px solid var(--blue);
-            color: rgba(255,255,255,0.5);
-        }
-
-        .tip-box.warn {
-            background: rgba(249,115,22,0.07);
-            border-left: 3px solid var(--orange);
-            color: rgba(255,255,255,0.5);
-        }
-
-        .tip-box.danger {
-            background: rgba(239,68,68,0.07);
-            border-left: 3px solid var(--red);
-            color: rgba(255,255,255,0.5);
-        }
-
-        .tip-box i { margin-top: 1px; flex-shrink: 0; }
-        .tip-box.info i { color: var(--blue); }
-        .tip-box.warn i { color: var(--orange); }
-        .tip-box.danger i { color: var(--red); }
-
-        /* Image slot */
-        .step-img-wrap { margin-top: 14px; }
-
-        .step-connector {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 12px 0;
-            color: rgba(59, 130, 246, 0.35);
-            font-size: 1.25rem;
-        }
-
-        .step-img-placeholder {
-            width: 100%;
-            border: 2px dashed rgba(59,130,246,0.2);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: border-color 0.3s, background 0.3s;
-            background: rgba(59,130,246,0.02);
-            position: relative;
-            box-sizing: border-box;
-            display: block;
-        }
-
-        .step-img-placeholder:hover {
-            border-color: rgba(59,130,246,0.5);
-            background: rgba(59,130,246,0.06);
-        }
-
-        .step-img-placeholder input[type="file"] {
-            position: absolute; inset: 0;
-            opacity: 0; cursor: pointer;
-            width: 100%; height: 100%;
-        }
-
-        .step-img-preview {
-            width: 100%;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.07);
-            display: block;
-            max-height: 340px;
-            object-fit: contain;
-            background: rgba(0,0,0,0.25);
-            cursor: zoom-in;
-            transition: opacity 0.2s;
-        }
-
-        .step-img-preview:hover { opacity: 0.9; }
-
-        .step-img-actions {
-            display: flex; gap: 8px; margin-top: 8px;
-        }
-
-        .btn-img-change {
-            font-size: 0.73rem; padding: 5px 12px;
-            border-radius: 50px;
-            border: 1px solid rgba(59,130,246,0.28);
-            background: rgba(59,130,246,0.07);
-            color: #60a5fa; cursor: pointer;
-            font-family: 'Outfit', sans-serif;
-            transition: all 0.2s; position: relative; overflow: hidden;
-        }
-
-        .btn-img-change input[type="file"] {
-            position: absolute; inset: 0; opacity: 0; cursor: pointer;
-        }
-
-        .btn-img-change:hover { background: rgba(59,130,246,0.18); }
-
-        .btn-img-remove {
-            font-size: 0.73rem; padding: 5px 12px;
-            border-radius: 50px;
-            border: 1px solid rgba(239,68,68,0.25);
-            background: rgba(239,68,68,0.06);
-            color: #f87171; cursor: pointer;
-            font-family: 'Outfit', sans-serif;
-            transition: all 0.2s;
-        }
-
-        .btn-img-remove:hover { background: rgba(239,68,68,0.16); }
-
-        /* Result box */
-        .result-box {
-            background: linear-gradient(135deg, rgba(34,197,94,0.06), rgba(6,182,212,0.03));
-            border: 1px solid rgba(34,197,94,0.18);
-            border-radius: 20px;
-            padding: 26px 28px;
-            margin-top: 32px;
-        }
-
-        .result-box h3 {
-            font-size: 0.95rem; font-weight: 700;
-            color: var(--green); margin-bottom: 14px;
-            display: flex; align-items: center; gap: 8px;
-        }
-
-        .result-box ul {
-            list-style: none; padding: 0; margin: 0;
-        }
-
-        .result-box li {
-            display: flex; align-items: flex-start; gap: 10px;
-            font-size: 0.86rem; color: rgba(255,255,255,0.55);
-            line-height: 1.6; padding: 6px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-        }
-
-        .result-box li:last-child { border-bottom: none; }
-        .result-box li::before {
-            content: '✓';
-            color: var(--green);
-            font-weight: 700;
-            flex-shrink: 0;
-            margin-top: 1px;
-        }
-
-        /* Folder tree */
-        .folder-tree {
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 12px;
-            padding: 16px 20px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            color: rgba(255,255,255,0.55);
-            line-height: 1.9;
-            margin-top: 14px;
-        }
-
-        .folder-tree .dir { color: #60a5fa; }
-        .folder-tree .file { color: rgba(255,255,255,0.45); }
-
-        /* Back btn */
-        .back-btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 11px 22px; border-radius: 50px;
-            border: 1px solid rgba(59,130,246,0.25);
-            background: rgba(59,130,246,0.07);
-            color: #60a5fa; text-decoration: none;
-            font-size: 0.85rem; font-weight: 600;
-            transition: all 0.3s ease;
-            margin-top: 28px;
-        }
-
-        .back-btn:hover {
-            background: rgba(59,130,246,0.18);
-            border-color: rgba(59,130,246,0.5);
-            transform: translateX(-3px);
-        }
-
-        .nav-btns {
-            display: flex;
-            gap: 12px;
-            margin-top: 28px;
-            flex-wrap: wrap;
-        }
-        .nav-btn-prev, .nav-btn-next {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 11px 22px; border-radius: 50px;
-            font-size: 0.85rem; font-weight: 600;
-            text-decoration: none; transition: all 0.3s ease;
-        }
-        .nav-btn-prev {
-            border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(255,255,255,0.04);
-            color: rgba(255,255,255,0.45);
-        }
-        .nav-btn-prev:hover {
-            background: rgba(255,255,255,0.08);
-            border-color: rgba(255,255,255,0.2);
-            color: #fff;
-            transform: translateX(-3px);
-        }
-        .nav-btn-next {
-            border: 1px solid rgba(59,130,246,0.3);
-            background: rgba(59,130,246,0.08);
-            color: #60a5fa;
-            margin-left: auto;
-        }
-        .nav-btn-next:hover {
-            background: rgba(59,130,246,0.2);
-            border-color: #3b82f6;
-            color: #fff;
-            transform: translateX(3px);
-        }
-
-        /* Admin FAB */
-        .admin-fab-wrap {
-            position: fixed; bottom: 24px; right: 24px; z-index: 999;
-            display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
-        }
-
-        .admin-fab {
-            padding: 10px 18px; border-radius: 50px;
-            border: 1px solid rgba(59,130,246,0.25);
-            background: rgba(59,130,246,0.1);
-            color: #60a5fa;
-            font-family: 'Outfit', sans-serif;
-            font-size: 0.82rem; font-weight: 700;
-            cursor: pointer; transition: all 0.3s ease;
-        }
-
-        .admin-fab.logged {
-            background: rgba(34,197,94,0.12);
-            border-color: rgba(34,197,94,0.3);
-            color: var(--green);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .layout { grid-template-columns: 1fr; padding-top: 100px; }
-            .sidebar { position: static; }
-        }
-    </style>
 </head>
 <body>
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
 
     <nav class="navbar-unified">
         <a href="../index.html" class="nav-logo">
@@ -658,496 +39,449 @@
         </div>
     </nav>
 
-    <div class="layout">
-        <!-- ── SIDEBAR ── -->
-        <aside class="sidebar">
-            <!-- Progress ring -->
-            <div class="sidebar-card">
-                <div class="sidebar-title">Tiến độ hoàn thành</div>
-                <div class="progress-ring-wrap">
-                    <svg class="ring-svg" width="100" height="100" viewBox="0 0 100 100">
-                        <defs>
-                            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" stop-color="#3b82f6"/>
-                                <stop offset="100%" stop-color="#06b6d4"/>
-                            </linearGradient>
-                        </defs>
-                        <circle class="ring-bg" cx="50" cy="50" r="40"/>
-                        <circle class="ring-fill" id="ring-fill" cx="50" cy="50" r="40"
-                            stroke-dasharray="251.2" stroke-dashoffset="251.2"/>
-                    </svg>
-                    <div class="ring-label" id="ring-pct">0%</div>
-                    <div class="ring-sub" id="ring-sub">0 / 12 bước</div>
+    <div class="dashboard">
+        <!-- TOPBAR -->
+        <div class="dash-topbar">
+            <span class="topbar-id">SYS::CNS-BAI01</span>
+            <span class="topbar-title">MÁY TÍNH & THIẾT BỊ NGOẠI VI</span>
+            <div class="topbar-status">
+                <span class="status-dot"></span>
+                <span>ONLINE</span>
+            </div>
+        </div>
+
+        <!-- SIDEBAR -->
+        <aside class="dash-sidebar">
+            <div class="sidebar-block">
+                <div class="sb-label">Tiến Độ</div>
+                <div class="hud-wrap">
+                    <div class="hud-ring-outer">
+                        <svg width="140" height="140" viewBox="0 0 140 140">
+                            <circle class="hud-track" cx="70" cy="70" r="62"/>
+                            <circle class="hud-track2" cx="70" cy="70" r="54"/>
+                            <circle class="hud-fill" id="hud-fill" cx="70" cy="70" r="62"
+                                stroke-dasharray="389.6" stroke-dashoffset="389.6"/>
+                        </svg>
+                        <div class="hud-center">
+                            <div class="hud-pct" id="ring-pct">0%</div>
+                            <div class="hud-pct-label">COMPLETE</div>
+                        </div>
+                    </div>
+                    <div class="hud-stats">
+                        <div class="hud-stat">
+                            <div class="hud-stat-val" id="done-count">0</div>
+                            <div class="hud-stat-key">DONE</div>
+                        </div>
+                        <div class="hud-stat">
+                            <div class="hud-stat-val">6</div>
+                            <div class="hud-stat-key">TOTAL</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Step nav -->
-            <div class="sidebar-card">
-                <div class="sidebar-title">Danh sách bước</div>
-                <div id="step-nav"></div>
+            <div class="sidebar-block">
+                <div class="sb-label">Mission Steps</div>
+                <div class="mission-list" id="step-nav"></div>
             </div>
 
-            <!-- Meta -->
-            <div class="sidebar-card">
-                <div class="sidebar-title">Thông tin bài</div>
-                <div class="meta-row"><i class="fa-solid fa-calendar" style="color:var(--blue)"></i> Hạn nộp: 15/03/2026</div>
-                <div class="meta-row"><i class="fa-solid fa-clock" style="color:var(--cyan)"></i> ~30 phút</div>
-                <div class="meta-row"><i class="fa-solid fa-star" style="color:#facc15"></i> Điểm: <strong style="color:var(--green);margin-left:4px;">9.5 / 10</strong></div>
-                <div class="meta-row"><i class="fa-solid fa-tag" style="color:var(--purple)"></i> File Explorer</div>
+            <div class="sidebar-block">
+                <div class="sb-label">Thông Tin Bài</div>
+                <div class="meta-items">
+                    <div class="meta-item"><i class="fa-solid fa-calendar"></i> 23/02 – 08/03/2026</div>
+                    <div class="meta-item"><i class="fa-solid fa-clock"></i> Tuần 1, Tuần 2</div>
+                    <div class="meta-item"><i class="fa-solid fa-star"></i> Điểm: <strong>— / 10</strong></div>
+                    <div class="meta-item"><i class="fa-solid fa-microchip"></i> Phần cứng máy tính</div>
+                    <div class="meta-item"><i class="fa-solid fa-file-pdf"></i> Nộp file PDF</div>
+                </div>
             </div>
         </aside>
 
-        <!-- ── MAIN ── -->
-        <main class="main-content">
+        <!-- MAIN -->
+        <main class="dash-main">
+
             <!-- Breadcrumb -->
-            <div class="breadcrumb">
+            <div class="sci-breadcrumb">
                 <a href="cns.html"><i class="fa-solid fa-layer-group"></i> Portfolio CNS</a>
-                <i class="fa-solid fa-chevron-right" style="font-size:0.55rem"></i>
+                <span class="sep">/</span>
                 <span>Chương 1</span>
-                <i class="fa-solid fa-chevron-right" style="font-size:0.55rem"></i>
-                <span style="color:rgba(255,255,255,0.55)">Bài 1</span>
+                <span class="sep">/</span>
+                <span>Bài 1</span>
             </div>
 
             <!-- Hero -->
-            <div class="hero-badge"><i class="fa-solid fa-folder-open"></i> Chương 1 · Thực hành</div>
-            <h1 class="hero-title">
-                Quản Lý Tệp & Thư Mục<br>
-                <span>trên Windows</span>
-            </h1>
-            <p class="hero-desc">
-                Thực hành các thao tác cơ bản với File Explorer: tạo thư mục, tạo tệp, đổi tên, sao chép, di chuyển, xóa và khôi phục tệp từ Thùng rác.
-            </p>
+            <div class="sci-hero">
+                <div class="sci-chapter-badge"><i class="fa-solid fa-microchip"></i> Chương 1 · Tuần 1–2</div>
+                <h1 class="sci-title">Máy Tính Và<br><span class="accent">Các Thiết Bị Ngoại Vi</span></h1>
+                <p class="sci-desc">Tìm hiểu cấu trúc phần cứng máy tính, phân loại các thành phần và thiết bị ngoại vi. Thực hành nhận biết, kết nối và sử dụng hiệu quả thiết bị trong môi trường học tập số.</p>
+            </div>
 
-            <!-- Score banner -->
-            <div class="score-banner">
-                <div class="score-big">9.5</div>
-                <div class="score-info">
-                    <div class="s-label">Điểm số</div>
-                    <div class="s-val">Đã nộp · Chương 1 · Bài thực hành số 1</div>
+            <!-- Score Panel -->
+            <div class="score-panel">
+                <div class="score-val">—</div>
+                <div>
+                    <div class="score-info-label">Trạng Thái</div>
+                    <div class="score-info-val">Chương 1 · Bài 1 · Máy Tính & Thiết Bị Ngoại Vi</div>
                 </div>
-                <i class="fa-solid fa-circle-check" style="font-size:1.8rem;color:var(--green);opacity:0.7"></i>
+                <i class="fa-solid fa-desktop" style="font-size:1.8rem;color:var(--cyan);opacity:0.4;margin-left:auto;"></i>
             </div>
 
-            <!-- Steps -->
-            <div class="section-hdr">
-                <h2><i class="fa-solid fa-list-check"></i> Các bước thực hiện</h2>
-                <button class="btn-reset-all" onclick="resetAll()">
-                    <i class="fa-solid fa-rotate-left"></i> Reset
-                </button>
-            </div>
-
-            <div id="steps-list"></div>
-
-            <!-- Folder tree result -->
-            <div class="result-box">
-                <h3><i class="fa-solid fa-circle-check"></i> Cấu trúc thư mục sau khi hoàn thành</h3>
-                <div class="folder-tree">
-<span class="dir">📁 D:\</span>
-└── <span class="dir">📁 ThucHanh_HoangManhTruong\</span>
-    ├── <span class="dir">📁 TaiLieu\</span>
-    │   └── <span class="file">📄 GhiChuQuanTrong.txt</span>  <span style="color:rgba(255,255,255,0.2)">(bản sao)</span>
-    └── <span class="file">📄 GhiChuQuanTrong.txt</span>
+            <!-- I: LÝ THUYẾT -->
+            <div>
+                <div class="sec-header">
+                    <span class="sec-index">01</span>
+                    <span class="sec-title"><i class="fa-solid fa-book-open"></i> Nội Dung Lý Thuyết</span>
+                    <span class="sec-line"></span>
                 </div>
-                <ul style="margin-top:16px;">
-                    <li>Tạo thành công cấu trúc thư mục lồng nhau <code style="background:rgba(255,255,255,0.07);padding:1px 6px;border-radius:4px;font-family:monospace;font-size:0.8rem;">ThucHanh_HoangManhTruong/TaiLieu/</code></li>
-                    <li>Thực hành đầy đủ 12 bước: tạo, đổi tên, sao chép, di chuyển, xóa, khôi phục</li>
-                    <li>Hiểu rõ sự khác biệt giữa <strong style="color:#fff">Delete</strong> (vào Recycle Bin) và <strong style="color:#fff">Shift+Delete</strong> (xóa vĩnh viễn)</li>
-                </ul>
+                <div class="hex-grid">
+                    <div class="hex-node">
+                        <div class="node-icon-wrap" style="background:rgba(0,210,255,0.1);color:var(--cyan);"><i class="fa-solid fa-microchip"></i></div>
+                        <div class="node-name">CPU</div>
+                        <div class="node-desc">Não bộ của máy tính, thực thi mọi lệnh và tính toán. Tốc độ đo bằng GHz, hiệu năng phụ thuộc số nhân và luồng.</div>
+                        <div class="node-tags">
+                            <span class="nano-tag tag-process">Xử lý</span>
+                            <span class="nano-tag" style="background:rgba(255,255,255,0.06);color:var(--muted);">Intel/AMD</span>
+                        </div>
+                    </div>
+                    <div class="hex-node">
+                        <div class="node-icon-wrap" style="background:rgba(0,170,255,0.1);color:#60a5fa;"><i class="fa-solid fa-memory"></i></div>
+                        <div class="node-name">RAM</div>
+                        <div class="node-desc">Lưu dữ liệu đang được xử lý. Dung lượng lớn giúp chạy nhiều ứng dụng cùng lúc. Dữ liệu mất khi tắt máy.</div>
+                        <div class="node-tags">
+                            <span class="nano-tag tag-memory">Bộ nhớ</span>
+                            <span class="nano-tag" style="background:rgba(255,255,255,0.06);color:var(--muted);">DDR4/DDR5</span>
+                        </div>
+                    </div>
+                    <div class="hex-node">
+                        <div class="node-icon-wrap" style="background:rgba(168,85,247,0.1);color:#c4b5fd;"><i class="fa-solid fa-hard-drive"></i></div>
+                        <div class="node-name">HDD / SSD</div>
+                        <div class="node-desc">Lưu dữ liệu lâu dài. SSD nhanh hơn HDD nhiều lần nhờ không có bộ phận cơ học. SSD NVMe là tiêu chuẩn hiện đại nhất.</div>
+                        <div class="node-tags">
+                            <span class="nano-tag tag-store">Lưu trữ</span>
+                            <span class="nano-tag" style="background:rgba(255,255,255,0.06);color:var(--muted);">SSD/HDD</span>
+                        </div>
+                    </div>
+                    <div class="hex-node">
+                        <div class="node-icon-wrap" style="background:rgba(0,255,136,0.1);color:var(--green);"><i class="fa-solid fa-display"></i></div>
+                        <div class="node-name">GPU</div>
+                        <div class="node-desc">Xử lý hình ảnh và video. Quan trọng với AI, gaming và đồ họa. Có loại tích hợp (iGPU) và rời (dGPU).</div>
+                        <div class="node-tags">
+                            <span class="nano-tag tag-process">Đồ họa</span>
+                            <span class="nano-tag" style="background:rgba(255,255,255,0.06);color:var(--muted);">NVIDIA/AMD</span>
+                        </div>
+                    </div>
+                    <div class="hex-node">
+                        <div class="node-icon-wrap" style="background:rgba(255,184,0,0.1);color:var(--amber);"><i class="fa-solid fa-plug"></i></div>
+                        <div class="node-name">Thiết Bị Đầu Vào</div>
+                        <div class="node-desc">Bàn phím, chuột, máy quét, webcam, micro — giúp người dùng nhập liệu và tương tác với máy tính.</div>
+                        <div class="node-tags">
+                            <span class="nano-tag tag-input">Input</span>
+                            <span class="nano-tag" style="background:rgba(255,255,255,0.06);color:var(--muted);">USB/Wireless</span>
+                        </div>
+                    </div>
+                    <div class="hex-node">
+                        <div class="node-icon-wrap" style="background:rgba(255,184,0,0.1);color:var(--amber);"><i class="fa-solid fa-volume-high"></i></div>
+                        <div class="node-name">Thiết Bị Đầu Ra</div>
+                        <div class="node-desc">Màn hình, máy in, loa, tai nghe — xuất kết quả xử lý từ máy tính ra môi trường bên ngoài.</div>
+                        <div class="node-tags">
+                            <span class="nano-tag tag-output">Output</span>
+                            <span class="nano-tag" style="background:rgba(255,255,255,0.06);color:var(--muted);">HDMI/USB</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <a href="cns.html" class="back-btn">
-                <i class="fa-solid fa-arrow-left"></i> Quay lại danh sách bài tập
-            </a>
-            <div class="nav-btns">
-                <span class="nav-btn-prev" style="opacity:0.3;cursor:default"><i class="fa-solid fa-chevron-left"></i> Bài trước</span>
-                <a href="cns_bai2.html" class="nav-btn-next">Bài 2: Tìm kiếm thông tin <i class="fa-solid fa-chevron-right"></i></a>
+            <!-- II: PHÂN LOẠI -->
+            <div>
+                <div class="sec-header">
+                    <span class="sec-index">02</span>
+                    <span class="sec-title"><i class="fa-solid fa-table-list"></i> Phân Loại Thành Phần</span>
+                    <span class="sec-line"></span>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Thành Phần</th>
+                            <th>Loại</th>
+                            <th>Chức Năng Chính</th>
+                            <th>Ví Dụ Phổ Biến</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="c-name">CPU</td><td><span class="energy-tag tag-process">Xử lý</span></td><td>Thực thi lệnh, tính toán</td><td>Intel Core i5, AMD Ryzen 5</td></tr>
+                        <tr><td class="c-name">RAM</td><td><span class="energy-tag tag-memory">Bộ nhớ</span></td><td>Lưu tạm dữ liệu đang dùng</td><td>Kingston 8GB DDR4</td></tr>
+                        <tr><td class="c-name">SSD / HDD</td><td><span class="energy-tag tag-store">Lưu trữ</span></td><td>Lưu dữ liệu lâu dài</td><td>Samsung 970 EVO (NVMe)</td></tr>
+                        <tr><td class="c-name">Mainboard</td><td><span class="energy-tag tag-process">Kết nối</span></td><td>Kết nối tất cả linh kiện</td><td>ASUS B550, MSI Z790</td></tr>
+                        <tr><td class="c-name">GPU</td><td><span class="energy-tag tag-process">Xử lý</span></td><td>Xử lý đồ họa, AI</td><td>NVIDIA RTX 4060</td></tr>
+                        <tr><td class="c-name">Màn hình</td><td><span class="energy-tag tag-output">Output</span></td><td>Hiển thị kết quả</td><td>Dell 24" FHD IPS</td></tr>
+                        <tr><td class="c-name">Bàn phím, Chuột</td><td><span class="energy-tag tag-input">Input</span></td><td>Nhập liệu, điều khiển</td><td>Logitech MX Keys</td></tr>
+                        <tr><td class="c-name">Webcam, Micro</td><td><span class="energy-tag tag-input">Input</span></td><td>Thu hình, thu âm</td><td>Logitech C920, Blue Yeti</td></tr>
+                        <tr><td class="c-name">Máy in</td><td><span class="energy-tag tag-output">Output</span></td><td>In tài liệu ra giấy</td><td>Canon G3010</td></tr>
+                        <tr><td class="c-name">USB / Ổ cứng di động</td><td><span class="energy-tag tag-store">Lưu trữ</span></td><td>Mang dữ liệu di động</td><td>SanDisk 64GB USB 3.2</td></tr>
+                    </tbody>
+                </table>
             </div>
+
+            <!-- III: QUY TRÌNH -->
+            <div>
+                <div class="sec-header">
+                    <span class="sec-index">03</span>
+                    <span class="sec-title"><i class="fa-solid fa-list-check"></i> Quy Trình Thực Hiện</span>
+                    <span class="sec-line"></span>
+                </div>
+                <div class="ops-list" id="process-wrap"></div>
+            </div>
+
+            <!-- IV: SẢN PHẨM -->
+            <div>
+                <div class="sec-header">
+                    <span class="sec-index">04</span>
+                    <span class="sec-title"><i class="fa-solid fa-trophy"></i> Sản Phẩm Cuối Cùng</span>
+                    <span class="sec-line"></span>
+                </div>
+                <div class="result-panel">
+                    <h3><i class="fa-solid fa-circle-check"></i> Những Gì Đã Thực Hiện Được</h3>
+                    <div class="result-items">
+                        <div class="result-item"><i class="fa-solid fa-check-circle"></i> Nhận diện và phân loại đúng các thành phần bên trong và bên ngoài máy tính</div>
+                        <div class="result-item"><i class="fa-solid fa-check-circle"></i> Mô tả chức năng của từng linh kiện: CPU, RAM, SSD, GPU, Mainboard</div>
+                        <div class="result-item"><i class="fa-solid fa-check-circle"></i> Lập bảng so sánh thiết bị Input / Output / Storage có minh họa thực tế</div>
+                        <div class="result-item"><i class="fa-solid fa-check-circle"></i> Thực hành kết nối thiết bị ngoại vi (màn hình, chuột, bàn phím, USB)</div>
+                        <div class="result-item"><i class="fa-solid fa-check-circle"></i> Kiểm tra thông số phần cứng qua Device Manager và System Info trên Windows</div>
+                        <div class="result-item"><i class="fa-solid fa-check-circle"></i> Hoàn thiện báo cáo PDF theo mẫu yêu cầu của môn CNS</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- V: PDF -->
+            <div>
+                <div class="sec-header">
+                    <span class="sec-index">05</span>
+                    <span class="sec-title"><i class="fa-solid fa-file-pdf" style="color:var(--amber);"></i> File Bài Tập (PDF)</span>
+                    <span class="sec-line"></span>
+                </div>
+                <div class="sci-panel" style="padding:22px 24px;">
+                    <div class="sweep"></div>
+                    <div style="font-size:0.82rem;font-weight:700;color:var(--white);margin-bottom:4px;display:flex;align-items:center;gap:8px;">
+                        <i class="fa-solid fa-folder-open" style="color:var(--amber);"></i> Tất Cả Bài Nộp — Môn Công Nghệ Số
+                    </div>
+                    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:16px;">Admin upload file PDF của từng bài. Giáo viên click vào bài tương ứng để xem hoặc tải về.</div>
+                    <div class="pdf-modules" id="pdf-grid"></div>
+                </div>
+            </div>
+
+            <!-- NAV -->
+            <div class="sci-nav-btns">
+                <a href="cns.html" class="sci-btn back"><i class="fa-solid fa-arrow-left"></i> Quay Lại</a>
+                <span class="sci-btn prev" style="opacity:0.3;cursor:default;"><i class="fa-solid fa-chevron-left"></i> Bài Trước</span>
+                <div class="sci-btn-next-wrap">
+                    <a href="cns_bai2.html" class="sci-btn">Bài 2: Khai Thác Dữ Liệu <i class="fa-solid fa-chevron-right"></i></a>
+                </div>
+            </div>
+
         </main>
+
+        <!-- FOOTER -->
+        <div class="dash-footer">
+            <span class="footer-sys">CNS-DASHBOARD · BAI01 · © 2026 Hoàng Mạnh Trường</span>
+            <span class="footer-sys">Học để hiểu, không chỉ để qua môn.</span>
+        </div>
     </div>
 
-    <footer class="tutor-footer">
-        <div class="footer-content">
-            <p>&copy; 2026 Hoàng Mạnh Trường. Học để hiểu, không chỉ để qua môn.</p>
-        </div>
-    </footer>
-
-    <!-- Admin Login Modal -->
-    <div id="admin-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:10001;justify-content:center;align-items:center;backdrop-filter:blur(12px);">
-        <div style="background:rgba(8,12,35,0.98);border:1px solid rgba(59,130,246,0.22);border-radius:28px;padding:2rem;width:300px;text-align:center;">
-            <i class="fa-solid fa-shield-halved" style="font-size:2rem;color:var(--blue);margin-bottom:1rem;display:block;"></i>
-            <h3 style="margin-bottom:1.2rem;font-size:0.95rem;color:#f8fafc;">Xác thực Admin</h3>
-            <input type="password" id="admin-pwd" placeholder="Mật khẩu..."
-                style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:11px;border-radius:12px;font-family:'Outfit',sans-serif;margin-bottom:12px;text-align:center;letter-spacing:5px;transition:border-color 0.3s;"
+    <!-- Admin Modal -->
+    <div class="sys-modal-overlay" id="admin-modal">
+        <div class="sys-modal">
+            <i class="fa-solid fa-shield-halved lock-glow"></i>
+            <h3>Xác Thực Admin</h3>
+            <input type="password" id="admin-pwd" class="sys-pwd" placeholder="••••"
                 onkeydown="if(event.key==='Enter')checkPwd()">
-            <button onclick="checkPwd()" style="width:100%;padding:11px;border-radius:12px;border:none;background:linear-gradient(135deg,#3b82f6,#06b6d4);color:#fff;font-family:'Outfit',sans-serif;font-weight:700;cursor:pointer;margin-bottom:8px;">Xác nhận</button>
-            <button onclick="closeModal()" style="background:none;border:none;color:rgba(255,255,255,0.3);cursor:pointer;font-family:'Outfit',sans-serif;font-size:0.82rem;">Hủy</button>
+            <button class="sys-confirm-btn" onclick="checkPwd()">Xác Nhận</button>
+            <button class="sys-cancel-btn" onclick="closeModal()">Hủy</button>
         </div>
     </div>
 
     <!-- Admin FAB -->
-    <div class="admin-fab-wrap">
-        <button id="admin-fab" class="admin-fab" onclick="toggleAdmin()">
-            <i class="fa-solid fa-lock"></i> Admin
+    <div class="sys-lock-wrap">
+        <button id="admin-fab" class="sys-lock-btn" onclick="toggleAdmin()">
+            <i class="fa-solid fa-lock lock-glow"></i> Admin
         </button>
     </div>
 
     <script>
-    const steps = [
-        { num:1,  title:"Mở File Explorer",           sub:"Windows + E",
-          desc:"Nhấn <span class='step-kbd'><i class='fa-brands fa-windows'></i></span> + <span class='step-kbd'>E</span> hoặc nhấp vào biểu tượng thư mục màu vàng trên thanh tác vụ.",
-          tips:[] },
-        { num:2,  title:"Truy cập ổ đĩa",             sub:"This PC → ổ D: hoặc E:",
-          desc:"Ở cột bên trái nhấp vào <strong>This PC</strong>, sau đó nhấp đúp vào ổ đĩa không phải ổ hệ thống (ví dụ: <code>D:</code> hoặc <code>E:</code>). Nếu chỉ có <code>C:</code>, vào thư mục <code>Documents</code>.",
-          tips:[] },
-        { num:3,  title:"Tạo thư mục mới",            sub:"Chuột phải → New → Folder",
-          desc:"Nhấp chuột phải vào khoảng trống → <strong>New → Folder</strong>. Đặt tên <code>ThucHanh_HoangManhTruong</code>. Nhấn <span class='step-kbd'>Enter</span>.",
-          tips:[{type:'info', icon:'fa-lightbulb', text:"Tên thư mục theo cú pháp: <code>ThucHanh_hotensinhvien</code>"}] },
-        { num:4,  title:"Vào thư mục vừa tạo",        sub:"Double-click",
-          desc:"Nhấp đúp vào thư mục <code>ThucHanh_HoangManhTruong</code> để mở.",
-          tips:[] },
-        { num:5,  title:"Tạo tệp văn bản",            sub:"New → Text Document",
-          desc:"Nhấp chuột phải → <strong>New → Text Document</strong>. Đặt tên <code>GhiChu.txt</code>. Nhấn <span class='step-kbd'>Enter</span>.",
-          tips:[] },
-        { num:6,  title:"Đổi tên tệp",                sub:"Rename → GhiChuQuanTrong.txt",
-          desc:"Nhấp chuột phải vào <code>GhiChu.txt</code> → <strong>Rename</strong>. Đổi thành <code>GhiChuQuanTrong.txt</code>. Nhấn <span class='step-kbd'>Enter</span>.",
-          tips:[{type:'info', icon:'fa-lightbulb', text:"Phím tắt: chọn file rồi nhấn <span class='step-kbd'>F2</span>"}] },
-        { num:7,  title:"Tạo thư mục con",            sub:"New → Folder → TaiLieu",
-          desc:"Trong thư mục gốc, nhấp chuột phải → <strong>New → Folder</strong>. Đặt tên <code>TaiLieu</code>.",
-          tips:[] },
-        { num:8,  title:"Sao chép tệp (Copy & Paste)", sub:"Ctrl+C → Ctrl+V",
-          desc:"Nhấp chuột phải vào <code>GhiChuQuanTrong.txt</code> → <strong>Copy</strong> (<span class='step-kbd'>Ctrl</span>+<span class='step-kbd'>C</span>). Vào thư mục <code>TaiLieu</code> → <strong>Paste</strong> (<span class='step-kbd'>Ctrl</span>+<span class='step-kbd'>V</span>). Bây giờ có bản sao trong <code>TaiLieu</code>.",
-          tips:[] },
-        { num:9,  title:"Di chuyển tệp (Cut & Paste)", sub:"Ctrl+X → Ctrl+V",
-          desc:"Quay lại thư mục gốc, tạo tệp mới tên <code>DiChuyen.txt</code>. Nhấp chuột phải → <strong>Cut</strong> (<span class='step-kbd'>Ctrl</span>+<span class='step-kbd'>X</span>). Vào <code>TaiLieu</code> → <strong>Paste</strong>. Tệp gốc biến mất khỏi vị trí cũ.",
-          tips:[{type:'warn', icon:'fa-triangle-exclamation', text:"Cut khác Copy: tệp gốc sẽ bị xóa khỏi vị trí ban đầu."}] },
-        { num:10, title:"Xóa tệp (Recycle Bin)",       sub:"Delete → vào Thùng rác",
-          desc:"Trong <code>TaiLieu</code>, nhấp chuột phải vào <code>GhiChuQuanTrong.txt</code> → <strong>Delete</strong>. Tệp chuyển vào <strong>Recycle Bin</strong>.",
-          tips:[] },
-        { num:11, title:"Xóa vĩnh viễn",               sub:"Shift + Delete",
-          desc:"Chọn <code>DiChuyen.txt</code>, nhấn <span class='step-kbd'>Shift</span>+<span class='step-kbd'>Delete</span>. Xác nhận cảnh báo — tệp bị xóa vĩnh viễn, <strong>không qua Thùng rác</strong>.",
-          tips:[{type:'danger', icon:'fa-triangle-exclamation', text:"Không thể khôi phục sau Shift+Delete!"}] },
-        { num:12, title:"Khôi phục từ Thùng rác",      sub:"Recycle Bin → Restore",
-          desc:"Mở <strong>Recycle Bin</strong> trên Desktop. Tìm <code>GhiChuQuanTrong.txt</code>, nhấp chuột phải → <strong>Restore</strong>. Tệp quay về vị trí ban đầu.",
-          tips:[{type:'info', icon:'fa-lightbulb', text:"Chỉ khôi phục được tệp xóa bằng Delete thông thường."}] }
+    const STEPS = [
+        { num:1, title:"Đọc tài liệu & nghiên cứu", sub:"Tự học lý thuyết",
+          desc:"Đọc slide bài giảng và tài liệu tham khảo về cấu trúc máy tính. Ghi chú các thành phần chính: CPU, RAM, SSD/HDD, GPU, Mainboard và phân loại thiết bị ngoại vi.",
+          tip:{type:'info', icon:'fa-lightbulb', text:"Gợi ý: Tìm kiếm trên Google Scholar với từ khóa <strong>'computer hardware components'</strong> để có nguồn học thuật."} },
+        { num:2, title:"Lập bảng phân loại thiết bị", sub:"Phân loại Input / Output / Storage",
+          desc:"Tạo bảng phân loại trong Word hoặc Excel với 3 cột: <code>Tên thiết bị</code>, <code>Loại</code> (Input/Output/Storage), <code>Chức năng</code>. Điền tối thiểu 10 thiết bị.",
+          tip:{type:'info', icon:'fa-table', text:"Bảng cần có tiêu đề rõ ràng, font đồng nhất và căn chỉnh cột hợp lý."} },
+        { num:3, title:"Thực hành kết nối ngoại vi", sub:"Thao tác thực tế",
+          desc:"Kết nối màn hình qua HDMI/DisplayPort, cắm chuột và bàn phím USB, cắm USB flash drive. Kiểm tra nhận diện thiết bị trong <code>Device Manager</code> (<kbd>Win+X</kbd> → Device Manager).",
+          tip:{type:'warn', icon:'fa-triangle-exclamation', text:"Tắt máy trước khi cắm/rút thiết bị PCIe hoặc SATA. Với USB thì có thể cắm nóng."} },
+        { num:4, title:"Kiểm tra thông số hệ thống", sub:"System Information",
+          desc:"Mở <strong>System Information</strong> (<kbd>Win+R</kbd> → gõ <code>msinfo32</code>). Ghi lại: CPU model, tổng RAM, dung lượng ổ đĩa, phiên bản Windows. Chụp màn hình để đưa vào báo cáo.",
+          tip:{type:'info', icon:'fa-computer', text:"Task Manager (<kbd>Ctrl+Shift+Esc</kbd>) → tab Performance cũng hiển thị thông số thời gian thực."} },
+        { num:5, title:"Viết báo cáo", sub:"Tổng hợp kết quả",
+          desc:"Soạn báo cáo theo cấu trúc: <strong>Giới thiệu</strong> → <strong>Lý thuyết</strong> → <strong>Bảng phân loại</strong> → <strong>Thực hành</strong> → <strong>Nhận xét cá nhân</strong>. Font Times New Roman 12pt, dãn dòng 1.5, lề 2.5cm.",
+          tip:{type:'info', icon:'fa-pen', text:"Viết nhận xét cá nhân tối thiểu 3-5 câu: điểm khó, điểm thú vị, và ứng dụng thực tế của kiến thức này."} },
+        { num:6, title:"Xuất PDF & nộp bài", sub:"Hoàn thiện & upload",
+          desc:"Xuất file Word sang PDF: <strong>File → Save As → PDF</strong>. Đặt tên theo mẫu <code>Bai1_HoangManhTruong.pdf</code>. Upload lên hệ thống và đính kèm vào trang Portfolio này.",
+          tip:{type:'warn', icon:'fa-triangle-exclamation', text:"Kiểm tra file PDF trước khi nộp: đảm bảo hình ảnh hiển thị đúng, không bị cắt chữ, font nhúng đầy đủ."} }
     ];
 
-    const lessonId = 'bai1';
-    let doneSteps = new Set();
-    let savedImgs  = {};
-    let isAdmin    = sessionStorage.getItem('cns_admin') === 'true';
+    const PDF_SLOTS = [
+        { id:'bai1', label:'Bài 1', sub:'Máy Tính & Ngoại Vi', icon:'fa-microchip' },
+        { id:'bai2', label:'Bài 2', sub:'Khai Thác Dữ Liệu', icon:'fa-magnifying-glass' },
+        { id:'bai3', label:'Bài 3', sub:'Tổng Quan AI', icon:'fa-robot' },
+        { id:'bai4', label:'Bài 4', sub:'Giao Tiếp & Hợp Tác', icon:'fa-users' },
+        { id:'bai5', label:'Bài 5', sub:'Sáng Tạo Nội Dung Số', icon:'fa-wand-magic-sparkles' },
+        { id:'bai6', label:'Bài 6', sub:'An Toàn & Liêm Chính', icon:'fa-shield-halved' },
+    ];
 
-    async function fetchImgsWithRetry(maxRetries = 5, delayMs = 3000) {
-        for (let attempt = 1; attempt <= maxRetries; attempt++) {
-            try {
-                const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}`, {
-                    signal: AbortSignal.timeout(8000)
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    savedImgs = {};
-                    data.forEach(x => {
-                        if (x.imageUrl) savedImgs[x.stepNum] = x.imageUrl;
-                    });
-                    hideImgLoading();
-                    render();
-                    return; // thanh cong
-                }
-            } catch (e) {
-                console.warn(`Lần thử ${attempt}/${maxRetries} thất bại:`, e.message);
-            }
-            if (attempt < maxRetries) {
-                showImgLoading(attempt, maxRetries);
-                await new Promise(r => setTimeout(r, delayMs));
-            }
-        }
-        // Het retry — van render voi savedImgs rong
-        hideImgLoading();
-        render();
-    }
-
-    function showImgLoading(attempt, max) {
-        let el = document.getElementById('img-loading-banner');
-        if (!el) {
-            el = document.createElement('div');
-            el.id = 'img-loading-banner';
-            el.style.cssText = `
-                position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-                background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.4);
-                backdrop-filter: blur(12px); border-radius: 50px;
-                padding: 10px 22px; color: rgba(255,255,255,0.85);
-                font-size: 0.82rem; z-index: 9999;
-                display: flex; align-items: center; gap: 10px;
-            `;
-            document.body.appendChild(el);
-        }
-        el.innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="color:#a855f7"></i>
-            Server đang khởi động, đang tải ảnh... (${attempt}/${max})`;
-    }
-
-    function hideImgLoading() {
-        const el = document.getElementById('img-loading-banner');
-        if (el) el.remove();
-    }
-
-    async function loadProgress() {
-        // Tiến độ (done) luôn lấy từ localStorage — mỗi người riêng
-        doneSteps = new Set(JSON.parse(localStorage.getItem('cns_bai1_done') || '[]'));
-        render(); // Render ngay voi tien do, anh se cap nhat sau
-
-        // Ảnh minh chứng lấy từ DB — retry khi server dang wake up
-        fetchImgsWithRetry();
-    }
-
-    /* ── Render ── */
-    function render() {
-        renderSteps();
-        renderSideNav();
-        updateRing();
-    }
+    let doneSteps = new Set(JSON.parse(localStorage.getItem('cns_bai1_done') || '[]'));
+    let pdfData   = JSON.parse(localStorage.getItem('cns_pdf_data') || '{}');
+    let isAdmin   = sessionStorage.getItem('cns_admin') === 'true';
 
     function renderSteps() {
-        const container = document.getElementById('steps-list');
-        container.innerHTML = steps.map(s => {
+        document.getElementById('process-wrap').innerHTML = STEPS.map(s => {
             const done = doneSteps.has(s.num);
-            const imgSrc = savedImgs[s.num] || s.image;
-
-            const tipsHtml = s.tips.map(t => `
-                <div class="tip-box ${t.type}">
-                    <i class="fa-solid ${t.icon}"></i>
-                    <span>${t.text}</span>
-                </div>`).join('');
-
-            let imgSlot = '';
-            if (imgSrc) {
-                // Ảnh đã có — chỉ Admin mới được đổi/xóa
-                const adminActions = isAdmin ? `
-                    <div class="step-img-actions">
-                        <label class="btn-img-change"><i class="fa-solid fa-image"></i> Đổi ảnh
-                            <input type="file" accept="image/*" onchange="handleImg(event,${s.num})">
-                        </label>
-                        <button class="btn-img-remove" onclick="removeImg(${s.num})"><i class="fa-solid fa-trash"></i> Xóa ảnh</button>
-                    </div>` : '';
-                imgSlot = `
-                    <div class="step-img-wrap">
-                        <img src="${imgSrc}" class="step-img-preview" onclick="zoomImg('${imgSrc}')">
-                        ${adminActions}
-                    </div>`;
-            } else {
-                // Chưa có ảnh — chỉ Admin mới upload được
-                imgSlot = isAdmin ? `
-                    <div class="step-img-wrap">
-                        <label class="step-img-placeholder">
-                            <div style="font-size:1.4rem;color:rgba(59,130,246,0.35);margin-bottom:5px;"><i class="fa-solid fa-image"></i></div>
-                            <div style="font-size:0.75rem;color:rgba(255,255,255,0.25);">Nhấp để thêm ảnh minh chứng</div>
-                            <input type="file" accept="image/*" onchange="handleImg(event,${s.num})">
-                        </label>
-                    </div>` : `
-                    <div class="step-img-wrap">
-                        <div class="step-img-placeholder" style="cursor:default;">
-                            <div style="font-size:1.4rem;color:rgba(255,255,255,0.1);margin-bottom:5px;"><i class="fa-solid fa-image"></i></div>
-                            <div style="font-size:0.75rem;color:rgba(255,255,255,0.15);">Chưa có ảnh minh chứng</div>
-                        </div>
-                    </div>`;
-            }
-
-            const isLast = s.num === steps.length;
-            const connectorHtml = isLast ? '' : `
-                <div class="step-connector">
-                    <i class="fa-solid fa-arrow-down"></i>
-                </div>`;
-
-            return `
-                <div class="step-card ${done ? 'completed' : ''}" id="step-${s.num}">
-                    <div class="step-head" onclick="toggleStep(${s.num})">
-                        <div class="step-num-badge">${done ? '<i class="fa-solid fa-check" style="font-size:0.8rem"></i>' : s.num}</div>
-                        <div class="step-head-text">
-                            <div class="step-head-title">${s.title}</div>
-                            <div class="step-head-sub">${s.sub}</div>
-                        </div>
-                        <button class="step-check-btn" onclick="event.stopPropagation();toggleDone(${s.num})" title="${done ? 'Bỏ đánh dấu' : 'Đánh dấu hoàn thành'}">
-                            <i class="fa-solid fa-check" style="font-size:0.7rem"></i>
-                        </button>
-                        <i class="fa-solid fa-chevron-down step-expand-icon"></i>
-                    </div>
-                    <div class="step-body">
-                        <div class="step-body-inner">
-                            <div class="step-desc">${s.desc}</div>
-                            ${tipsHtml}
-                            ${imgSlot}
-                        </div>
-                    </div>
+            const tipMap = { info: 'info', warn: 'warn', danger: 'warn', success: 'ok' };
+            return `<div class="ops-item ${done ? 'done' : ''}" id="ps-${s.num}">
+                <div class="ops-num">${done ? '<i class="fa-solid fa-check" style="font-size:0.7rem"></i>' : s.num}</div>
+                <div class="ops-body">
+                    <div class="ops-title">${s.title}</div>
+                    <div class="ops-sub">${s.sub}</div>
+                    <div class="ops-desc">${s.desc}</div>
+                    ${s.tip ? `<div class="ops-alert ${tipMap[s.tip.type] || 'info'}"><i class="fa-solid ${s.tip.icon}"></i><span>${s.tip.text}</span></div>` : ''}
+                    <button class="ops-btn ${done ? 'done' : ''}" onclick="toggleDone(${s.num})">
+                        ${done ? '<i class="fa-solid fa-check"></i> Đã hoàn thành' : '<i class="fa-regular fa-circle"></i> Đánh dấu hoàn thành'}
+                    </button>
                 </div>
-                ${connectorHtml}`;
+            </div>`;
         }).join('');
     }
 
     function renderSideNav() {
-        const nav = document.getElementById('step-nav');
-        nav.innerHTML = steps.map(s => `
-            <a class="step-nav-item ${doneSteps.has(s.num) ? 'done' : ''}" onclick="scrollToStep(${s.num})">
-                <span class="snav-dot"></span>
-                <span>${s.num}. ${s.title}</span>
-            </a>`).join('');
+        document.getElementById('step-nav').innerHTML = STEPS.map(s => `
+            <div class="mission-item ${doneSteps.has(s.num) ? 'done' : ''}" onclick="scrollToStep(${s.num})">
+                <div class="mi-icon">${doneSteps.has(s.num) ? '<i class="fa-solid fa-check" style="font-size:0.6rem"></i>' : s.num}</div>
+                <span class="mi-text">${s.title}</span>
+            </div>`).join('');
     }
 
     function updateRing() {
-        const pct = Math.round((doneSteps.size / steps.length) * 100);
-        const circ = 251.2;
-        document.getElementById('ring-fill').style.strokeDashoffset = circ - (circ * pct / 100);
+        const pct = Math.round((doneSteps.size / STEPS.length) * 100);
+        const circ = 2 * Math.PI * 62;
+        document.getElementById('hud-fill').style.strokeDashoffset = circ * (1 - pct / 100);
         document.getElementById('ring-pct').textContent = pct + '%';
-        document.getElementById('ring-sub').textContent = `${doneSteps.size} / ${steps.length} bước`;
-    }
-
-    /* ── Interactions ── */
-    function toggleStep(num) {
-        const card = document.getElementById('step-' + num);
-        card.classList.toggle('open');
-    }
-
-    function toggleDone(num) {
-        const isDone = !doneSteps.has(num);
-        if (isDone) doneSteps.add(num); else doneSteps.delete(num);
-        // Lưu tiến độ vào localStorage — riêng từng người dùng
-        localStorage.setItem('cns_bai1_done', JSON.stringify([...doneSteps]));
-        render();
-        const card = document.getElementById('step-' + num);
-        if (card) card.classList.add('open');
-    }
-
-    function resetAll() {
-        if (!confirm('Reset tiến độ của bạn?')) return;
-        doneSteps.clear();
-        localStorage.removeItem('cns_bai1_done');
-        render();
-        // Không xóa ảnh trên server khi reset tiến độ cá nhân
+        document.getElementById('done-count').textContent = doneSteps.size;
     }
 
     function scrollToStep(num) {
-        const el = document.getElementById('step-' + num);
-        if (!el) return;
-        el.classList.add('open');
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.getElementById('ps-' + num)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    /* ── Images ── */
-    async function handleImg(event, num) {
+    function toggleDone(num) {
+        if (doneSteps.has(num)) doneSteps.delete(num); else doneSteps.add(num);
+        localStorage.setItem('cns_bai1_done', JSON.stringify([...doneSteps]));
+        renderSteps(); renderSideNav(); updateRing();
+    }
+
+    function renderPDF() {
+        document.getElementById('pdf-grid').innerHTML = PDF_SLOTS.map(slot => {
+            const saved = pdfData[slot.id];
+            if (saved) {
+                return `<div class="pdf-mod has-file" id="slot-${slot.id}">
+                    <span class="pdf-mod-icon"><i class="fa-solid fa-file-pdf"></i></span>
+                    <div class="pdf-mod-label">${slot.label}</div>
+                    <div class="pdf-mod-sub">${slot.sub}</div>
+                    <a href="${saved.url || saved.fileUrl}" target="_blank" class="pdf-mod-btn"><i class="fa-solid fa-eye"></i> Xem</a>
+                    ${isAdmin ? `<button class="pdf-mod-del" onclick="removePDF('${slot.id}')"><i class="fa-solid fa-trash"></i> Xóa</button>` : ''}
+                </div>`;
+            }
+            return `<div class="pdf-mod" id="slot-${slot.id}">
+                <span class="pdf-mod-icon"><i class="fa-solid fa-${slot.icon}"></i></span>
+                <div class="pdf-mod-label">${slot.label}</div>
+                <div class="pdf-mod-sub">${isAdmin ? 'Upload PDF' : slot.sub}</div>
+                ${isAdmin ? `<input type="file" accept="application/pdf" onchange="handlePDF(event,'${slot.id}')">` : ''}
+            </div>`;
+        }).join('');
+    }
+
+    async function handlePDF(event, slotId) {
         const file = event.target.files[0];
         if (!file) return;
-
-        const card = document.getElementById('step-' + num);
-        if (card) card.classList.add('open');
-
-        // Optimistic local preview
-        const reader = new FileReader();
-        reader.onload = e => {
-            if (!savedImgs[num]) {
-                savedImgs[num] = e.target.result;
-                render();
-                const card = document.getElementById('step-' + num);
-                if (card) card.classList.add('open');
-            }
-        };
-        reader.readAsDataURL(file);
-
+        if (file.type !== 'application/pdf') { alert('Chỉ chấp nhận file PDF!'); return; }
+        const blobUrl = URL.createObjectURL(file);
+        pdfData[slotId] = { name: file.name, url: blobUrl, local: true };
+        renderPDF();
         try {
             const formData = new FormData();
             formData.append('file', file);
-            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}/${num}/image`, {
-                method: 'POST',
-                body: formData
-            });
+            formData.append('slotId', slotId);
+            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf/${slotId}`, { method: 'POST', body: formData });
             if (res.ok) {
                 const data = await res.json();
-                savedImgs[num] = data.imageUrl;
-                localStorage.setItem('cns_bai1_imgs', JSON.stringify(savedImgs));
-                render();
-                const card = document.getElementById('step-' + num);
-                if (card) card.classList.add('open');
-            } else {
-                throw new Error("Upload failed");
+                pdfData[slotId] = { name: file.name, url: data.fileUrl };
+                localStorage.setItem('cns_pdf_data', JSON.stringify(pdfData));
+                renderPDF();
             }
         } catch (e) {
-            alert("Không thể tải ảnh lên server!");
-            console.error(e);
+            localStorage.setItem('cns_pdf_data', JSON.stringify(pdfData));
+            console.warn('Upload PDF loi, giu local:', e);
         }
     }
 
-    async function removeImg(num) {
-        if (!confirm("Bạn muốn xóa ảnh minh chứng này?")) return;
-        delete savedImgs[num];
-        render();
-        const card = document.getElementById('step-' + num);
-        if (card) card.classList.add('open');
-
-        try {
-            await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}/${num}/image`, {
-                method: 'DELETE'
-            });
-            localStorage.setItem('cns_bai1_imgs', JSON.stringify(savedImgs));
-        } catch (e) {
-            console.error(e);
-        }
+    function removePDF(slotId) {
+        if (!confirm('Xóa file PDF này?')) return;
+        delete pdfData[slotId];
+        localStorage.setItem('cns_pdf_data', JSON.stringify(pdfData));
+        renderPDF();
+        fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf/${slotId}`, { method: 'DELETE' }).catch(() => {});
     }
 
-    function zoomImg(src) {
-        const o = document.createElement('div');
-        o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.93);z-index:99999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;backdrop-filter:blur(10px);';
-        o.innerHTML = `<img src="${src}" style="max-width:92vw;max-height:90vh;border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,0.8);">`;
-        o.onclick = () => o.remove();
-        document.body.appendChild(o);
-    }
-
-    /* ── Admin ── */
     function toggleAdmin() {
         if (isAdmin) {
-            if (confirm('Đăng xuất Admin?')) {
-                sessionStorage.removeItem('cns_admin');
-                isAdmin = false; updateFab(); render();
-            }
+            if (confirm('Đăng xuất Admin?')) { sessionStorage.removeItem('cns_admin'); isAdmin = false; updateFab(); renderSteps(); renderPDF(); }
         } else {
-            document.getElementById('admin-modal').style.display = 'flex';
+            document.getElementById('admin-modal').classList.add('open');
             setTimeout(() => document.getElementById('admin-pwd').focus(), 80);
         }
     }
-
-    function closeModal() {
-        document.getElementById('admin-modal').style.display = 'none';
-        document.getElementById('admin-pwd').value = '';
-    }
-
+    function closeModal() { document.getElementById('admin-modal').classList.remove('open'); document.getElementById('admin-pwd').value = ''; }
     function checkPwd() {
-        const pwd = document.getElementById('admin-pwd').value;
-        if (pwd === '1002') {
-            sessionStorage.setItem('cns_admin', 'true');
-            isAdmin = true; closeModal(); updateFab(); render();
-        } else {
-            const inp = document.getElementById('admin-pwd');
-            inp.style.borderColor = '#ef4444';
-            setTimeout(() => inp.style.borderColor = '', 800);
-            inp.value = '';
-        }
+        const p = document.getElementById('admin-pwd').value;
+        if (p === '1002') { sessionStorage.setItem('cns_admin', 'true'); isAdmin = true; closeModal(); updateFab(); renderSteps(); renderPDF(); }
+        else { const i = document.getElementById('admin-pwd'); i.style.borderColor = 'var(--red)'; setTimeout(() => i.style.borderColor = '', 800); i.value = ''; }
     }
-
     function updateFab() {
-        const fab = document.getElementById('admin-fab');
-        if (isAdmin) {
-            fab.innerHTML = '<i class="fa-solid fa-unlock"></i> Admin';
-            fab.className = 'admin-fab logged';
-        } else {
-            fab.innerHTML = '<i class="fa-solid fa-lock"></i> Admin';
-            fab.className = 'admin-fab';
-        }
+        const f = document.getElementById('admin-fab');
+        if (isAdmin) { f.innerHTML = '<i class="fa-solid fa-unlock lock-glow"></i> Admin'; f.className = 'sys-lock-btn active'; }
+        else { f.innerHTML = '<i class="fa-solid fa-lock lock-glow"></i> Admin'; f.className = 'sys-lock-btn'; }
     }
 
-    // Init
-    updateFab();
-    loadProgress();
-    setTimeout(() => {
-        const first = document.getElementById('step-1');
-        if (first) first.classList.add('open');
-    }, 100);
+    async function loadPDFFromServer() {
+        try {
+            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf`, { signal: AbortSignal.timeout(8000) });
+            if (res.ok) {
+                const data = await res.json();
+                if (data && typeof data === 'object') {
+                    Object.assign(pdfData, data);
+                    localStorage.setItem('cns_pdf_data', JSON.stringify(pdfData));
+                    renderPDF();
+                }
+            }
+        } catch (e) { console.warn('Không load được PDF từ server:', e.message); }
+    }
+
+    renderSteps(); renderSideNav(); updateRing(); updateFab(); renderPDF();
+    loadPDFFromServer();
+    document.addEventListener('keypress', e => {
+        if (e.key === 'Enter' && document.getElementById('admin-modal').classList.contains('open')) checkPwd();
+    });
     </script>
-    <script src="../assets/js/cns-enhanced.js"></script>
+
+    <script src="../assets/js/config.js"></script>
     <script src="../assets/js/common.js"></script>
+    <script src="../assets/js/main.js"></script>
 </body>
 </html>
