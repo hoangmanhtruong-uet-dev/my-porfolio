@@ -836,24 +836,66 @@
     let savedImgs  = {};
     let isAdmin    = sessionStorage.getItem('cns_admin') === 'true';
 
+    async function fetchImgsWithRetry(maxRetries = 5, delayMs = 3000) {
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}`, {
+                    signal: AbortSignal.timeout(8000)
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    savedImgs = {};
+                    data.forEach(x => {
+                        if (x.imageUrl) savedImgs[x.stepNum] = x.imageUrl;
+                    });
+                    hideImgLoading();
+                    render();
+                    return; // thanh cong
+                }
+            } catch (e) {
+                console.warn(`Lần thử ${attempt}/${maxRetries} thất bại:`, e.message);
+            }
+            if (attempt < maxRetries) {
+                showImgLoading(attempt, maxRetries);
+                await new Promise(r => setTimeout(r, delayMs));
+            }
+        }
+        // Het retry — van render voi savedImgs rong
+        hideImgLoading();
+        render();
+    }
+
+    function showImgLoading(attempt, max) {
+        let el = document.getElementById('img-loading-banner');
+        if (!el) {
+            el = document.createElement('div');
+            el.id = 'img-loading-banner';
+            el.style.cssText = `
+                position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+                background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.4);
+                backdrop-filter: blur(12px); border-radius: 50px;
+                padding: 10px 22px; color: rgba(255,255,255,0.85);
+                font-size: 0.82rem; z-index: 9999;
+                display: flex; align-items: center; gap: 10px;
+            `;
+            document.body.appendChild(el);
+        }
+        el.innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="color:#a855f7"></i>
+            Server đang khởi động, đang tải ảnh... (${attempt}/${max})`;
+    }
+
+    function hideImgLoading() {
+        const el = document.getElementById('img-loading-banner');
+        if (el) el.remove();
+    }
+
     async function loadProgress() {
         // Tiến độ (done) luôn lấy từ localStorage — mỗi người riêng
         doneSteps = new Set(JSON.parse(localStorage.getItem('cns_bai1_done') || '[]'));
+        render(); // Render ngay voi tien do, anh se cap nhat sau
 
-        // Ảnh minh chứng lấy từ DB — dùng chung cho tất cả
-        try {
-            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}`);
-            if (res.ok) {
-                const data = await res.json();
-                savedImgs = {};
-                data.forEach(x => {
-                    if (x.imageUrl) savedImgs[x.stepNum] = x.imageUrl;
-                });
-            }
-        } catch (e) {
-            console.error("Không thể tải ảnh từ server:", e);
-        }
-        render();
+        // Ảnh minh chứng lấy từ DB — retry khi server dang wake up
+        fetchImgsWithRetry();
     }
 
     /* ── Render ── */

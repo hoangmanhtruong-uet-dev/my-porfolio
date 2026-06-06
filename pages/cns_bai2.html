@@ -617,23 +617,37 @@
     let savedImgs = {};
     let isAdmin = sessionStorage.getItem('cns_admin') === 'true';
 
-    async function loadProgress() {
-        try {
-            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}`);
-            if (res.ok) {
-                const data = await res.json();
-                readSecs = new Set(data.filter(x => x.done).map(x => x.stepNum));
-                savedImgs = {};
-                data.forEach(x => {
-                    if (x.imageUrl) savedImgs[x.stepNum] = x.imageUrl;
+    async function fetchImgsWithRetry(maxRetries = 5, delayMs = 3000) {
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}`, {
+                    signal: AbortSignal.timeout(8000)
                 });
-            }
-        } catch (e) {
-            console.error("Failed to load progress from server, falling back to LocalStorage:", e);
-            readSecs = new Set(JSON.parse(localStorage.getItem('cns_bai2_read') || '[]'));
-            savedImgs = JSON.parse(localStorage.getItem('cns_bai2_imgs') || '{}');
+                if (res.ok) {
+                    const data = await res.json();
+                    readSecs = new Set(data.filter(x => x.done).map(x => x.stepNum));
+                    savedImgs = {};
+                    data.forEach(x => { if (x.imageUrl) savedImgs[x.stepNum] = x.imageUrl; });
+                    hideImgLoading(); render(); return;
+                }
+            } catch (e) { console.warn(`Lần thử ${attempt}/${maxRetries}:`, e.message); }
+            if (attempt < maxRetries) { showImgLoading(attempt, maxRetries); await new Promise(r => setTimeout(r, delayMs)); }
         }
+        hideImgLoading(); render();
+    }
+    function showImgLoading(attempt, max) {
+        let el = document.getElementById('img-loading-banner');
+        if (!el) { el = document.createElement('div'); el.id = 'img-loading-banner';
+            el.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.4);backdrop-filter:blur(12px);border-radius:50px;padding:10px 22px;color:rgba(255,255,255,0.85);font-size:0.82rem;z-index:9999;display:flex;align-items:center;gap:10px;';
+            document.body.appendChild(el); }
+        el.innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="color:#a855f7"></i> Server đang khởi động, đang tải ảnh... (${attempt}/${max})`;
+    }
+    function hideImgLoading() { const el = document.getElementById('img-loading-banner'); if (el) el.remove(); }
+
+    async function loadProgress() {
+        readSecs = new Set(JSON.parse(localStorage.getItem('cns_bai2_read') || '[]'));
         render();
+        fetchImgsWithRetry();
     }
 
     function render(){
