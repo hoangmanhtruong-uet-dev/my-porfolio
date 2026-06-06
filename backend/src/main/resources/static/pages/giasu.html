@@ -53,9 +53,9 @@
             </button>
             <div class="tutor-hero-container">
                 <div class="tutor-hero-image">
-                    <label for="tutor-img-upload" class="tutor-img-wrapper" title="Nhấp để thay đổi ảnh chân dung" style="cursor: pointer;">
+                    <label id="tutor-img-label" class="tutor-img-wrapper" title="" style="cursor: default;">
                         <img src="../assets/images/profile.jpg" alt="Gia sư Trường" class="tutor-img" id="main-tutor-img" onerror="this.src='https://ui-avatars.com/api/?name=Truong&background=f15a24&color=fff&size=512'">
-                        <div class="img-edit-overlay">
+                        <div class="img-edit-overlay" id="img-edit-overlay" style="display: none;">
                             <i class="fa-solid fa-camera"></i>
                             <span>Chọn ảnh đại diện</span>
                         </div>
@@ -1217,6 +1217,16 @@
                         lockIcon.parentElement.style.color = 'var(--primary-color)';
                     }
                     
+                    // Bật khả năng click đổi ảnh đại diện
+                    const imgLabel = document.getElementById('tutor-img-label');
+                    if (imgLabel) {
+                        imgLabel.setAttribute('for', 'tutor-img-upload');
+                        imgLabel.style.cursor = 'pointer';
+                        imgLabel.title = 'Nhấp để thay đổi ảnh chân dung';
+                    }
+                    const imgOverlay = document.getElementById('img-edit-overlay');
+                    if (imgOverlay) imgOverlay.style.display = '';
+
                     const btnChoose = document.getElementById('btn-choose-img');
                     const btnUpload = document.getElementById('btn-upload-cert');
                     if (btnChoose) btnChoose.style.display = 'inline-flex';
@@ -1236,6 +1246,17 @@
                         lockIcon.classList.add('fa-lock');
                         lockIcon.parentElement.style.color = 'rgba(255, 255, 255, 0.3)';
                     }
+
+                    // Tắt khả năng click đổi ảnh đại diện
+                    const imgLabel = document.getElementById('tutor-img-label');
+                    if (imgLabel) {
+                        imgLabel.removeAttribute('for');
+                        imgLabel.style.cursor = 'default';
+                        imgLabel.title = '';
+                    }
+                    const imgOverlay = document.getElementById('img-edit-overlay');
+                    if (imgOverlay) imgOverlay.style.display = 'none';
+
                     if (document.getElementById('btn-choose-img')) document.getElementById('btn-choose-img').style.display = 'none';
                     if (document.getElementById('btn-remove-img')) document.getElementById('btn-remove-img').style.display = 'none';
                     if (document.getElementById('btn-upload-cert')) document.getElementById('btn-upload-cert').style.display = 'none';

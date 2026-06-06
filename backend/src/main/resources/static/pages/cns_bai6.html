@@ -9,7 +9,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/common.css">
+    <link rel="stylesheet" href="../assets/css/cns-enhanced.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="stylesheet" href="../assets/css/cns-patch.css">
+            <!-- Removed cns-polish.css to keep Sci‑Fi theme consistent -->
     <style>
         :root{--blue:#3b82f6;--cyan:#06b6d4;--green:#22c55e;--orange:#f97316;--red:#ef4444;--purple:#a855f7;--yellow:#facc15;--accent:#10b981;}
         body{background:#050810;overflow-x:hidden;}
@@ -182,6 +185,10 @@
             <div class="hero-badge"><i class="fa-solid fa-shield-halved"></i> Báo cáo · Đạo đức AI</div>
             <h1 class="hero-title">Xây Dựng Năng Lực Sử Dụng<br><span>AI Có Trách Nhiệm Trong Học Thuật</span></h1>
             <p class="hero-desc">Báo cáo phân tích chính sách AI của VNU, thực hành nhiệm vụ học tập với sự hỗ trợ của AI, phân tích các vấn đề đạo đức và xây dựng bộ nguyên tắc cá nhân về sử dụng AI có trách nhiệm.</p>
+            <div class="mission-compact" style="max-width:900px;margin:12px auto 6px;padding:12px 14px;border:1px solid rgba(255,255,255,0.04);border-radius:12px;background:rgba(255,255,255,0.01);">
+                <div style="font-weight:700;margin-bottom:8px;color:rgba(255,255,255,0.85)">Quy trình thực hiện (các bước)</div>
+                <div id="mission-steps-list-b6"></div>
+            </div>
             <div class="score-banner">
                 <div class="score-big">5</div>
                 <div class="score-info">
@@ -195,6 +202,24 @@
                 <button onclick="resetAll()" style="font-size:0.72rem;padding:5px 12px;border-radius:50px;border:1px solid rgba(255,255,255,0.1);background:none;color:rgba(255,255,255,0.3);cursor:pointer;font-family:'Outfit',sans-serif;"><i class="fa-solid fa-rotate-left"></i> Reset</button>
             </div>
             <div id="sections-list"></div>
+
+            <!-- VI: PDF -->
+            <div>
+                <div class="sec-header">
+                    <span class="sec-index">06</span>
+                    <span class="sec-title"><i class="fa-solid fa-file-pdf" style="color:var(--amber);"></i> File Bài Tập (PDF)</span>
+                    <span class="sec-line"></span>
+                </div>
+                <div class="sci-panel" style="padding:22px 24px;">
+                    <div class="sweep"></div>
+                    <div style="font-size:0.82rem;font-weight:700;color:var(--white);margin-bottom:4px;display:flex;align-items:center;gap:8px;">
+                        <i class="fa-solid fa-folder-open" style="color:var(--amber);"></i> Tất Cả Bài Nộp — Môn Công Nghệ Số
+                    </div>
+                    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:16px;">Admin upload file PDF của từng bài. Giáo viên click vào bài tương ứng để xem hoặc tải về.</div>
+                    <div class="pdf-modules" id="pdf-grid"></div>
+                </div>
+            </div>
+
             <a href="cns.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Quay lại danh sách bài tập</a>
             <div class="nav-btns">
                 <a href="cns_bai5.html" class="nav-btn-prev"><i class="fa-solid fa-chevron-left"></i> Bài 5: Sáng tạo nội dung AI</a>
@@ -342,6 +367,77 @@
     function closeModal(){document.getElementById('admin-modal').style.display='none';document.getElementById('admin-pwd').value='';}
     renderSections();
     </script>
+    <script src="../assets/js/cns-enhanced.js"></script>
     <script src="../assets/js/common.js"></script>
+    <script src="../assets/js/cns-upload.js"></script>
+    <script>
+    // Mission steps (interactive checklist) for Bài 6
+    const MISSION_STEPS_B6 = [
+        'Xem video 1 — Mục tiêu học tập & nội dung chính',
+        'Xem video 2 — An toàn thông tin',
+        'Xem video 3 — An toàn sức khỏe & trách nhiệm',
+        'Xem video 4 — Liêm chính học thuật',
+        'Soạn phản ánh & trích dẫn minh bạch'
+    ];
+    let doneMissionB6 = new Set(JSON.parse(localStorage.getItem('cns_bai6_done')||'[]'));
+    function renderMissionB6(){
+        const el=document.getElementById('mission-steps-list-b6'); if(!el) return;
+        el.innerHTML = MISSION_STEPS_B6.map((t,i)=>{
+            const id=i+1, done=doneMissionB6.has(id);
+            return `<div style="display:flex;align-items:center;gap:12px;padding:8px 6px;border-radius:8px;margin-bottom:6px;background:${done? 'rgba(16,185,129,0.06)':'transparent'}">
+                <button onclick="toggleMissionB6(${id})" style="width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,0.06);background:${done?'linear-gradient(135deg,#10b981,#06b6d4)':'transparent'};color:${done?'#fff':'rgba(255,255,255,0.6)'};display:inline-flex;align-items:center;justify-content:center;cursor:pointer">${done?'<i class="fa-solid fa-check"></i>':id}</button>
+                <div style="flex:1;color:rgba(255,255,255,0.8);">${t}</div>
+            </div>`;
+        }).join('');
+    }
+    function toggleMissionB6(id){ if(doneMissionB6.has(id)) doneMissionB6.delete(id); else doneMissionB6.add(id); localStorage.setItem('cns_bai6_done', JSON.stringify([...doneMissionB6])); renderMissionB6(); }
+    renderMissionB6();
+    </script>
+    <script>
+    const PDF_SLOTS = [
+        { id:'bai1', label:'Bài 1', sub:'Máy Tính & Ngoại Vi', icon:'fa-microchip' },
+        { id:'bai2', label:'Bài 2', sub:'Khai Thác Dữ Liệu', icon:'fa-magnifying-glass' },
+        { id:'bai3', label:'Bài 3', sub:'Tổng Quan AI', icon:'fa-robot' },
+        { id:'bai4', label:'Bài 4', sub:'Giao Tiếp & Hợp Tác', icon:'fa-users' },
+        { id:'bai5', label:'Bài 5', sub:'Sáng Tạo Nội Dung Số', icon:'fa-wand-magic-sparkles' },
+        { id:'bai6', label:'Bài 6', sub:'An Toàn & Liêm Chính', icon:'fa-shield-halved' },
+    ];
+
+    let pdfData = JSON.parse(localStorage.getItem('cns_pdf_data') || '{}');
+
+    function renderPDF() {
+        const el = document.getElementById('pdf-grid'); if (!el) return;
+        el.innerHTML = PDF_SLOTS.map(slot => {
+            const saved = pdfData[slot.id];
+            if (saved) return `<div class="pdf-mod has-file" id="slot-${slot.id}">
+                <span class="pdf-mod-icon"><i class="fa-solid fa-file-pdf"></i></span>
+                <div class="pdf-mod-label">${slot.label}</div>
+                <div class="pdf-mod-sub">${slot.sub}</div>
+                <a href="${saved.url||saved.fileUrl}" target="_blank" class="pdf-mod-btn"><i class="fa-solid fa-eye"></i> Xem</a>
+                ${isAdmin?`<button class="pdf-mod-del" onclick="removePDF('${slot.id}')"><i class="fa-solid fa-trash"></i> Xóa</button>`:''}
+            </div>`;
+            return `<div class="pdf-mod" id="slot-${slot.id}">
+                <span class="pdf-mod-icon"><i class="fa-solid fa-${slot.icon}"></i></span>
+                <div class="pdf-mod-label">${slot.label}</div>
+                <div class="pdf-mod-sub">${isAdmin?'Upload PDF':slot.sub}</div>
+                ${isAdmin?`<input type="file" accept="application/pdf" onchange="handlePDF(event,'${slot.id}')">` :''}
+            </div>`;
+        }).join('');
+    }
+
+    async function handlePDF(event, slotId) {
+        const file = event.target.files[0]; if (!file || file.type!=='application/pdf') { alert('Chỉ chấp nhận file PDF!'); return; }
+        pdfData[slotId] = { name:file.name, url:URL.createObjectURL(file) }; renderPDF();
+        try { const fd=new FormData(); fd.append('file',file); fd.append('slotId',slotId); const res=await fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf/${slotId}`,{method:'POST',body:fd}); if(res.ok){const d=await res.json(); pdfData[slotId]={name:file.name,fileUrl:d.fileUrl};} } catch(e){console.warn('Upload PDF loi:',e); }
+        localStorage.setItem('cns_pdf_data',JSON.stringify(pdfData)); renderPDF();
+    }
+
+    function removePDF(slotId) { if(!confirm('Xóa file PDF này?')) return; delete pdfData[slotId]; localStorage.setItem('cns_pdf_data',JSON.stringify(pdfData)); renderPDF(); fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf/${slotId}`,{method:'DELETE'}).catch(()=>{}); }
+
+    async function loadPDFFromServer(){ try{ const res=await fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf`,{signal:AbortSignal.timeout(8000)}); if(res.ok){const data=await res.json(); if(data&&typeof data==='object'){Object.assign(pdfData,data); localStorage.setItem('cns_pdf_data',JSON.stringify(pdfData)); renderPDF();}} }catch(e){console.warn('Không load PDF:',e.message);} }
+
+    // initial
+    renderPDF(); loadPDFFromServer();
+    </script>
 </body>
 </html>

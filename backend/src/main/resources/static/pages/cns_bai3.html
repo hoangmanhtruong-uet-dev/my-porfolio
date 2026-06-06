@@ -3,184 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bài 3 — Kỹ Năng Viết Prompt Hiệu Quả | CNS</title>
+    <title>Bài 3 — Tổng Quan Về Trí Tuệ Nhân Tạo | CNS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/common.css">
+    <link rel="stylesheet" href="../assets/css/cns-scifi.css">
+    <link rel="stylesheet" href="../assets/css/cns-patch.css">
+    <!-- Removed cns-polish.css to keep Sci‑Fi theme consistent -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root{ --blue:#3b82f6;--cyan:#06b6d4;--green:#22c55e;--orange:#f97316;--red:#ef4444;--purple:#a855f7;--yellow:#facc15;--teal:#14b8a6; }
-        body{ background:#050810; overflow-x:hidden; }
+        /* AI Def box */
+        .ai-def-box { background: rgba(0,255,136,0.03); border: 1px solid rgba(0,255,136,0.18); padding: 22px 26px; display: flex; gap: 20px; align-items: flex-start; margin-bottom: 16px; }
+        .ai-def-icon { width: 52px; height: 52px; border: 1px solid rgba(0,255,136,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--green); flex-shrink: 0; }
+        .ai-def-title { font-size: 0.9rem; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+        .ai-def-text { font-size: 0.85rem; color: var(--muted); line-height: 1.7; }
+        .ai-def-text strong { color: var(--white); }
 
-        .layout{ display:grid; grid-template-columns:260px 1fr; gap:32px; max-width:1140px; margin:0 auto; padding:120px 24px 100px; align-items:start; }
+        /* AI Types */
+        .ai-types-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 16px; }
+        .ai-type-card { background: rgba(0,14,28,0.8); border: 1px solid var(--border); padding: 16px; transition: all 0.3s; }
+        .ai-type-card:hover { border-color: var(--border-hi); }
+        .atc-icon { width: 38px; height: 38px; border: 1px solid rgba(0,210,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 1rem; margin-bottom: 10px; }
+        .atc-label { font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; font-family: 'JetBrains Mono', monospace; }
+        .atc-title { font-size: 0.85rem; font-weight: 700; color: var(--white); margin-bottom: 5px; }
+        .atc-desc { font-size: 0.75rem; color: var(--muted); line-height: 1.55; }
+        .atc-example { margin-top: 8px; font-size: 0.7rem; padding: 4px 10px; font-family: 'JetBrains Mono', monospace; }
 
-        /* Sidebar */
-        .sidebar{ position:sticky; top:100px; }
-        .sidebar-card{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:20px; padding:20px; margin-bottom:16px; }
-        .sidebar-title{ font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:rgba(255,255,255,0.3); margin-bottom:14px; }
-        .ring-svg{ transform:rotate(-90deg); }
-        .ring-bg  { fill:none; stroke:rgba(255,255,255,0.06); stroke-width:8; }
-        .ring-fill{ fill:none; stroke:url(#rg3); stroke-width:8; stroke-linecap:round; transition:stroke-dashoffset 0.6s cubic-bezier(0.23,1,0.32,1); }
-        .progress-ring-wrap{ display:flex; flex-direction:column; align-items:center; padding:8px 0 4px; }
-        .ring-label{ font-size:1.8rem; font-weight:800; color:#f8fafc; margin-top:-4px; }
-        .ring-sub  { font-size:0.72rem; color:rgba(255,255,255,0.35); margin-top:2px; }
-        .sec-nav-item{ display:flex; align-items:center; gap:10px; padding:7px 10px; border-radius:10px; cursor:pointer; transition:background 0.2s; font-size:0.82rem; color:rgba(255,255,255,0.45); text-decoration:none; }
-        .sec-nav-item:hover{ background:rgba(255,255,255,0.05); color:#fff; }
-        .sec-nav-item.done{ color:var(--teal); }
-        .snav-dot{ width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.15); flex-shrink:0; }
-        .sec-nav-item.done .snav-dot{ background:var(--teal); }
-        .meta-row{ display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:0.82rem; color:rgba(255,255,255,0.45); }
-        .meta-row:last-child{ border-bottom:none; }
-        .meta-row i{ width:16px; text-align:center; }
+        /* Timeline */
+        .timeline-wrap { display: flex; flex-direction: column; gap: 0; margin-bottom: 16px; position: relative; padding-left: 28px; }
+        .timeline-wrap::before { content:''; position:absolute; left:9px; top:8px; bottom:8px; width:1px; background:linear-gradient(180deg,var(--green),rgba(0,255,136,0.05)); }
+        .tl-item { display:flex; gap:16px; padding-bottom:16px; position:relative; }
+        .tl-dot { width:18px; height:18px; border-radius:0; border:1px solid var(--green); background:var(--bg); flex-shrink:0; margin-top:2px; z-index:1; position:absolute; left:-28px; clip-path:polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%); }
+        .tl-dot.active { background:rgba(0,255,136,0.2); box-shadow:var(--glow-g); }
+        .tl-year { font-size:0.7rem; font-weight:700; color:var(--green); white-space:nowrap; min-width:38px; margin-top:2px; font-family:'JetBrains Mono',monospace; }
+        .tl-content { flex:1; background:rgba(0,14,28,0.6); border:1px solid rgba(0,255,136,0.08); padding:10px 14px; transition:border-color 0.3s; }
+        .tl-content:hover { border-color:rgba(0,255,136,0.22); }
+        .tl-title { font-size:0.84rem; font-weight:700; color:var(--white); margin-bottom:3px; }
+        .tl-desc { font-size:0.75rem; color:var(--muted); line-height:1.55; }
 
-        /* Breadcrumb */
-        .breadcrumb{ display:flex; align-items:center; gap:7px; font-size:0.78rem; color:rgba(255,255,255,0.3); margin-bottom:28px; }
-        .breadcrumb a{ color:rgba(255,255,255,0.3); text-decoration:none; transition:color 0.2s; }
-        .breadcrumb a:hover{ color:var(--teal); }
+        /* App grid */
+        .app-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:16px; }
+        .app-card { background:rgba(0,14,28,0.8); border:1px solid var(--border); padding:16px 18px; display:flex; gap:14px; align-items:flex-start; transition:border-color 0.3s; }
+        .app-card:hover { border-color:rgba(0,255,136,0.25); }
+        .app-icon { width:36px; height:36px; border:1px solid rgba(0,210,255,0.15); display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex-shrink:0; }
+        .app-title { font-size:0.85rem; font-weight:700; color:var(--white); margin-bottom:4px; }
+        .app-desc { font-size:0.75rem; color:var(--muted); line-height:1.55; }
+        .app-tools { display:flex; flex-wrap:wrap; gap:4px; margin-top:7px; }
+        .tool-tag { font-size:0.62rem; padding:2px 7px; font-family:'JetBrains Mono',monospace; font-weight:600; }
 
-        /* Hero */
-        .hero-badge{ display:inline-flex; align-items:center; gap:6px; padding:4px 14px; border-radius:50px; background:rgba(20,184,166,0.1); border:1px solid rgba(20,184,166,0.22); color:#5eead4; font-size:0.75rem; font-weight:700; letter-spacing:0.5px; margin-bottom:14px; }
-        .hero-title{ font-size:2rem; font-weight:800; color:#f8fafc; line-height:1.25; margin-bottom:12px; }
-        .hero-title span{ background:linear-gradient(135deg,var(--teal),var(--blue)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-        .hero-desc{ color:rgba(255,255,255,0.48); font-size:0.95rem; line-height:1.7; max-width:640px; margin-bottom:28px; }
+        /* Prompt model */
+        .prompt-model-wrap { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px; }
+        .prompt-level { overflow:hidden; }
+        .pl-header { padding:10px 14px; display:flex; align-items:center; gap:10px; background:rgba(0,14,28,0.6); border:1px solid var(--border); }
+        .pl-badge { padding:2px 8px; font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; font-family:'JetBrains Mono',monospace; }
+        .pl-label { font-size:0.78rem; font-weight:600; color:var(--muted); }
+        .pl-result { margin-left:auto; font-size:0.65rem; padding:2px 8px; font-family:'JetBrains Mono',monospace; }
+        .pl-body { padding:12px 14px; background:rgba(0,10,20,0.6); border:1px solid var(--border); border-top:none; }
+        .pl-body code { display:block; font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--muted); line-height:1.7; white-space:pre-wrap; }
+        .pl-body .kw { color:var(--green); }
+        .pl-body .role { color:var(--cyan); }
+        .pl-body .fmt { color:#c4b5fd; }
 
-        /* Score banner */
-        .score-banner{ display:flex; align-items:center; gap:16px; padding:16px 22px; background:linear-gradient(135deg,rgba(20,184,166,0.08),rgba(59,130,246,0.04)); border:1px solid rgba(20,184,166,0.2); border-radius:16px; margin-bottom:36px; }
-        .score-big{ font-size:2.2rem; font-weight:800; color:var(--teal); line-height:1; }
-        .score-info .s-label{ font-size:0.72rem; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:1px; }
-        .score-info .s-val  { font-size:0.9rem; color:rgba(255,255,255,0.7); margin-top:2px; }
+        /* CRISP model */
+        .crisp-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-bottom:14px; }
+        .crisp-cell { text-align:center; padding:10px 6px; border:1px solid var(--border); background:rgba(0,14,28,0.6); }
+        .crisp-letter { font-size:1.2rem; font-weight:800; color:var(--green); font-family:'JetBrains Mono',monospace; }
+        .crisp-sub { font-size:0.6rem; color:var(--muted); margin-top:3px; line-height:1.4; }
 
-        /* Section header */
-        .section-hdr{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
-        .section-hdr h2{ font-size:1.05rem; font-weight:700; color:#f8fafc; display:flex; align-items:center; gap:8px; }
-        .section-hdr h2 i{ color:var(--teal); }
-
-        /* Accordion */
-        .sec-card{ background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.07); border-radius:20px; margin-bottom:14px; overflow:hidden; transition:border-color 0.3s, box-shadow 0.3s; scroll-margin-top:110px; }
-        .sec-card:hover{ border-color:rgba(20,184,166,0.25); box-shadow:0 4px 24px rgba(20,184,166,0.07); }
-        .sec-card.read{ border-color:rgba(20,184,166,0.22); background:rgba(20,184,166,0.03); }
-        .sec-head{ display:flex; align-items:center; gap:14px; padding:18px 22px; cursor:pointer; user-select:none; }
-        .sec-num-badge{ width:34px; height:34px; border-radius:10px; background:rgba(20,184,166,0.14); color:#5eead4; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.85rem; flex-shrink:0; transition:background 0.3s; }
-        .sec-card.read .sec-num-badge{ background:rgba(20,184,166,0.25); color:#2dd4bf; }
-        .sec-head-text{ flex:1; }
-        .sec-head-title{ font-size:0.92rem; font-weight:700; color:#f8fafc; }
-        .sec-head-sub  { font-size:0.72rem; color:rgba(255,255,255,0.28); margin-top:2px; }
-        .sec-read-btn{ width:28px; height:28px; border-radius:50%; border:2px solid rgba(255,255,255,0.12); background:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color:transparent; transition:all 0.25s; flex-shrink:0; }
-        .sec-read-btn:hover{ border-color:var(--teal); color:var(--teal); }
-        .sec-card.read .sec-read-btn{ background:var(--teal); border-color:var(--teal); color:#fff; }
-        .expand-icon{ color:rgba(255,255,255,0.2); font-size:0.75rem; transition:transform 0.3s, color 0.2s; flex-shrink:0; }
-        .sec-card.open .expand-icon{ transform:rotate(180deg); color:var(--teal); }
-        .sec-body{ max-height:0; overflow:hidden; transition:max-height 0.45s cubic-bezier(0.23,1,0.32,1); }
-        .sec-card.open .sec-body{ max-height:4000px; }
-        .sec-body-inner{ padding:0 22px 22px; border-top:1px solid rgba(255,255,255,0.05); padding-top:18px; }
-
-        /* Prose */
-        .prose{ font-size:0.88rem; color:rgba(255,255,255,0.55); line-height:1.75; margin-bottom:14px; }
-        .prose strong{ color:rgba(255,255,255,0.85); }
-
-        /* Task card */
-        .task-card{ background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.07); border-radius:16px; padding:18px 20px; margin-bottom:16px; }
-        .task-header{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
-        .task-icon{ width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
-        .task-icon.t1{ background:rgba(20,184,166,0.15); color:var(--teal); }
-        .task-icon.t2{ background:rgba(59,130,246,0.15); color:var(--blue); }
-        .task-icon.t3{ background:rgba(168,85,247,0.15); color:var(--purple); }
-        .task-title{ font-size:0.95rem; font-weight:700; color:#f8fafc; }
-        .task-sub  { font-size:0.72rem; color:rgba(255,255,255,0.3); margin-top:2px; }
-
-        .task-meta-grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:14px; }
-        .task-meta-item{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:10px 12px; }
-        .task-meta-item .tm-label{ font-size:0.68rem; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
-        .task-meta-item .tm-val  { font-size:0.82rem; color:rgba(255,255,255,0.65); line-height:1.5; }
-
-        /* Prompt level cards */
-        .prompt-levels{ display:flex; flex-direction:column; gap:10px; }
-        .prompt-level{ border-radius:14px; overflow:hidden; }
-        .pl-header{ display:flex; align-items:center; gap:10px; padding:10px 16px; }
-        .pl-badge{ padding:3px 10px; border-radius:50px; font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
-        .pl-badge.basic   { background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.4); }
-        .pl-badge.improved{ background:rgba(59,130,246,0.15); color:#60a5fa; }
-        .pl-badge.advanced{ background:rgba(20,184,166,0.15); color:#2dd4bf; }
-        .pl-label{ font-size:0.8rem; font-weight:600; color:rgba(255,255,255,0.6); }
-        .pl-result-badge{ margin-left:auto; font-size:0.7rem; padding:2px 8px; border-radius:50px; }
-        .pl-result-badge.weak  { background:rgba(239,68,68,0.1);  color:#f87171; }
-        .pl-result-badge.ok    { background:rgba(249,115,22,0.1); color:#fb923c; }
-        .pl-result-badge.great { background:rgba(34,197,94,0.1);  color:#4ade80; }
-
-        .pl-body.basic   { background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:0 0 14px 14px; }
-        .pl-body.improved{ background:rgba(59,130,246,0.04);  border:1px solid rgba(59,130,246,0.12); border-radius:0 0 14px 14px; }
-        .pl-body.advanced{ background:rgba(20,184,166,0.04);  border:1px solid rgba(20,184,166,0.15); border-radius:0 0 14px 14px; }
-        .pl-header.basic   { background:rgba(255,255,255,0.03); }
-        .pl-header.improved{ background:rgba(59,130,246,0.07); }
-        .pl-header.advanced{ background:rgba(20,184,166,0.08); }
-
-        .prompt-code{ font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:rgba(255,255,255,0.65); line-height:1.7; padding:14px 16px; white-space:pre-wrap; }
-        .prompt-code .role{ color:#5eead4; font-weight:600; }
-        .prompt-code .instruction{ color:#93c5fd; }
-        .prompt-code .format{ color:#c084fc; }
-        .prompt-code .example{ color:rgba(255,255,255,0.35); font-style:italic; }
-
-        /* Comparison table */
-        .cmp-table{ width:100%; border-collapse:collapse; font-size:0.82rem; margin-bottom:14px; }
-        .cmp-table th{ text-align:left; padding:10px 14px; background:rgba(20,184,166,0.1); color:#5eead4; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid rgba(20,184,166,0.2); }
-        .cmp-table td{ padding:10px 14px; color:rgba(255,255,255,0.55); border-bottom:1px solid rgba(255,255,255,0.04); vertical-align:top; }
-        .cmp-table tr:hover td{ background:rgba(255,255,255,0.02); }
-        .cmp-table .c-weak  { color:#f87171; }
-        .cmp-table .c-ok    { color:#fb923c; }
-        .cmp-table .c-great { color:#4ade80; font-weight:600; }
-
-        /* Principle cards */
-        .principle-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
-        .principle-card{ background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:14px; padding:14px 16px; transition:border-color 0.3s, transform 0.3s; }
-        .principle-card:hover{ border-color:rgba(20,184,166,0.3); transform:translateY(-2px); }
-        .principle-card .pc-num{ font-size:1.4rem; font-weight:800; color:rgba(20,184,166,0.3); line-height:1; margin-bottom:6px; }
-        .principle-card .pc-title{ font-size:0.88rem; font-weight:700; color:#f8fafc; margin-bottom:4px; }
-        .principle-card .pc-desc { font-size:0.8rem; color:rgba(255,255,255,0.45); line-height:1.55; }
-        .principle-card .pc-example{ margin-top:8px; padding:6px 10px; background:rgba(20,184,166,0.07); border-radius:8px; font-size:0.75rem; color:#5eead4; font-family:'JetBrains Mono',monospace; }
-
-        /* Bullet list */
-        .bullet-list{ list-style:none; padding:0; margin:0 0 14px; }
-        .bullet-list li{ display:flex; align-items:flex-start; gap:10px; font-size:0.86rem; color:rgba(255,255,255,0.55); line-height:1.6; padding:5px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
-        .bullet-list li:last-child{ border-bottom:none; }
-        .bullet-list li .bi{ color:var(--teal); flex-shrink:0; margin-top:3px; font-size:0.7rem; }
-
-        /* Conclusion */
-        .conclusion-box{ background:linear-gradient(135deg,rgba(20,184,166,0.07),rgba(59,130,246,0.03)); border:1px solid rgba(20,184,166,0.18); border-radius:18px; padding:22px 24px; }
-        .conclusion-box h4{ font-size:0.9rem; font-weight:700; color:#2dd4bf; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
-
-        /* Image slot */
-        .img-wrap{ margin-top:14px; }
-        .img-placeholder{ width:100%; border:2px dashed rgba(20,184,166,0.2); border-radius:12px; padding:20px; text-align:center; cursor:pointer; transition:border-color 0.3s, background 0.3s; background:rgba(20,184,166,0.02); position:relative; box-sizing:border-box; display:block; }
-        .img-placeholder:hover{ border-color:rgba(20,184,166,0.5); background:rgba(20,184,166,0.06); }
-        .img-placeholder input[type="file"]{ position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
-        .img-preview{ width:100%; border-radius:12px; border:1px solid rgba(255,255,255,0.07); display:block; max-height:340px; object-fit:contain; background:rgba(0,0,0,0.25); cursor:zoom-in; }
-        .img-actions{ display:flex; gap:8px; margin-top:8px; }
-        .btn-img-change{ font-size:0.73rem; padding:5px 12px; border-radius:50px; border:1px solid rgba(20,184,166,0.28); background:rgba(20,184,166,0.07); color:#5eead4; cursor:pointer; font-family:'Outfit',sans-serif; transition:all 0.2s; position:relative; overflow:hidden; }
-        .btn-img-change input[type="file"]{ position:absolute; inset:0; opacity:0; cursor:pointer; }
-        .btn-img-change:hover{ background:rgba(20,184,166,0.18); }
-        .btn-img-remove{ font-size:0.73rem; padding:5px 12px; border-radius:50px; border:1px solid rgba(239,68,68,0.25); background:rgba(239,68,68,0.06); color:#f87171; cursor:pointer; font-family:'Outfit',sans-serif; transition:all 0.2s; }
-        .btn-img-remove:hover{ background:rgba(239,68,68,0.16); }
-
-        .back-btn{ display:inline-flex; align-items:center; gap:8px; padding:11px 22px; border-radius:50px; border:1px solid rgba(20,184,166,0.25); background:rgba(20,184,166,0.07); color:#5eead4; text-decoration:none; font-size:0.85rem; font-weight:600; transition:all 0.3s; margin-top:28px; }
-        .back-btn:hover{ background:rgba(20,184,166,0.18); border-color:rgba(20,184,166,0.5); transform:translateX(-3px); }
-
-        .nav-btns{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;}
-        .nav-btn-prev,.nav-btn-next{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:50px;font-size:0.85rem;font-weight:600;text-decoration:none;transition:all 0.3s;}
-        .nav-btn-prev{border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.45);}
-        .nav-btn-prev:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.2);color:#fff;transform:translateX(-3px);}
-        .nav-btn-next{border:1px solid rgba(20,184,166,0.3);background:rgba(20,184,166,0.08);color:#5eead4;margin-left:auto;}
-        .nav-btn-next:hover{background:rgba(20,184,166,0.2);border-color:#14b8a6;color:#fff;transform:translateX(3px);}
-        .admin-fab{ padding:10px 18px; border-radius:50px; border:1px solid rgba(20,184,166,0.25); background:rgba(20,184,166,0.1); color:#5eead4; font-family:'Outfit',sans-serif; font-size:0.82rem; font-weight:700; cursor:pointer; transition:all 0.3s; }
-        .admin-fab.logged{ background:rgba(34,197,94,0.12); border-color:rgba(34,197,94,0.3); color:var(--green); }
-
-        @media(max-width:768px){ .layout{grid-template-columns:1fr;padding-top:100px;} .sidebar{position:static;} .task-meta-grid,.principle-grid{grid-template-columns:1fr;} }
+        @media (max-width:768px) { .ai-types-grid,.app-grid,.prompt-model-wrap { grid-template-columns:1fr; } .crisp-grid { grid-template-columns:repeat(3,1fr); } }
     </style>
 </head>
 <body>
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
 
     <nav class="navbar-unified">
         <a href="../index.html" class="nav-logo"><i class="fa-solid fa-circle-user"></i> Mtruong<span>_dev</span></a>
@@ -204,441 +99,530 @@
         </div>
     </nav>
 
-    <div class="layout">
-        <aside class="sidebar">
-            <div class="sidebar-card">
-                <div class="sidebar-title">Tiến độ đọc</div>
-                <div class="progress-ring-wrap">
-                    <svg class="ring-svg" width="100" height="100" viewBox="0 0 100 100">
-                        <defs>
-                            <linearGradient id="rg3" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" stop-color="#14b8a6"/>
-                                <stop offset="100%" stop-color="#3b82f6"/>
-                            </linearGradient>
-                        </defs>
-                        <circle class="ring-bg" cx="50" cy="50" r="40"/>
-                        <circle class="ring-fill" id="ring-fill" cx="50" cy="50" r="40" stroke-dasharray="251.2" stroke-dashoffset="251.2"/>
-                    </svg>
-                    <div class="ring-label" id="ring-pct">0%</div>
-                    <div class="ring-sub" id="ring-sub">0 / 7 mục</div>
+    <div class="dashboard">
+        <div class="dash-topbar">
+            <span class="topbar-id">SYS::CNS-BAI03</span>
+            <span class="topbar-title">TỔNG QUAN VỀ TRÍ TUỆ NHÂN TẠO</span>
+            <div class="topbar-status">
+                <span class="status-dot"></span>
+                <span>ONLINE</span>
+            </div>
+        </div>
+
+        <aside class="dash-sidebar">
+            <div class="sidebar-block">
+                <div class="sb-label">Tiến Độ</div>
+                <div class="hud-wrap">
+                    <div class="hud-ring-outer">
+                        <svg width="140" height="140" viewBox="0 0 140 140">
+                            <circle class="hud-track" cx="70" cy="70" r="62"/>
+                            <circle class="hud-track2" cx="70" cy="70" r="54"/>
+                            <circle class="hud-fill" id="hud-fill" cx="70" cy="70" r="62"
+                                stroke-dasharray="389.6" stroke-dashoffset="389.6"/>
+                        </svg>
+                        <div class="hud-center">
+                            <div class="hud-pct" id="ring-pct">0%</div>
+                            <div class="hud-pct-label">COMPLETE</div>
+                        </div>
+                    </div>
+                    <div class="hud-stats">
+                        <div class="hud-stat">
+                            <div class="hud-stat-val" id="done-count">0</div>
+                            <div class="hud-stat-key">DONE</div>
+                        </div>
+                        <div class="hud-stat">
+                            <div class="hud-stat-val">6</div>
+                            <div class="hud-stat-key">TOTAL</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="sidebar-card">
-                <div class="sidebar-title">Mục lục</div>
-                <div id="sec-nav"></div>
+
+            <div class="sidebar-block">
+                <div class="sb-label">Mission Steps</div>
+                <div class="mission-list" id="step-nav"></div>
             </div>
-            <div class="sidebar-card">
-                <div class="sidebar-title">Thông tin bài</div>
-                <div class="meta-row"><i class="fa-solid fa-calendar" style="color:var(--teal)"></i> Hạn nộp: 05/04/2026</div>
-                <div class="meta-row"><i class="fa-solid fa-clock" style="color:var(--cyan)"></i> ~45 phút</div>
-                <div class="meta-row"><i class="fa-solid fa-star" style="color:var(--yellow)"></i> Điểm: <strong style="color:var(--teal);margin-left:4px;">— / 10</strong></div>
-                <div class="meta-row"><i class="fa-solid fa-robot" style="color:var(--blue)"></i> Prompt Engineering</div>
-                <div class="meta-row"><i class="fa-solid fa-layer-group" style="color:var(--purple)"></i> 3 tác vụ · 3 cấp độ</div>
+
+            <div class="sidebar-block">
+                <div class="sb-label">Thông Tin Bài</div>
+                <div class="meta-items">
+                    <div class="meta-item"><i class="fa-solid fa-calendar"></i> 23/03 – 05/04/2026</div>
+                    <div class="meta-item"><i class="fa-solid fa-clock"></i> Tuần 5, Tuần 6</div>
+                    <div class="meta-item"><i class="fa-solid fa-star"></i> Điểm: <strong>— / 10</strong></div>
+                    <div class="meta-item"><i class="fa-solid fa-robot"></i> Trí tuệ nhân tạo</div>
+                    <div class="meta-item"><i class="fa-solid fa-file-pdf"></i> Nộp file PDF</div>
+                </div>
             </div>
         </aside>
 
-        <main>
-            <div class="breadcrumb">
+        <main class="dash-main">
+
+            <div class="sci-breadcrumb">
                 <a href="cns.html"><i class="fa-solid fa-layer-group"></i> Portfolio CNS</a>
-                <i class="fa-solid fa-chevron-right" style="font-size:0.55rem"></i>
-                <span>Chương 2</span>
-                <i class="fa-solid fa-chevron-right" style="font-size:0.55rem"></i>
-                <span style="color:rgba(255,255,255,0.55)">Bài 3</span>
+                <span class="sep">/</span>
+                <span>Chương 3</span>
+                <span class="sep">/</span>
+                <span>Bài 3</span>
             </div>
 
-            <div class="hero-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> Chương 2 · Báo cáo</div>
-            <h1 class="hero-title">Phát Triển Kỹ Năng<br><span>Viết Prompt Hiệu Quả</span></h1>
-            <p class="hero-desc">Xây dựng, thử nghiệm và phân tích các loại prompt theo 3 cấp độ (cơ bản → cải tiến → nâng cao) cho 3 tác vụ học tập với AI.</p>
+            <div class="sci-hero">
+                <div class="sci-chapter-badge" style="border-left-color:var(--green);color:var(--green);background:rgba(0,255,136,0.05);border-color:rgba(0,255,136,0.2);"><i class="fa-solid fa-robot"></i> Chương 3 · Tuần 5–6</div>
+                <h1 class="sci-title">Tổng Quan Về<br><span class="accent" style="color:var(--green);text-shadow:var(--glow-g);">Trí Tuệ Nhân Tạo</span></h1>
+                <p class="sci-desc">Tìm hiểu định nghĩa, phân loại và lịch sử phát triển AI. Nắm vững nguyên lý hoạt động, các ứng dụng thực tế và kỹ năng viết Prompt hiệu quả để khai thác tối đa sức mạnh của AI.</p>
+            </div>
 
-            <div class="score-banner">
-                <div class="score-big">3</div>
-                <div class="score-info">
-                    <div class="s-label">Tác vụ thử nghiệm</div>
-                    <div class="s-val">Tóm tắt · Giải thích · Tạo câu hỏi</div>
+            <div class="score-panel" style="border-left-color:var(--green);border-color:rgba(0,255,136,0.18);background:rgba(0,255,136,0.03);">
+                <div class="score-val" style="color:var(--green);text-shadow:var(--glow-g);">—</div>
+                <div>
+                    <div class="score-info-label">Trạng Thái</div>
+                    <div class="score-info-val">Chương 3 · Bài 3 · Tổng Quan Về Trí Tuệ Nhân Tạo</div>
                 </div>
-                <i class="fa-solid fa-wand-magic-sparkles" style="font-size:1.8rem;color:var(--teal);opacity:0.6"></i>
+                <i class="fa-solid fa-robot" style="font-size:1.8rem;color:var(--green);opacity:0.4;margin-left:auto;"></i>
             </div>
 
-            <div class="section-hdr">
-                <h2><i class="fa-solid fa-list"></i> Nội dung báo cáo</h2>
-                <button onclick="resetAll()" style="font-size:0.72rem;padding:5px 12px;border-radius:50px;border:1px solid rgba(255,255,255,0.1);background:none;color:rgba(255,255,255,0.3);cursor:pointer;font-family:'Outfit',sans-serif;">
-                    <i class="fa-solid fa-rotate-left"></i> Reset
-                </button>
+            <!-- I: ĐỊNH NGHĨA AI -->
+            <div>
+                <div class="sec-header">
+                    <span class="sec-index">01</span>
+                    <span class="sec-title"><i class="fa-solid fa-book-open" style="color:var(--green);"></i> Trí Tuệ Nhân Tạo Là Gì?</span>
+                    <span class="sec-line"></span>
+                </div>
+                <div class="ai-def-box">
+                    <div class="ai-def-icon"><i class="fa-solid fa-robot"></i></div>
+                    <div>
+                        <div class="ai-def-title">Định nghĩa</div>
+                        <div class="ai-def-text">
+                            <strong>Trí tuệ nhân tạo (Artificial Intelligence — AI)</strong> là lĩnh vực khoa học máy tính nghiên cứu và phát triển các hệ thống có khả năng thực hiện những nhiệm vụ thường đòi hỏi trí tuệ con người: <strong>học hỏi</strong>, <strong>lập luận</strong>, <strong>giải quyết vấn đề</strong>, <strong>nhận thức ngôn ngữ</strong> và <strong>nhận dạng hình ảnh</strong>.
+                        </div>
+                        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+                            <span style="padding:3px 10px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.2);color:var(--green);font-size:0.7rem;font-family:'JetBrains Mono',monospace;">Machine Learning</span>
+                            <span style="padding:3px 10px;background:rgba(0,210,255,0.08);border:1px solid rgba(0,210,255,0.2);color:var(--cyan);font-size:0.7rem;font-family:'JetBrains Mono',monospace;">Deep Learning</span>
+                            <span style="padding:3px 10px;background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.2);color:#c4b5fd;font-size:0.7rem;font-family:'JetBrains Mono',monospace;">NLP</span>
+                            <span style="padding:3px 10px;background:rgba(255,184,0,0.08);border:1px solid rgba(255,184,0,0.2);color:var(--amber);font-size:0.7rem;font-family:'JetBrains Mono',monospace;">Computer Vision</span>
+                            <span style="padding:3px 10px;background:rgba(255,184,0,0.08);border:1px solid rgba(255,184,0,0.2);color:var(--amber);font-size:0.7rem;font-family:'JetBrains Mono',monospace;">Generative AI</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="ai-types-grid">
+                    <div class="ai-type-card">
+                        <div class="atc-icon" style="background:rgba(0,170,255,0.1);color:#60a5fa;"><i class="fa-solid fa-microchip"></i></div>
+                        <div class="atc-label" style="color:#60a5fa;">Narrow AI (Hẹp)</div>
+                        <div class="atc-title">AI Chuyên Biệt</div>
+                        <div class="atc-desc">Chỉ thực hiện được một nhiệm vụ cụ thể. Đây là dạng AI phổ biến nhất hiện nay.</div>
+                        <div class="atc-example" style="background:rgba(0,170,255,0.06);border:1px solid rgba(0,170,255,0.12);color:#93c5fd;">Ví dụ: ChatGPT, AlphaGo, FaceID</div>
+                    </div>
+                    <div class="ai-type-card">
+                        <div class="atc-icon" style="background:rgba(0,255,136,0.1);color:var(--green);"><i class="fa-solid fa-brain"></i></div>
+                        <div class="atc-label" style="color:var(--green);">General AI (Rộng)</div>
+                        <div class="atc-title">AI Tổng Quát</div>
+                        <div class="atc-desc">Có thể học và thực hiện bất kỳ nhiệm vụ trí tuệ nào như con người. Chưa tồn tại trong thực tế.</div>
+                        <div class="atc-example" style="background:rgba(0,255,136,0.06);border:1px solid rgba(0,255,136,0.12);color:var(--green);">Trạng thái: Đang nghiên cứu</div>
+                    </div>
+                    <div class="ai-type-card">
+                        <div class="atc-icon" style="background:rgba(168,85,247,0.1);color:#c4b5fd;"><i class="fa-solid fa-infinity"></i></div>
+                        <div class="atc-label" style="color:#c4b5fd;">Super AI (Siêu)</div>
+                        <div class="atc-title">AI Siêu Việt</div>
+                        <div class="atc-desc">Vượt trội mọi khả năng của con người trong mọi lĩnh vực. Chỉ tồn tại trong lý thuyết.</div>
+                        <div class="atc-example" style="background:rgba(168,85,247,0.06);border:1px solid rgba(168,85,247,0.12);color:#c4b5fd;">Trạng thái: Lý thuyết / Sci-Fi</div>
+                    </div>
+                </div>
             </div>
 
-            <div id="sections-list"></div>
-            <a href="cns.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Quay lại danh sách bài tập</a>
-            <div class="nav-btns">
-                <a href="cns_bai2.html" class="nav-btn-prev"><i class="fa-solid fa-chevron-left"></i> Bài 2: Tìm kiếm thông tin</a>
-                <a href="cns_bai4.html" class="nav-btn-next">Bài 4: Công cụ hợp tác <i class="fa-solid fa-chevron-right"></i></a>
+            <!-- II: LỊCH SỬ -->
+            <div>
+                <div class="sec-header">
+                    <span class="sec-index">02</span>
+                    <span class="sec-title"><i class="fa-solid fa-timeline" style="color:var(--green);"></i> Lịch Sử Phát Triển AI</span>
+                    <span class="sec-line"></span>
+                </div>
+                <div class="timeline-wrap">
+                    <div class="tl-item"><div class="tl-dot active"></div><div class="tl-year">1950</div><div class="tl-content"><div class="tl-title">Alan Turing — "Máy tính có thể suy nghĩ không?"</div><div class="tl-desc">Turing đề xuất "Turing Test" — nền tảng triết học của AI. Bài báo "Computing Machinery and Intelligence" đặt câu hỏi mang tính cách mạng.</div></div></div>
+                    <div class="tl-item"><div class="tl-dot active"></div><div class="tl-year">1956</div><div class="tl-content"><div class="tl-title">Hội nghị Dartmouth — Thuật ngữ "AI" ra đời</div><div class="tl-desc">John McCarthy, Marvin Minsky và đồng nghiệp đặt tên "Artificial Intelligence" và khởi động kỷ nguyên nghiên cứu chính thức.</div></div></div>
+                    <div class="tl-item"><div class="tl-dot active"></div><div class="tl-year">1997</div><div class="tl-content"><div class="tl-title">Deep Blue (IBM) đánh bại Kasparov</div><div class="tl-desc">Lần đầu tiên máy tính đánh bại nhà vô địch cờ vua thế giới — cột mốc đột phá của AI trong game theory.</div></div></div>
+                    <div class="tl-item"><div class="tl-dot active"></div><div class="tl-year">2012</div><div class="tl-content"><div class="tl-title">AlexNet — Cách mạng Deep Learning</div><div class="tl-desc">Mạng neural sâu AlexNet thắng ImageNet Challenge, mở ra kỷ nguyên Deep Learning và Computer Vision hiện đại.</div></div></div>
+                    <div class="tl-item"><div class="tl-dot active"></div><div class="tl-year">2017</div><div class="tl-content"><div class="tl-title">Transformer — Nền tảng của ChatGPT</div><div class="tl-desc">Google giới thiệu kiến trúc Transformer ("Attention is All You Need"), nền tảng của GPT, BERT và mọi LLM hiện đại.</div></div></div>
+                    <div class="tl-item"><div class="tl-dot active"></div><div class="tl-year">2022</div><div class="tl-content"><div class="tl-title">ChatGPT — AI phổ cập toàn cầu</div><div class="tl-desc">OpenAI ra mắt ChatGPT, đạt 100 triệu người dùng trong 2 tháng. Generative AI trở thành công cụ đại chúng, thay đổi mọi ngành nghề.</div></div></div>
+                </div>
             </div>
+
+            <!-- III: ỨNG DỤNG -->
+            <div>
+                <div class="sec-header">
+                    <span class="sec-index">03</span>
+                    <span class="sec-title"><i class="fa-solid fa-rocket" style="color:var(--green);"></i> Ứng Dụng AI Trong Thực Tiễn</span>
+                    <span class="sec-line"></span>
+                </div>
+                <div class="app-grid">
+                    <div class="app-card">
+                        <div class="app-icon" style="background:rgba(0,255,136,0.1);color:var(--green);"><i class="fa-solid fa-graduation-cap"></i></div>
+                        <div>
+                            <div class="app-title">Giáo dục</div>
+                            <div class="app-desc">AI hỗ trợ học cá nhân hóa, giải thích khái niệm, tạo đề thi, chấm bài tự động và đề xuất lộ trình học phù hợp.</div>
+                            <div class="app-tools">
+                                <span class="tool-tag" style="background:rgba(0,255,136,0.08);color:var(--green);">ChatGPT</span>
+                                <span class="tool-tag" style="background:rgba(0,255,136,0.08);color:var(--green);">Gemini</span>
+                                <span class="tool-tag" style="background:rgba(0,255,136,0.08);color:var(--green);">Khan Academy AI</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-icon" style="background:rgba(0,170,255,0.1);color:#60a5fa;"><i class="fa-solid fa-heartbeat"></i></div>
+                        <div>
+                            <div class="app-title">Y tế</div>
+                            <div class="app-desc">Chẩn đoán ảnh y khoa, phát hiện ung thư sớm, phát triển thuốc mới và hỗ trợ phẫu thuật robot.</div>
+                            <div class="app-tools">
+                                <span class="tool-tag" style="background:rgba(0,170,255,0.08);color:#60a5fa;">Google Med-PaLM</span>
+                                <span class="tool-tag" style="background:rgba(0,170,255,0.08);color:#60a5fa;">DeepMind AlphaFold</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-icon" style="background:rgba(255,184,0,0.1);color:var(--amber);"><i class="fa-solid fa-code"></i></div>
+                        <div>
+                            <div class="app-title">Lập trình</div>
+                            <div class="app-desc">Sinh code tự động, review code, gợi ý tối ưu, debug và viết documentation. Tăng năng suất lập trình viên 30-50%.</div>
+                            <div class="app-tools">
+                                <span class="tool-tag" style="background:rgba(255,184,0,0.08);color:var(--amber);">GitHub Copilot</span>
+                                <span class="tool-tag" style="background:rgba(255,184,0,0.08);color:var(--amber);">Claude</span>
+                                <span class="tool-tag" style="background:rgba(255,184,0,0.08);color:var(--amber);">Cursor AI</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-icon" style="background:rgba(168,85,247,0.1);color:#c4b5fd;"><i class="fa-solid fa-palette"></i></div>
+                        <div>
+                            <div class="app-title">Sáng tạo nội dung</div>
+                            <div class="app-desc">Tạo hình ảnh, video, âm nhạc, văn bản từ prompt. AI trở thành cộng tác viên sáng tạo đắc lực.</div>
+                            <div class="app-tools">
+                                <span class="tool-tag" style="background:rgba(168,85,247,0.08);color:#c4b5fd;">Midjourney</span>
+                                <span class="tool-tag" style="background:rgba(168,85,247,0.08);color:#c4b5fd;">DALL-E 3</span>
+                                <span class="tool-tag" style="background:rgba(168,85,247,0.08);color:#c4b5fd;">Sora</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IV: PROMPT -->
+            <div>
+                <div class="sec-header">
+                    <span class="sec-index">04</span>
+                    <span class="sec-title"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--green);"></i> Mô Hình & Kỹ Thuật Viết Prompt</span>
+                    <span class="sec-line"></span>
+                </div>
+                <div class="sci-panel" style="padding:18px 20px;margin-bottom:14px;">
+                    <div class="sweep"></div>
+                    <div style="font-size:0.82rem;font-weight:700;color:var(--white);margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+                        <i class="fa-solid fa-diagram-project" style="color:var(--green);"></i> Mô hình C.R.I.S.P
+                    </div>
+                    <div class="crisp-grid">
+                        <div class="crisp-cell" style="border-color:rgba(0,255,136,0.15);background:rgba(0,255,136,0.05);">
+                            <div class="crisp-letter">C</div>
+                            <div class="crisp-sub">Context<br>Ngữ cảnh</div>
+                        </div>
+                        <div class="crisp-cell" style="border-color:rgba(0,210,255,0.15);background:rgba(0,210,255,0.05);">
+                            <div class="crisp-letter" style="color:var(--cyan);">R</div>
+                            <div class="crisp-sub">Role<br>Vai trò</div>
+                        </div>
+                        <div class="crisp-cell" style="border-color:rgba(168,85,247,0.15);background:rgba(168,85,247,0.05);">
+                            <div class="crisp-letter" style="color:#c4b5fd;">I</div>
+                            <div class="crisp-sub">Instructions<br>Hướng dẫn</div>
+                        </div>
+                        <div class="crisp-cell" style="border-color:rgba(255,184,0,0.15);background:rgba(255,184,0,0.05);">
+                            <div class="crisp-letter" style="color:var(--amber);">S</div>
+                            <div class="crisp-sub">Style<br>Định dạng</div>
+                        </div>
+                        <div class="crisp-cell" style="border-color:rgba(255,184,0,0.15);background:rgba(255,184,0,0.05);">
+                            <div class="crisp-letter" style="color:var(--amber);">P</div>
+                            <div class="crisp-sub">Purpose<br>Mục đích</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="prompt-model-wrap">
+                    <div class="prompt-level">
+                        <div class="pl-header">
+                            <span class="pl-badge" style="background:rgba(255,255,255,0.06);color:var(--muted);">Cơ bản</span>
+                            <span class="pl-label">Prompt đơn giản</span>
+                            <span class="pl-result" style="background:rgba(255,64,96,0.1);color:var(--red);">Kết quả yếu</span>
+                        </div>
+                        <div class="pl-body">
+                            <code>Giải thích về Machine Learning.</code>
+                        </div>
+                    </div>
+                    <div class="prompt-level">
+                        <div class="pl-header" style="background:rgba(0,255,136,0.05);border-color:rgba(0,255,136,0.15);">
+                            <span class="pl-badge" style="background:rgba(0,255,136,0.12);color:var(--green);">Nâng cao</span>
+                            <span class="pl-label">Prompt C.R.I.S.P</span>
+                            <span class="pl-result" style="background:rgba(0,255,136,0.1);color:var(--green);">Xuất sắc</span>
+                        </div>
+                        <div class="pl-body" style="background:rgba(0,255,136,0.03);border-color:rgba(0,255,136,0.1);">
+                            <code><span class="role">[Role] Bạn là giảng viên CNTT tại UET.</span>
+<span class="kw">[Context] Tôi là SV năm 1, chưa biết gì về AI.</span>
+<span class="fmt">[Instructions] Giải thích Machine Learning theo 3 bước: định nghĩa → cách hoạt động → ví dụ thực tế.</span>
+<span class="fmt">[Style] Ngôn ngữ đơn giản, dùng ví dụ gần gũi, tối đa 200 từ.</span></code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- V: QUY TRÌNH -->
+            <div>
+                <div class="sec-header">
+                    <span class="sec-index">05</span>
+                    <span class="sec-title"><i class="fa-solid fa-list-check" style="color:var(--green);"></i> Quy Trình Thực Hiện</span>
+                    <span class="sec-line"></span>
+                </div>
+                <div class="ops-list" id="process-wrap"></div>
+            </div>
+
+            <!-- VI: SẢN PHẨM -->
+            <div>
+                <div class="sec-header">
+                    <span class="sec-index">06</span>
+                    <span class="sec-title"><i class="fa-solid fa-trophy" style="color:var(--green);"></i> Sản Phẩm Cuối Cùng</span>
+                    <span class="sec-line"></span>
+                </div>
+                <div class="result-panel">
+                    <h3><i class="fa-solid fa-circle-check"></i> Những Gì Đã Thực Hiện Được</h3>
+                    <div class="result-items">
+                        <div class="result-item"><i class="fa-solid fa-check-circle"></i> Phân biệt Narrow AI / General AI / Super AI và lịch sử phát triển qua 6 cột mốc quan trọng</div>
+                        <div class="result-item"><i class="fa-solid fa-check-circle"></i> Mô tả nguyên lý hoạt động: dữ liệu → huấn luyện → mô hình → dự đoán</div>
+                        <div class="result-item"><i class="fa-solid fa-check-circle"></i> Thực hành với ít nhất 3 công cụ AI: ChatGPT/Gemini, Copilot, Midjourney/DALL-E</div>
+                        <div class="result-item"><i class="fa-solid fa-check-circle"></i> Viết và so sánh prompt cơ bản vs nâng cao (mô hình C.R.I.S.P) cho 3 tác vụ khác nhau</div>
+                        <div class="result-item"><i class="fa-solid fa-check-circle"></i> Phân tích tác động của AI lên năng lực số người học: cơ hội và thách thức</div>
+                        <div class="result-item"><i class="fa-solid fa-check-circle"></i> Hoàn thiện báo cáo PDF đầy đủ minh chứng thực hành với AI</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VII: PDF -->
+            <div>
+                <div class="sec-header">
+                    <span class="sec-index">07</span>
+                    <span class="sec-title"><i class="fa-solid fa-file-pdf" style="color:var(--amber);"></i> File Bài Tập (PDF)</span>
+                    <span class="sec-line"></span>
+                </div>
+                <div class="sci-panel" style="padding:22px 24px;">
+                    <div class="sweep"></div>
+                    <div style="font-size:0.82rem;font-weight:700;color:var(--white);margin-bottom:4px;display:flex;align-items:center;gap:8px;">
+                        <i class="fa-solid fa-folder-open" style="color:var(--amber);"></i> Tất Cả Bài Nộp — Môn Công Nghệ Số
+                    </div>
+                    <div style="font-size:0.75rem;color:var(--muted);margin-bottom:16px;">Admin upload file PDF của từng bài. Giáo viên click vào bài tương ứng để xem hoặc tải về.</div>
+                                    <div class="pdf-upload-wrap" id="pdf-slot-wrap">
+                    <input type="file" accept="application/pdf" onchange="handlePDF(event)" style="display:none;">
+                    <div class="pdf-upload-icon"><i class="fa-solid fa-file-pdf"></i></div>
+                    <div class="pdf-upload-info">
+                        <div class="pdf-upload-title">Chưa có file bài nộp</div>
+                        <div class="pdf-upload-hint">Admin chưa upload file bài này</div>
+                    </div>
+                    <div class="pdf-upload-actions"></div>
+                </div>
+                </div>
+            </div>
+
+            <!-- NAV -->
+            <div class="sci-nav-btns">
+                <a href="cns.html" class="sci-btn back"><i class="fa-solid fa-arrow-left"></i> Quay Lại</a>
+                <a href="cns_bai2.html" class="sci-btn prev"><i class="fa-solid fa-chevron-left"></i> Bài 2: Khai Thác Dữ Liệu</a>
+                <div class="sci-btn-next-wrap">
+                    <a href="cns_bai4.html" class="sci-btn">Bài 4: Giao Tiếp & Hợp Tác <i class="fa-solid fa-chevron-right"></i></a>
+                </div>
+            </div>
+
         </main>
-    </div>
 
-    <footer class="tutor-footer">
-        <div class="footer-content"><p>&copy; 2026 Hoàng Mạnh Trường. Học để hiểu, không chỉ để qua môn.</p></div>
-    </footer>
-
-    <div id="admin-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:10001;justify-content:center;align-items:center;backdrop-filter:blur(12px);">
-        <div style="background:rgba(8,12,35,0.98);border:1px solid rgba(20,184,166,0.22);border-radius:28px;padding:2rem;width:300px;text-align:center;">
-            <i class="fa-solid fa-shield-halved" style="font-size:2rem;color:var(--teal);margin-bottom:1rem;display:block;"></i>
-            <h3 style="margin-bottom:1.2rem;font-size:0.95rem;color:#f8fafc;">Xác thực Admin</h3>
-            <input type="password" id="admin-pwd" placeholder="Mật khẩu..."
-                style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:11px;border-radius:12px;font-family:'Outfit',sans-serif;margin-bottom:12px;text-align:center;letter-spacing:5px;transition:border-color 0.3s;"
-                onkeydown="if(event.key==='Enter')checkPwd()">
-            <button onclick="checkPwd()" style="width:100%;padding:11px;border-radius:12px;border:none;background:linear-gradient(135deg,#14b8a6,#3b82f6);color:#fff;font-family:'Outfit',sans-serif;font-weight:700;cursor:pointer;margin-bottom:8px;">Xác nhận</button>
-            <button onclick="closeModal()" style="background:none;border:none;color:rgba(255,255,255,0.3);cursor:pointer;font-family:'Outfit',sans-serif;font-size:0.82rem;">Hủy</button>
+        <div class="dash-footer">
+            <span class="footer-sys">CNS-DASHBOARD · BAI03 · © 2026 Hoàng Mạnh Trường</span>
+            <span class="footer-sys">Học để hiểu, không chỉ để qua môn.</span>
         </div>
     </div>
-    <div style="position:fixed;bottom:24px;right:24px;z-index:999;">
-        <button id="admin-fab" class="admin-fab" onclick="toggleAdmin()"><i class="fa-solid fa-lock"></i> Admin</button>
+
+    <div class="sys-modal-overlay" id="admin-modal">
+        <div class="sys-modal">
+            <i class="fa-solid fa-shield-halved lock-glow" style="color:var(--green);filter:drop-shadow(0 0 8px var(--green));"></i>
+            <h3>Xác Thực Admin</h3>
+            <input type="password" id="admin-pwd" class="sys-pwd" placeholder="••••"
+                onkeydown="if(event.key==='Enter')checkPwd()">
+            <button class="sys-confirm-btn" onclick="checkPwd()">Xác Nhận</button>
+            <button class="sys-cancel-btn" onclick="closeModal()">Hủy</button>
+        </div>
+    </div>
+
+    <div class="sys-lock-wrap">
+        <button id="admin-fab" class="sys-lock-btn" onclick="toggleAdmin()">
+            <i class="fa-solid fa-lock lock-glow"></i> Admin
+        </button>
     </div>
 
     <script>
-    // Helper to build prompt level block
-    function promptLevel(level, badge, label, result, resultClass, codeHtml) {
-        return `<div class="prompt-level">
-            <div class="pl-header ${level}">
-                <span class="pl-badge ${level}">${badge}</span>
-                <span class="pl-label">${label}</span>
-                <span class="pl-result-badge ${resultClass}">${result}</span>
-            </div>
-            <div class="pl-body ${level}">
-                <div class="prompt-code">${codeHtml}</div>
-            </div>
-        </div>`;
-    }
-
-    const sections = [
-      { id:1, title:"I. Giới thiệu", sub:"Bối cảnh & mục tiêu báo cáo",
-        render:()=>`
-          <div class="prose">Trong bối cảnh các mô hình ngôn ngữ lớn (LLMs) ngày càng được ứng dụng rộng rãi trong học tập, kỹ năng viết <strong>prompt</strong> (câu lệnh yêu cầu AI) đóng vai trò quan trọng trong việc khai thác tối đa hiệu quả của các công cụ này.</div>
-          <div class="prose">Báo cáo này tập trung vào việc <strong>xây dựng, thử nghiệm và phân tích</strong> các loại prompt khác nhau nhằm rút ra những nguyên tắc viết prompt hiệu quả.</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:4px;">
-            ${[
-              {icon:'fa-file-lines',color:'var(--teal)',label:'Tác vụ 1',val:'Tóm tắt tài liệu'},
-              {icon:'fa-lightbulb',color:'var(--blue)',label:'Tác vụ 2',val:'Giải thích khái niệm'},
-              {icon:'fa-circle-question',color:'var(--purple)',label:'Tác vụ 3',val:'Tạo câu hỏi ôn tập'}
-            ].map(t=>`<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;text-align:center;">
-              <i class="fa-solid ${t.icon}" style="font-size:1.4rem;color:${t.color};margin-bottom:8px;display:block;"></i>
-              <div style="font-size:0.7rem;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px;">${t.label}</div>
-              <div style="font-size:0.82rem;font-weight:600;color:#f8fafc;margin-top:3px;">${t.val}</div>
-            </div>`).join('')}
-          </div>`
-      },
-      { id:2, title:"II. Phân tích tác vụ học tập", sub:"Mục tiêu, yêu cầu & thách thức",
-        render:()=>`
-          ${[
-            {cls:'t1',icon:'fa-file-lines',title:'Tác vụ 1: Tóm tắt tài liệu học thuật',
-             items:[
-               {l:'Mục tiêu',v:'Giúp người học nhanh chóng nắm được nội dung chính của tài liệu dài.'},
-               {l:'Yêu cầu',v:'Giữ lại ý chính, loại bỏ thông tin thừa, đảm bảo tính chính xác.'},
-               {l:'Thách thức',v:'AI có thể bỏ sót ý quan trọng hoặc tóm tắt quá chung chung nếu prompt không rõ ràng.'}
-             ]},
-            {cls:'t2',icon:'fa-lightbulb',title:'Tác vụ 2: Giải thích khái niệm phức tạp',
-             items:[
-               {l:'Mục tiêu',v:'Hiểu rõ bản chất của khái niệm khó (ví dụ: Blockchain, Định lý Bayes).'},
-               {l:'Yêu cầu',v:'Dễ hiểu, có ví dụ minh họa, phù hợp trình độ người học.'},
-               {l:'Thách thức',v:'AI có thể giải thích quá chuyên sâu hoặc quá đơn giản nếu không định hướng rõ.'}
-             ]},
-            {cls:'t3',icon:'fa-circle-question',title:'Tác vụ 3: Tạo câu hỏi ôn tập',
-             items:[
-               {l:'Mục tiêu',v:'Hỗ trợ ôn luyện và kiểm tra kiến thức.'},
-               {l:'Yêu cầu',v:'Đa dạng (trắc nghiệm, tự luận), bám sát nội dung.'},
-               {l:'Thách thức',v:'AI dễ tạo câu hỏi chung chung, thiếu tính phân loại mức độ.'}
-             ]}
-          ].map(t=>`
-            <div class="task-card">
-              <div class="task-header">
-                <div class="task-icon ${t.cls}"><i class="fa-solid ${t.icon}"></i></div>
-                <div><div class="task-title">${t.title}</div></div>
-              </div>
-              <div class="task-meta-grid">
-                ${t.items.map(i=>`<div class="task-meta-item"><div class="tm-label">${i.l}</div><div class="tm-val">${i.v}</div></div>`).join('')}
-              </div>
-            </div>`).join('')}`
-      },
-      { id:3, title:"III. Tác vụ 1 — Tóm tắt tài liệu", sub:"3 cấp độ prompt so sánh",
-        render:()=>`
-          <div class="prompt-levels">
-            ${promptLevel('basic','Cơ bản','Prompt đơn giản','Kết quả yếu','weak',
-              `Tóm tắt đoạn văn sau.`)}
-            ${promptLevel('improved','Cải tiến','Thêm yêu cầu định dạng','Rõ hơn','ok',
-              `Tóm tắt đoạn văn sau thành các ý chính.\n<span class="format">Trình bày dưới dạng gạch đầu dòng, giữ lại các khái niệm quan trọng và loại bỏ thông tin không cần thiết.</span>`)}
-            ${promptLevel('advanced','Nâng cao','Role + Cấu trúc + Few-shot','Xuất sắc','great',
-              `<span class="role">Bạn là một giảng viên đại học.</span> Hãy tóm tắt đoạn văn sau theo các yêu cầu:\n<span class="instruction">• Chia thành 3 phần: ý chính, khái niệm quan trọng, kết luận\n• Sử dụng ngôn ngữ dễ hiểu cho sinh viên năm nhất\n• Độ dài khoảng 150 từ</span>\n\n<span class="example">Ví dụ:\nInput: "Machine learning is a subset of AI..."\nOutput:\n  • Ý chính: ...\n  • Khái niệm: ...\n  • Kết luận: ...</span>`)}
-          </div>`
-      },
-      { id:4, title:"IV. Tác vụ 2 — Giải thích khái niệm", sub:"Blockchain qua 3 cấp độ",
-        render:()=>`
-          <div class="prompt-levels">
-            ${promptLevel('basic','Cơ bản','Không có ngữ cảnh','Chung chung','weak',
-              `Giải thích khái niệm Blockchain.`)}
-            ${promptLevel('improved','Cải tiến','Thêm yêu cầu ví dụ & so sánh','Dễ hiểu hơn','ok',
-              `Giải thích khái niệm Blockchain một cách đơn giản, dễ hiểu.\n<span class="format">Có ví dụ minh họa thực tế và so sánh với hệ thống truyền thống.</span>`)}
-            ${promptLevel('advanced','Nâng cao','Role + Cấu trúc từng bước + Đối tượng','Logic, có hệ thống','great',
-              `<span class="role">Bạn là một giáo viên dạy công nghệ.</span> Hãy giải thích Blockchain theo các bước:\n<span class="instruction">1. Định nghĩa đơn giản\n2. Cách hoạt động (từng bước)\n3. Ví dụ thực tế\n4. Ưu và nhược điểm</span>\n\n<span class="format">Hãy trình bày sao cho học sinh lớp 10 có thể hiểu được.</span>`)}
-          </div>`
-      },
-      { id:5, title:"V. Tác vụ 3 — Tạo câu hỏi ôn tập", sub:"Java qua 3 cấp độ",
-        render:()=>`
-          <div class="prompt-levels">
-            ${promptLevel('basic','Cơ bản','Không có yêu cầu cụ thể','Ít đa dạng','weak',
-              `Tạo câu hỏi ôn tập về Java.`)}
-            ${promptLevel('improved','Cải tiến','Số lượng + phân loại + đáp án','Có phân loại','ok',
-              `Tạo 10 câu hỏi ôn tập về Java, gồm:\n<span class="instruction">• 5 câu trắc nghiệm\n• 5 câu tự luận</span>\n<span class="format">Có đáp án đi kèm.</span>`)}
-            ${promptLevel('advanced','Nâng cao','Role + Phân cấp độ + Giải thích + Few-shot','Rất chi tiết','great',
-              `<span class="role">Bạn là giảng viên môn lập trình Java.</span> Hãy tạo bộ câu hỏi gồm:\n<span class="instruction">• 5 câu dễ, 5 câu trung bình, 5 câu khó\n• Bao gồm trắc nghiệm và tự luận\n• Có đáp án chi tiết và giải thích</span>\n\n<span class="example">Ví dụ:\nCâu hỏi: ...\nĐáp án: ...\nGiải thích: ...</span>`)}
-          </div>`
-      },
-      { id:6, title:"VI. So sánh & Phân tích hiệu quả", sub:"Bảng so sánh + 5 nguyên lý",
-        render:()=>`
-          <div class="prose" style="margin-bottom:16px"><strong>Bảng so sánh kết quả:</strong></div>
-          <table class="cmp-table">
-            <thead><tr><th>Tác vụ</th><th>Prompt cơ bản</th><th>Prompt cải tiến</th><th>Prompt nâng cao</th></tr></thead>
-            <tbody>
-              <tr><td style="color:#f8fafc;font-weight:600">Tóm tắt</td><td class="c-weak">Ngắn, thiếu ý</td><td class="c-ok">Rõ ràng hơn</td><td class="c-great">Có cấu trúc, đầy đủ</td></tr>
-              <tr><td style="color:#f8fafc;font-weight:600">Giải thích</td><td class="c-weak">Chung chung</td><td class="c-ok">Dễ hiểu hơn</td><td class="c-great">Logic, có hệ thống</td></tr>
-              <tr><td style="color:#f8fafc;font-weight:600">Câu hỏi</td><td class="c-weak">Ít đa dạng</td><td class="c-ok">Có phân loại</td><td class="c-great">Rất chi tiết, có giải thích</td></tr>
-            </tbody>
-          </table>
-          <div class="prose" style="margin-top:20px;margin-bottom:16px"><strong>5 yếu tố tạo nên prompt hiệu quả:</strong></div>
-          <div style="display:flex;flex-direction:column;gap:10px;">
-            ${[
-              {n:'01',t:'Độ cụ thể',d:'Prompt càng cụ thể → AI càng hiểu rõ yêu cầu → kết quả chính xác hơn.'},
-              {n:'02',t:'Cấu trúc rõ ràng',d:'Prompt có cấu trúc giúp AI tổ chức thông tin tốt hơn (chia mục, bullet).'},
-              {n:'03',t:'Role Prompting',d:'Khi gán vai trò (giảng viên, giáo viên), AI tạo ra nội dung phù hợp đối tượng hơn.'},
-              {n:'04',t:'Few-shot Prompting',d:'Việc đưa ví dụ giúp AI hiểu định dạng đầu ra mong muốn.'},
-              {n:'05',t:'Kiểm soát đầu ra',d:'Chỉ định độ dài, định dạng, đối tượng người đọc → tối ưu kết quả.'}
-            ].map(p=>`
-              <div style="display:flex;gap:14px;align-items:flex-start;padding:12px 16px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);border-radius:12px;">
-                <div style="font-size:1.2rem;font-weight:800;color:rgba(20,184,166,0.35);flex-shrink:0;line-height:1;margin-top:2px;">${p.n}</div>
-                <div>
-                  <div style="font-size:0.88rem;font-weight:700;color:#f8fafc;margin-bottom:3px;">${p.t}</div>
-                  <div style="font-size:0.82rem;color:rgba(255,255,255,0.5);">${p.d}</div>
-                </div>
-              </div>`).join('')}
-          </div>`
-      },
-      { id:7, title:"VII. Nguyên tắc & Kết luận", sub:"6 nguyên tắc viết prompt + tổng kết",
-        render:()=>`
-          <div class="principle-grid">
-            ${[
-              {n:'1',t:'Rõ ràng & cụ thể',d:'Không viết mơ hồ. Nêu rõ yêu cầu, tránh câu hỏi chung chung.',ex:'"Tóm tắt thành 5 ý chính dạng bullet"'},
-              {n:'2',t:'Có cấu trúc',d:'Chia nhỏ yêu cầu thành các phần rõ ràng, dễ theo dõi.',ex:'"Bước 1: ... Bước 2: ..."'},
-              {n:'3',t:'Xác định vai trò',d:'Gán vai trò cho AI để định hướng phong cách và độ sâu.',ex:'"Bạn là giảng viên đại học..."'},
-              {n:'4',t:'Chỉ định định dạng',d:'Nêu rõ định dạng đầu ra mong muốn.',ex:'"Trình bày dạng bảng / bullet / đoạn văn"'},
-              {n:'5',t:'Đưa ví dụ (few-shot)',d:'Cung cấp ví dụ mẫu giúp AI hiểu cách trả lời.',ex:'"Input: ... → Output: ..."'},
-              {n:'6',t:'Điều chỉnh theo mục tiêu',d:'Phù hợp trình độ người học (sinh viên năm 1, học sinh lớp 10...).',ex:'"Giải thích cho người mới bắt đầu"'}
-            ].map(p=>`
-              <div class="principle-card">
-                <div class="pc-num">${p.n}</div>
-                <div class="pc-title">${p.t}</div>
-                <div class="pc-desc">${p.d}</div>
-                <div class="pc-example">${p.ex}</div>
-              </div>`).join('')}
-          </div>
-          <div class="conclusion-box" style="margin-top:8px;">
-            <h4><i class="fa-solid fa-circle-check"></i> Kết luận</h4>
-            <ul class="bullet-list">
-              <li><i class="bi fa-solid fa-circle-dot"></i> Prompt nâng cao mang lại hiệu quả tốt nhất nhờ áp dụng <strong>role prompting</strong>, cấu trúc rõ ràng và ví dụ minh họa.</li>
-              <li><i class="bi fa-solid fa-circle-dot"></i> Viết prompt không chỉ là đặt câu hỏi mà còn là một <strong>kỹ năng quan trọng</strong> giúp tối ưu hóa việc học với AI.</li>
-              <li><i class="bi fa-solid fa-circle-dot"></i> Cùng một tác vụ, prompt khác nhau cho kết quả <strong>chênh lệch rõ rệt</strong> về chất lượng và độ phù hợp.</li>
-              <li><i class="bi fa-solid fa-circle-dot"></i> Kỹ năng này ngày càng quan trọng trong bối cảnh AI được tích hợp sâu vào giáo dục.</li>
-            </ul>
-          </div>`
-      }
+    const STEPS = [
+        { num:1, title:"Xem video bài giảng", sub:"6 video lý thuyết",
+          desc:"Xem đủ 6 video: <strong>Mục tiêu học tập</strong>, <strong>Giới thiệu về AI</strong>, <strong>AI và phát triển năng lực số</strong>, <strong>Nguyên lý & mô hình Prompt</strong>, <strong>Kỹ thuật viết Prompt</strong>, <strong>Thực hành công cụ AI</strong>. Ghi chú định nghĩa AI và phân loại.",
+          tip:{type:'info', icon:'fa-robot', text:"Chú ý phần nguyên lý hoạt động của LLM: <strong>Token → Attention → Generation</strong> — sẽ xuất hiện trong bài kiểm tra."} },
+        { num:2, title:"Nghiên cứu & tổng hợp lý thuyết", sub:"Đọc tài liệu bổ sung",
+          desc:"Đọc thêm bài giảng PDF và tìm hiểu lịch sử AI qua các nguồn học thuật. Ghi chú 5 cột mốc quan trọng nhất trong lịch sử phát triển AI. So sánh Narrow AI vs General AI bằng bảng.",
+          tip:{type:'info', icon:'fa-lightbulb', text:"Nguồn đề xuất: <code>AI 100 Report (Stanford)</code> — báo cáo thường niên về trạng thái AI toàn cầu, miễn phí."} },
+        { num:3, title:"Thực hành với công cụ AI", sub:"Ít nhất 3 công cụ khác nhau",
+          desc:"Thực hành với: <strong>(1) ChatGPT hoặc Gemini</strong> — viết prompt giải thích khái niệm; <strong>(2) GitHub Copilot hoặc Claude</strong> — hỗ trợ viết code; <strong>(3) DALL-E 3 hoặc Gemini Image</strong> — tạo hình ảnh từ mô tả. Chụp màn hình kết quả.",
+          tip:{type:'warn', icon:'fa-triangle-exclamation', text:"Đăng ký tài khoản miễn phí: Gemini (Google), ChatGPT (OpenAI), Copilot (Microsoft). Không cần trả phí."} },
+        { num:4, title:"Thực hành viết Prompt", sub:"So sánh Basic vs C.R.I.S.P",
+          desc:"Chọn <strong>3 tác vụ học tập</strong> (vd: tóm tắt tài liệu, giải bài tập, giải thích khái niệm). Với mỗi tác vụ: viết 1 prompt cơ bản và 1 prompt theo mô hình C.R.I.S.P. So sánh chất lượng đầu ra, ghi nhận xét vào bảng.",
+          tip:{type:'success', icon:'fa-wand-magic-sparkles', text:"Prompt tốt nhất khi: <strong>có vai trò (role)</strong> + <strong>ngữ cảnh rõ</strong> + <strong>yêu cầu cụ thể</strong> + <strong>định dạng mong muốn</strong>."} },
+        { num:5, title:"Viết báo cáo", sub:"Tổng hợp toàn bộ kết quả",
+          desc:"Cấu trúc báo cáo: <strong>I. Định nghĩa & phân loại AI</strong> → <strong>II. Lịch sử phát triển (timeline)</strong> → <strong>III. Ứng dụng thực tế (4 lĩnh vực)</strong> → <strong>IV. Thực hành công cụ AI</strong> (có screenshot) → <strong>V. Thực hành Prompt</strong> (bảng so sánh) → <strong>VI. Nhận xét cá nhân</strong>.",
+          tip:{type:'info', icon:'fa-pen', text:"Phần nhận xét cá nhân: chia sẻ công cụ AI nào bạn thấy hữu ích nhất cho việc học và tại sao."} },
+        { num:6, title:"Xuất PDF & nộp bài", sub:"Hoàn thiện & upload",
+          desc:"Kiểm tra lần cuối: screenshot hiển thị rõ, bảng so sánh prompt đủ cả 2 cột, timeline AI có ít nhất 5 cột mốc. Xuất PDF, đặt tên <code>Bai3_HoangManhTruong.pdf</code> và upload vào mục bên dưới.",
+          tip:{type:'warn', icon:'fa-file-pdf', text:"File PDF không được vượt quá 10MB. Nếu lớn hơn, nén ảnh trong Word trước khi xuất (File → Compress Pictures)."} }
     ];
 
-    const lessonId = 'bai3';
-    let readSecs = new Set();
-    let savedImgs = {};
-    let isAdmin = sessionStorage.getItem('cns_admin') === 'true';
+    let doneSteps = new Set(JSON.parse(localStorage.getItem('cns_bai3_done') || '[]'));
+    let pdfData   = JSON.parse(localStorage.getItem('cns_pdf_data') || '{}');
+    let isAdmin   = sessionStorage.getItem('cns_admin') === 'true';
 
-    async function loadProgress() {
-        try {
-            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}`);
-            if (res.ok) {
-                const data = await res.json();
-                readSecs = new Set(data.filter(x => x.done).map(x => x.stepNum));
-                savedImgs = {};
-                data.forEach(x => {
-                    if (x.imageUrl) savedImgs[x.stepNum] = x.imageUrl;
-                });
-            }
-        } catch (e) {
-            console.error("Failed to load progress from server, falling back to LocalStorage:", e);
-            readSecs = new Set(JSON.parse(localStorage.getItem('cns_bai3_read') || '[]'));
-            savedImgs = JSON.parse(localStorage.getItem('cns_bai3_imgs') || '{}');
-        }
-        render();
-    }
-
-    function render(){
-        const container = document.getElementById('sections-list');
-        container.innerHTML = sections.map(s => {
-            const done = readSecs.has(s.id);
-            const imgSrc = savedImgs[s.id] || s.image;
-            let imgSlot = '';
-            if(imgSrc){
-                imgSlot = `<div class="img-wrap">
-                    <img src="${imgSrc}" class="img-preview" onclick="zoomImg('${imgSrc}')">
-                    <div class="img-actions">
-                        <label class="btn-img-change"><i class="fa-solid fa-image"></i> Đổi ảnh<input type="file" accept="image/*" onchange="handleImg(event,${s.id})"></label>
-                        <button class="btn-img-remove" onclick="removeImg(${s.id})"><i class="fa-solid fa-trash"></i> Xóa ảnh</button>
-                    </div>
-                </div>`;
-            } else {
-                imgSlot = `<div class="img-wrap">
-                    <label class="img-placeholder">
-                        <div style="font-size:1.4rem;color:rgba(20,184,166,0.35);margin-bottom:5px;"><i class="fa-solid fa-image"></i></div>
-                        <div style="font-size:0.75rem;color:rgba(255,255,255,0.25);">Nhấp để thêm ảnh minh chứng</div>
-                        <input type="file" accept="image/*" onchange="handleImg(event,${s.id})">
-                    </label>
-                </div>`;
-            }
-            return `
-                <div class="sec-card ${done?'read':''}" id="sec-${s.id}">
-                    <div class="sec-head" onclick="toggleSec(${s.id})">
-                        <div class="sec-num-badge">${done?'<i class="fa-solid fa-check" style="font-size:0.8rem"></i>':s.id}</div>
-                        <div class="sec-head-text">
-                            <div class="sec-head-title">${s.title}</div>
-                            <div class="sec-head-sub">${s.sub}</div>
-                        </div>
-                        <button class="sec-read-btn" onclick="event.stopPropagation();toggleRead(${s.id})">
-                            <i class="fa-solid fa-check" style="font-size:0.7rem"></i>
-                        </button>
-                        <i class="fa-solid fa-chevron-down expand-icon"></i>
-                    </div>
-                    <div class="sec-body">
-                        <div class="sec-body-inner">
-                            ${s.render()}
-                            ${imgSlot}
-                        </div>
-                    </div>
-                </div>`;
+    function renderSteps() {
+        const tipMap = { info:'info', warn:'warn', danger:'warn', success:'ok' };
+        document.getElementById('process-wrap').innerHTML = STEPS.map(s => {
+            const done = doneSteps.has(s.num);
+            return `<div class="ops-item ${done?'done':''}" id="ps-${s.num}">
+                <div class="ops-num">${done?'<i class="fa-solid fa-check" style="font-size:0.7rem"></i>':s.num}</div>
+                <div class="ops-body">
+                    <div class="ops-title">${s.title}</div>
+                    <div class="ops-sub">${s.sub}</div>
+                    <div class="ops-desc">${s.desc}</div>
+                    ${s.tip?`<div class="ops-alert ${tipMap[s.tip.type]||'info'}"><i class="fa-solid ${s.tip.icon}"></i><span>${s.tip.text}</span></div>`:''}
+                    <button class="ops-btn ${done?'done':''}" onclick="toggleDone(${s.num})">
+                        ${done?'<i class="fa-solid fa-check"></i> Đã hoàn thành':'<i class="fa-regular fa-circle"></i> Đánh dấu hoàn thành'}
+                    </button>
+                </div>
+            </div>`;
         }).join('');
+    }
 
-        // Sidebar nav
-        document.getElementById('sec-nav').innerHTML = sections.map(s => `
-            <a class="sec-nav-item ${readSecs.has(s.id)?'done':''}" onclick="scrollToSec(${s.id})">
-                <span class="snav-dot"></span><span>${s.title}</span>
-            </a>`).join('');
+    function renderSideNav() {
+        document.getElementById('step-nav').innerHTML = STEPS.map(s => `
+            <div class="mission-item ${doneSteps.has(s.num)?'done':''}" onclick="scrollToStep(${s.num})">
+                <div class="mi-icon">${doneSteps.has(s.num)?'<i class="fa-solid fa-check" style="font-size:0.6rem"></i>':s.num}</div>
+                <span class="mi-text">${s.title}</span>
+            </div>`).join('');
+    }
 
-        // Ring
-        const pct = Math.round((readSecs.size / sections.length) * 100);
-        const circ = 251.2;
-        document.getElementById('ring-fill').style.strokeDashoffset = circ - (circ * pct / 100);
+    function updateRing() {
+        const pct = Math.round((doneSteps.size / STEPS.length) * 100);
+        document.getElementById('hud-fill').style.strokeDashoffset = 389.6 * (1 - pct / 100);
         document.getElementById('ring-pct').textContent = pct + '%';
-        document.getElementById('ring-sub').textContent = `${readSecs.size} / ${sections.length} mục`;
+        document.getElementById('done-count').textContent = doneSteps.size;
     }
 
-    function toggleSec(id){ document.getElementById('sec-'+id).classList.toggle('open'); }
-    
-    async function toggleRead(id){
-        const isDone = !readSecs.has(id);
-        if(isDone) readSecs.add(id); else readSecs.delete(id);
-        render();
-        document.getElementById('sec-'+id).classList.add('open');
+    function scrollToStep(num) { document.getElementById('ps-'+num)?.scrollIntoView({behavior:'smooth',block:'center'}); }
 
-        try {
-            await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}/${id}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ done: isDone })
-            });
-        } catch (e) {
-            console.error("Failed to save progress to server, falling back to LocalStorage:", e);
-            localStorage.setItem('cns_bai3_read', JSON.stringify([...readSecs]));
+    function toggleDone(num) {
+        if (doneSteps.has(num)) doneSteps.delete(num); else doneSteps.add(num);
+        localStorage.setItem('cns_bai3_done', JSON.stringify([...doneSteps]));
+        renderSteps(); renderSideNav(); updateRing();
+    }
+
+        function renderPDF() {
+        const saved = pdfData['bai3'];
+        const wrap = document.getElementById('pdf-slot-wrap');
+        if (!wrap) return;
+
+        if (saved) {
+            wrap.classList.add('has-file');
+            wrap.querySelector('.pdf-upload-icon i').className = 'fa-solid fa-file-pdf';
+            wrap.querySelector('.pdf-upload-title').textContent = saved.name || 'Bài 3.pdf';
+            wrap.querySelector('.pdf-upload-hint').textContent = 'Đã upload — click "Xem PDF" để mở';
+            // Actions
+            let actions = wrap.querySelector('.pdf-upload-actions');
+            actions.innerHTML = `
+                <a href="${saved.url || saved.fileUrl}" target="_blank" class="pdf-view-link">
+                    <i class="fa-solid fa-eye"></i> Xem PDF
+                </a>
+                ${isAdmin ? `<button class="pdf-del-btn" onclick="removePDF()"><i class="fa-solid fa-trash"></i> Xóa</button>` : ''}
+            `;
+            // Disable file input if not admin
+            const inp = wrap.querySelector('input[type="file"]');
+            if (inp) inp.style.display = isAdmin ? 'block' : 'none';
+        } else {
+            wrap.classList.remove('has-file');
+            wrap.querySelector('.pdf-upload-icon i').className = 'fa-solid fa-file-pdf';
+            wrap.querySelector('.pdf-upload-title').textContent = isAdmin ? 'Nhấp để upload file PDF bài Bài 3' : 'Chưa có file bài nộp';
+            wrap.querySelector('.pdf-upload-hint').textContent = isAdmin ? 'Chấp nhận file .pdf, kích thước tối đa 10MB' : 'Admin chưa upload file bài này';
+            wrap.querySelector('.pdf-upload-actions').innerHTML = '';
+            const inp = wrap.querySelector('input[type="file"]');
+            if (inp) inp.style.display = isAdmin ? 'block' : 'none';
         }
     }
 
-    async function resetAll(){
-        if(!confirm('Reset toàn bộ tiến độ?')) return;
-        readSecs.clear();
-        savedImgs = {};
-        render();
-
-        try {
-            await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}`, {
-                method: 'DELETE'
-            });
-            localStorage.removeItem('cns_bai3_read');
-            localStorage.removeItem('cns_bai3_imgs');
-        } catch (e) {
-            console.error("Failed to reset progress on server:", e);
-        }
-    }
-
-    function scrollToSec(id){ const el=document.getElementById('sec-'+id); if(!el) return; el.classList.add('open'); el.scrollIntoView({behavior:'smooth',block:'start'}); }
-    
-    async function handleImg(event,id){
-        const file = event.target.files[0]; if(!file) return;
-
-        const card = document.getElementById('sec-' + id);
-        if (card) card.classList.add('open');
-
-        const reader = new FileReader();
-        reader.onload = e => {
-            if (!savedImgs[id]) {
-                savedImgs[id] = e.target.result;
-                render();
-                const card = document.getElementById('sec-' + id);
-                if (card) card.classList.add('open');
-            }
-        };
-        reader.readAsDataURL(file);
-
+    async function handlePDF(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        if (file.type !== 'application/pdf') { alert('Chỉ chấp nhận file PDF!'); return; }
+        const blobUrl = URL.createObjectURL(file);
+        pdfData['bai3'] = { name: file.name, url: blobUrl };
+        renderPDF();
         try {
             const formData = new FormData();
             formData.append('file', file);
-            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}/${id}/image`, {
-                method: 'POST',
-                body: formData
-            });
+            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf/bai3`, { method: 'POST', body: formData });
             if (res.ok) {
                 const data = await res.json();
-                savedImgs[id] = data.imageUrl;
-                localStorage.setItem('cns_bai3_imgs', JSON.stringify(savedImgs));
-                render();
-                const card = document.getElementById('sec-' + id);
-                if (card) card.classList.add('open');
-            } else {
-                throw new Error("Upload failed");
+                pdfData['bai3'] = { name: file.name, url: data.fileUrl };
+                localStorage.setItem('cns_pdf_data', JSON.stringify(pdfData));
+                renderPDF();
             }
         } catch (e) {
-            alert("Không thể tải ảnh lên server!");
-            console.error(e);
+            localStorage.setItem('cns_pdf_data', JSON.stringify(pdfData));
+            console.warn('Upload PDF loi:', e);
         }
     }
 
-    async function removeImg(id){
-        if (!confirm("Bạn muốn xóa ảnh minh chứng này?")) return;
-        delete savedImgs[id];
-        render();
-        const card = document.getElementById('sec-' + id);
-        if (card) card.classList.add('open');
+    function removePDF() {
+        if (!confirm('Xóa file PDF bài Bài 3?')) return;
+        delete pdfData['bai3'];
+        localStorage.setItem('cns_pdf_data', JSON.stringify(pdfData));
+        renderPDF();
+        fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf/bai3`, { method: 'DELETE' }).catch(() => {});
+    }
 
+    async function loadPDFFromServer() {
         try {
-            await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}/${id}/image`, {
-                method: 'DELETE'
-            });
-            localStorage.setItem('cns_bai3_imgs', JSON.stringify(savedImgs));
-        } catch (e) {
-            console.error(e);
-        }
+            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf/bai3`, { signal: AbortSignal.timeout(8000) });
+            if (res.ok) {
+                const d = await res.json();
+                if (d && d.fileUrl) {
+                    pdfData['bai3'] = { name: d.fileName || 'Bài 3.pdf', url: d.fileUrl };
+                    localStorage.setItem('cns_pdf_data', JSON.stringify(pdfData));
+                    renderPDF();
+                }
+            }
+        } catch (e) { console.warn('Không load PDF:', e.message); }
     }
 
-    function zoomImg(src){ const o=document.createElement('div'); o.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.93);z-index:99999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;backdrop-filter:blur(10px);'; o.innerHTML=`<img src="${src}" style="max-width:92vw;max-height:90vh;border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,0.8);">`; o.onclick=()=>o.remove(); document.body.appendChild(o); }
-    function toggleAdmin(){ if(isAdmin){if(confirm('Đăng xuất Admin?')){sessionStorage.removeItem('cns_admin');isAdmin=false;updateFab();render();}}else{document.getElementById('admin-modal').style.display='flex';setTimeout(()=>document.getElementById('admin-pwd').focus(),80);} }
-    function closeModal(){ document.getElementById('admin-modal').style.display='none'; document.getElementById('admin-pwd').value=''; }
-    function checkPwd(){ const p=document.getElementById('admin-pwd').value; if(p==='1002'){sessionStorage.setItem('cns_admin','true');isAdmin=true;closeModal();updateFab();render();}else{const i=document.getElementById('admin-pwd');i.style.borderColor='#ef4444';setTimeout(()=>i.style.borderColor='',800);i.value='';} }
-    function updateFab(){ const f=document.getElementById('admin-fab'); if(isAdmin){f.innerHTML='<i class="fa-solid fa-unlock"></i> Admin';f.className='admin-fab logged';}else{f.innerHTML='<i class="fa-solid fa-lock"></i> Admin';f.className='admin-fab';} }
+    function toggleAdmin() {
+        if (isAdmin) { if(confirm('Đăng xuất Admin?')){ sessionStorage.removeItem('cns_admin'); isAdmin=false; updateFab(); renderSteps(); renderPDF(); } }
+        else { document.getElementById('admin-modal').classList.add('open'); setTimeout(()=>document.getElementById('admin-pwd').focus(),80); }
+    }
+    function closeModal() { document.getElementById('admin-modal').classList.remove('open'); document.getElementById('admin-pwd').value=''; }
+    function checkPwd() {
+        const p = document.getElementById('admin-pwd').value;
+        if (p==='1002') { sessionStorage.setItem('cns_admin','true'); isAdmin=true; closeModal(); updateFab(); renderSteps(); renderPDF(); }
+        else { const i=document.getElementById('admin-pwd'); i.style.borderColor='var(--red)'; setTimeout(()=>i.style.borderColor='',800); i.value=''; }
+    }
+    function updateFab() {
+        const f = document.getElementById('admin-fab');
+        if (isAdmin) { f.innerHTML='<i class="fa-solid fa-unlock lock-glow"></i> Admin'; f.className='sys-lock-btn active'; }
+        else { f.innerHTML='<i class="fa-solid fa-lock lock-glow"></i> Admin'; f.className='sys-lock-btn'; }
+    }
 
-    updateFab();
-    loadProgress();
-    setTimeout(()=>{ const f=document.getElementById('sec-1'); if(f) f.classList.add('open'); },100);
+    renderSteps(); renderSideNav(); updateRing(); updateFab(); renderPDF();
+    loadPDFFromServer();
+    document.addEventListener('keypress', e => { if(e.key==='Enter'&&document.getElementById('admin-modal').classList.contains('open')) checkPwd(); });
     </script>
+
+    <script src="../assets/js/config.js"></script>
     <script src="../assets/js/common.js"></script>
+    <script src="../assets/js/cns-upload.js"></script>
+    <script src="../assets/js/main.js"></script>
 </body>
 </html>

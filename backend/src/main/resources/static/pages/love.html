@@ -298,6 +298,7 @@
             margin: 1.5rem 0;
         }
 
+        /* Input group */
         .s-field {
             display: flex;
             flex-direction: column;
@@ -334,6 +335,7 @@
 
         .s-input::placeholder { color: rgba(255,255,255,0.2); }
 
+        /* Date input calendar icon color fix */
         .s-input[type="date"]::-webkit-calendar-picker-indicator {
             filter: invert(0.6) sepia(1) saturate(3) hue-rotate(300deg);
             cursor: pointer;
@@ -351,6 +353,7 @@
             margin-bottom: 18px;
         }
 
+        /* File upload custom */
         .file-upload-zone {
             position: relative;
             cursor: pointer;
@@ -395,7 +398,10 @@
             color: #ff6b8a;
         }
 
-        .file-upload-text { flex: 1; min-width: 0; }
+        .file-upload-text {
+            flex: 1;
+            min-width: 0;
+        }
 
         .file-upload-text .file-name {
             font-size: 0.8rem;
@@ -421,6 +427,7 @@
             flex-shrink: 0;
         }
 
+        /* Buttons */
         .s-btn-save {
             flex: 1;
             padding: 13px 20px;
@@ -496,7 +503,9 @@
             margin-bottom: 18px;
         }
 
-        .s-bg-row .file-upload-zone { flex: 1; }
+        .s-bg-row .file-upload-zone {
+            flex: 1;
+        }
     </style>
 
     <div id="settings-modal" class="modal-overlay">
