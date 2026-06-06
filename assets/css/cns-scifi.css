@@ -72,6 +72,8 @@ body::after {
   grid-template-rows: auto 1fr auto;
   min-height: 100vh;
   gap: 0;
+  max-width: 1200px; /* constrain layout width to center content like original design */
+  margin: 18px auto; /* center dashboard on large screens */
 }
 
 /* ══════════════════════════════
