@@ -426,7 +426,15 @@
                         <i class="fa-solid fa-folder-open" style="color:var(--amber);"></i> Tất Cả Bài Nộp — Môn Công Nghệ Số
                     </div>
                     <div style="font-size:0.75rem;color:var(--muted);margin-bottom:16px;">Admin upload file PDF của từng bài. Giáo viên click vào bài tương ứng để xem hoặc tải về.</div>
-                    <div class="pdf-modules" id="pdf-grid"></div>
+                                    <div class="pdf-upload-wrap" id="pdf-slot-wrap">
+                    <input type="file" accept="application/pdf" onchange="handlePDF(event)" style="display:none;">
+                    <div class="pdf-upload-icon"><i class="fa-solid fa-file-pdf"></i></div>
+                    <div class="pdf-upload-info">
+                        <div class="pdf-upload-title">Chưa có file bài nộp</div>
+                        <div class="pdf-upload-hint">Admin chưa upload file bài này</div>
+                    </div>
+                    <div class="pdf-upload-actions"></div>
+                </div>
                 </div>
             </div>
 
@@ -486,15 +494,6 @@
           tip:{type:'warn',icon:'fa-file-pdf',text:"Bao gồm ít nhất 3 screenshot: (1) Zoom/Meet đang họp, (2) Trello/Notion board, (3) Google Docs cộng tác."} }
     ];
 
-    const PDF_SLOTS = [
-        {id:'bai1',label:'Bài 1',sub:'Máy Tính & Ngoại Vi',icon:'fa-microchip'},
-        {id:'bai2',label:'Bài 2',sub:'Khai Thác Dữ Liệu',icon:'fa-magnifying-glass'},
-        {id:'bai3',label:'Bài 3',sub:'Tổng Quan AI',icon:'fa-robot'},
-        {id:'bai4',label:'Bài 4',sub:'Giao Tiếp & Hợp Tác',icon:'fa-users'},
-        {id:'bai5',label:'Bài 5',sub:'Sáng Tạo Nội Dung Số',icon:'fa-wand-magic-sparkles'},
-        {id:'bai6',label:'Bài 6',sub:'An Toàn & Liêm Chính',icon:'fa-shield-halved'},
-    ];
-
     let doneSteps = new Set(JSON.parse(localStorage.getItem('cns_bai4_done')||'[]'));
     let pdfData   = JSON.parse(localStorage.getItem('cns_pdf_data')||'{}');
     let isAdmin   = sessionStorage.getItem('cns_admin') === 'true';
@@ -541,46 +540,81 @@
         renderSteps();renderSideNav();updateRing();
     }
 
-    function renderPDF() {
-        document.getElementById('pdf-grid').innerHTML = PDF_SLOTS.map(slot => {
-            const s = pdfData[slot.id];
-            if(s) return `<div class="pdf-mod has-file" id="slot-${slot.id}">
-                <span class="pdf-mod-icon"><i class="fa-solid fa-file-pdf"></i></span>
-                <div class="pdf-mod-label">${slot.label}</div><div class="pdf-mod-sub">${slot.sub}</div>
-                <a href="${s.url||s.fileUrl}" target="_blank" class="pdf-mod-btn"><i class="fa-solid fa-eye"></i> Xem</a>
-                ${isAdmin?`<button class="pdf-mod-del" onclick="removePDF('${slot.id}')"><i class="fa-solid fa-trash"></i> Xóa</button>`:''}
-            </div>`;
-            return `<div class="pdf-mod" id="slot-${slot.id}">
-                <span class="pdf-mod-icon"><i class="fa-solid fa-${slot.icon}"></i></span>
-                <div class="pdf-mod-label">${slot.label}</div><div class="pdf-mod-sub">${isAdmin?'Upload PDF':slot.sub}</div>
-                ${isAdmin?`<input type="file" accept="application/pdf" onchange="handlePDF(event,'${slot.id}')">` :''}
-            </div>`;
-        }).join('');
+        function renderPDF() {
+        const saved = pdfData['bai4'];
+        const wrap = document.getElementById('pdf-slot-wrap');
+        if (!wrap) return;
+
+        if (saved) {
+            wrap.classList.add('has-file');
+            wrap.querySelector('.pdf-upload-icon i').className = 'fa-solid fa-file-pdf';
+            wrap.querySelector('.pdf-upload-title').textContent = saved.name || 'Bài 4.pdf';
+            wrap.querySelector('.pdf-upload-hint').textContent = 'Đã upload — click "Xem PDF" để mở';
+            // Actions
+            let actions = wrap.querySelector('.pdf-upload-actions');
+            actions.innerHTML = `
+                <a href="${saved.url || saved.fileUrl}" target="_blank" class="pdf-view-link">
+                    <i class="fa-solid fa-eye"></i> Xem PDF
+                </a>
+                ${isAdmin ? `<button class="pdf-del-btn" onclick="removePDF()"><i class="fa-solid fa-trash"></i> Xóa</button>` : ''}
+            `;
+            // Disable file input if not admin
+            const inp = wrap.querySelector('input[type="file"]');
+            if (inp) inp.style.display = isAdmin ? 'block' : 'none';
+        } else {
+            wrap.classList.remove('has-file');
+            wrap.querySelector('.pdf-upload-icon i').className = 'fa-solid fa-file-pdf';
+            wrap.querySelector('.pdf-upload-title').textContent = isAdmin ? 'Nhấp để upload file PDF bài Bài 4' : 'Chưa có file bài nộp';
+            wrap.querySelector('.pdf-upload-hint').textContent = isAdmin ? 'Chấp nhận file .pdf, kích thước tối đa 10MB' : 'Admin chưa upload file bài này';
+            wrap.querySelector('.pdf-upload-actions').innerHTML = '';
+            const inp = wrap.querySelector('input[type="file"]');
+            if (inp) inp.style.display = isAdmin ? 'block' : 'none';
+        }
     }
 
-    async function handlePDF(event,slotId) {
-        const file=event.target.files[0];
-        if(!file||file.type!=='application/pdf'){alert('Chỉ chấp nhận file PDF!');return;}
-        pdfData[slotId]={name:file.name,url:URL.createObjectURL(file)};renderPDF();
-        try{
-            const fd=new FormData();fd.append('file',file);fd.append('slotId',slotId);
-            const res=await fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf/${slotId}`,{method:'POST',body:fd});
-            if(res.ok){const d=await res.json();pdfData[slotId]={name:file.name,url:d.fileUrl};}
-        }catch(e){console.warn('Upload PDF loi:',e);}
-        localStorage.setItem('cns_pdf_data',JSON.stringify(pdfData));renderPDF();
+    async function handlePDF(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        if (file.type !== 'application/pdf') { alert('Chỉ chấp nhận file PDF!'); return; }
+        const blobUrl = URL.createObjectURL(file);
+        pdfData['bai4'] = { name: file.name, url: blobUrl };
+        renderPDF();
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf/bai4`, { method: 'POST', body: formData });
+            if (res.ok) {
+                const data = await res.json();
+                pdfData['bai4'] = { name: file.name, url: data.fileUrl };
+                localStorage.setItem('cns_pdf_data', JSON.stringify(pdfData));
+                renderPDF();
+            }
+        } catch (e) {
+            localStorage.setItem('cns_pdf_data', JSON.stringify(pdfData));
+            console.warn('Upload PDF loi:', e);
+        }
     }
 
-    function removePDF(slotId){
-        if(!confirm('Xóa file PDF này?'))return;
-        delete pdfData[slotId];localStorage.setItem('cns_pdf_data',JSON.stringify(pdfData));renderPDF();
-        fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf/${slotId}`,{method:'DELETE'}).catch(()=>{});
+    function removePDF() {
+        if (!confirm('Xóa file PDF bài Bài 4?')) return;
+        delete pdfData['bai4'];
+        localStorage.setItem('cns_pdf_data', JSON.stringify(pdfData));
+        renderPDF();
+        fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf/bai4`, { method: 'DELETE' }).catch(() => {});
     }
 
-    async function loadPDFFromServer(){
-        try{
-            const res=await fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf`,{signal:AbortSignal.timeout(8000)});
-            if(res.ok){const d=await res.json();if(d){Object.assign(pdfData,d);localStorage.setItem('cns_pdf_data',JSON.stringify(pdfData));renderPDF();}}
-        }catch(e){console.warn('Không load PDF:',e.message);}
+    async function loadPDFFromServer() {
+        try {
+            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf/bai4`, { signal: AbortSignal.timeout(8000) });
+            if (res.ok) {
+                const d = await res.json();
+                if (d && d.fileUrl) {
+                    pdfData['bai4'] = { name: d.fileName || 'Bài 4.pdf', url: d.fileUrl };
+                    localStorage.setItem('cns_pdf_data', JSON.stringify(pdfData));
+                    renderPDF();
+                }
+            }
+        } catch (e) { console.warn('Không load PDF:', e.message); }
     }
 
     function toggleAdmin(){
