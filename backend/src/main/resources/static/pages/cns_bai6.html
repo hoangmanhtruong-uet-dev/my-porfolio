@@ -413,7 +413,7 @@
                 <span class="pdf-mod-icon"><i class="fa-solid fa-file-pdf"></i></span>
                 <div class="pdf-mod-label">${slot.label}</div>
                 <div class="pdf-mod-sub">${slot.sub}</div>
-                <a href="${saved.url||saved.fileUrl}" target="_blank" class="pdf-mod-btn"><i class="fa-solid fa-eye"></i> Xem</a>
+                <a href="${saved.viewUrl||saved.url||saved.fileUrl}" target="_blank" class="pdf-mod-btn"><i class="fa-solid fa-eye"></i> Xem</a>
                 ${isAdmin?`<button class="pdf-mod-del" onclick="removePDF('${slot.id}')"><i class="fa-solid fa-trash"></i> Xóa</button>`:''}
             </div>`;
             return `<div class="pdf-mod" id="slot-${slot.id}">
@@ -428,7 +428,7 @@
     async function handlePDF(event, slotId) {
         const file = event.target.files[0]; if (!file || file.type!=='application/pdf') { alert('Chỉ chấp nhận file PDF!'); return; }
         pdfData[slotId] = { name:file.name, url:URL.createObjectURL(file) }; renderPDF();
-        try { const fd=new FormData(); fd.append('file',file); fd.append('slotId',slotId); const res=await fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf/${slotId}`,{method:'POST',body:fd}); if(res.ok){const d=await res.json(); pdfData[slotId]={name:file.name,fileUrl:d.fileUrl};} } catch(e){console.warn('Upload PDF loi:',e); }
+        try { const fd=new FormData(); fd.append('file',file); fd.append('slotId',slotId); const res=await fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf/${slotId}`,{method:'POST',body:fd}); if(res.ok){const d=await res.json(); pdfData[slotId]={name:file.name,fileUrl:d.fileUrl,viewUrl:d.viewUrl};} } catch(e){console.warn('Upload PDF loi:',e); }
         localStorage.setItem('cns_pdf_data',JSON.stringify(pdfData)); renderPDF();
     }
 

@@ -6,9 +6,10 @@ import com.love.portfolio.repository.CnsProgressRepository;
 import com.love.portfolio.repository.CnsPdfRepository;
 import com.love.portfolio.service.CloudinaryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -113,6 +114,8 @@ public class CnsController {
         Map<String, Object> result = new HashMap<>();
         pdfRepo.findAll().forEach(p -> {
             Map<String, String> info = new HashMap<>();
+            // expose a server-side view URL that streams the PDF with inline disposition
+            info.put("viewUrl", "/api/cns/pdf/view/" + p.getSlotId());
             info.put("fileUrl", p.getFileUrl());
             info.put("fileName", p.getFileName());
             result.put(p.getSlotId(), info);
@@ -134,7 +137,13 @@ public class CnsController {
         pdf.setFileName(file.getOriginalFilename());
         pdfRepo.save(pdf);
 
-        return ResponseEntity.ok(Map.of("fileUrl", url, "fileName", file.getOriginalFilename()));
+        // Return both original cloud URL and a server-side view URL that streams with inline disposition
+        String viewUrl = "/api/cns/pdf/view/" + slotId;
+        Map<String, String> resp = new HashMap<>();
+        resp.put("fileUrl", url);
+        resp.put("viewUrl", viewUrl);
+        resp.put("fileName", file.getOriginalFilename());
+        return ResponseEntity.ok(resp);
     }
 
     // ── DELETE: xóa PDF của 1 slot ───────────────────────────────────────────
@@ -142,5 +151,32 @@ public class CnsController {
     public ResponseEntity<Void> deletePdf(@PathVariable String slotId) {
         pdfRepo.deleteById(slotId);
         return ResponseEntity.noContent().build();
+    }
+
+    // ── GET: proxy/view a PDF inline (streams with Content-Disposition: inline)
+    @GetMapping("/pdf/view/{slotId}")
+    public ResponseEntity<byte[]> viewPdfInline(@PathVariable String slotId) {
+        var maybe = pdfRepo.findById(slotId);
+        if (maybe.isEmpty()) return ResponseEntity.notFound().build();
+        CnsPdf pdf = maybe.get();
+        if (pdf.getFileUrl() == null) return ResponseEntity.notFound().build();
+
+        RestTemplate rt = new RestTemplate();
+        ResponseEntity<byte[]> resp;
+        try {
+            resp = rt.getForEntity(pdf.getFileUrl(), byte[].class);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
+        }
+
+        if (!resp.getStatusCode().is2xxSuccessful() || resp.getBody() == null) {
+            return ResponseEntity.status(resp.getStatusCode()).build();
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        ContentDisposition cd = ContentDisposition.inline().filename(pdf.getFileName() == null ? "file.pdf" : pdf.getFileName()).build();
+        headers.setContentDisposition(cd);
+        return new ResponseEntity<>(resp.getBody(), headers, HttpStatus.OK);
     }
 }

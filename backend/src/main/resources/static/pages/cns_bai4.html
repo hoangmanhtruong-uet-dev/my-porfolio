@@ -553,7 +553,7 @@
             // Actions
             let actions = wrap.querySelector('.pdf-upload-actions');
             actions.innerHTML = `
-                <a href="${saved.url || saved.fileUrl}" target="_blank" class="pdf-view-link">
+                <a href="${saved.viewUrl || saved.url || saved.fileUrl}" target="_blank" class="pdf-view-link">
                     <i class="fa-solid fa-eye"></i> Xem PDF
                 </a>
                 ${isAdmin ? `<button class="pdf-del-btn" onclick="removePDF()"><i class="fa-solid fa-trash"></i> Xóa</button>` : ''}
@@ -585,7 +585,7 @@
             const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf/bai4`, { method: 'POST', body: formData });
             if (res.ok) {
                 const data = await res.json();
-                pdfData['bai4'] = { name: file.name, url: data.fileUrl };
+                pdfData['bai4'] = { name: file.name, fileUrl: data.fileUrl, viewUrl: data.viewUrl };
                 localStorage.setItem('cns_pdf_data', JSON.stringify(pdfData));
                 renderPDF();
             }
@@ -609,7 +609,7 @@
             if (res.ok) {
                 const d = await res.json();
                 if (d && d.fileUrl) {
-                    pdfData['bai4'] = { name: d.fileName || 'Bài 4.pdf', url: d.fileUrl };
+                    pdfData['bai4'] = { name: d.fileName || 'Bài 4.pdf', fileUrl: d.fileUrl, viewUrl: d.viewUrl };
                     localStorage.setItem('cns_pdf_data', JSON.stringify(pdfData));
                     renderPDF();
                 }
