@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/common.css">
+    <link rel="stylesheet" href="../assets/css/cns-enhanced.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -127,9 +128,6 @@
         }
         .meta-row:last-child { border-bottom: none; }
         .meta-row i { width: 16px; text-align: center; }
-
-        /* ── Main content ── */
-        .main-content {}
 
         /* Breadcrumb */
         .breadcrumb {
@@ -640,8 +638,10 @@
         <a href="../index.html" class="nav-logo">
             <i class="fa-solid fa-circle-user"></i> Mtruong<span>_dev</span>
         </a>
-        <ul class="nav-links-unified">            <li><a href="../index.html">Trang Chủ</a></li>
-            <li><a href="cns.html">Portfolio CNS</a></li>
+        <ul class="nav-links-unified">
+            <li><a href="../index.html">Trang Chủ</a></li>
+            <li><a href="cns.html">Bài Tập Công Nghệ Số</a></li>
+            <li><a href="muctieu.html">Mục Tiêu Cá Nhân</a></li>
             <li>
                 <a href="about.html">Tìm Hiểu Thêm ▾</a>
                 <ul class="nav-dropdown">
@@ -649,7 +649,7 @@
                     <li><a href="teaching.html">Giảng Dạy</a></li>
                     <li><a href="research_hub.html">Nghiên Cứu</a></li>
                     <li><a href="blog.html">Kiến Thức</a></li>
-                    <li><a href="muctieu.html">Mục Tiêu</a></li>
+                    <li><a href="muctieu.html">Mục Tiêu Cá Nhân</a></li>
                 </ul>
             </li>
         </ul>
@@ -837,20 +837,21 @@
     let isAdmin    = sessionStorage.getItem('cns_admin') === 'true';
 
     async function loadProgress() {
+        // Tiến độ (done) luôn lấy từ localStorage — mỗi người riêng
+        doneSteps = new Set(JSON.parse(localStorage.getItem('cns_bai1_done') || '[]'));
+
+        // Ảnh minh chứng lấy từ DB — dùng chung cho tất cả
         try {
             const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}`);
             if (res.ok) {
                 const data = await res.json();
-                doneSteps = new Set(data.filter(x => x.done).map(x => x.stepNum));
                 savedImgs = {};
                 data.forEach(x => {
                     if (x.imageUrl) savedImgs[x.stepNum] = x.imageUrl;
                 });
             }
         } catch (e) {
-            console.error("Failed to load progress from server, falling back to LocalStorage:", e);
-            doneSteps = new Set(JSON.parse(localStorage.getItem('cns_bai1_done') || '[]'));
-            savedImgs = JSON.parse(localStorage.getItem('cns_bai1_imgs') || '{}');
+            console.error("Không thể tải ảnh từ server:", e);
         }
         render();
     }
@@ -876,24 +877,34 @@
 
             let imgSlot = '';
             if (imgSrc) {
+                // Ảnh đã có — chỉ Admin mới được đổi/xóa
+                const adminActions = isAdmin ? `
+                    <div class="step-img-actions">
+                        <label class="btn-img-change"><i class="fa-solid fa-image"></i> Đổi ảnh
+                            <input type="file" accept="image/*" onchange="handleImg(event,${s.num})">
+                        </label>
+                        <button class="btn-img-remove" onclick="removeImg(${s.num})"><i class="fa-solid fa-trash"></i> Xóa ảnh</button>
+                    </div>` : '';
                 imgSlot = `
                     <div class="step-img-wrap">
                         <img src="${imgSrc}" class="step-img-preview" onclick="zoomImg('${imgSrc}')">
-                        <div class="step-img-actions">
-                            <label class="btn-img-change"><i class="fa-solid fa-image"></i> Đổi ảnh
-                                <input type="file" accept="image/*" onchange="handleImg(event,${s.num})">
-                            </label>
-                            <button class="btn-img-remove" onclick="removeImg(${s.num})"><i class="fa-solid fa-trash"></i> Xóa ảnh</button>
-                        </div>
+                        ${adminActions}
                     </div>`;
             } else {
-                imgSlot = `
+                // Chưa có ảnh — chỉ Admin mới upload được
+                imgSlot = isAdmin ? `
                     <div class="step-img-wrap">
                         <label class="step-img-placeholder">
                             <div style="font-size:1.4rem;color:rgba(59,130,246,0.35);margin-bottom:5px;"><i class="fa-solid fa-image"></i></div>
                             <div style="font-size:0.75rem;color:rgba(255,255,255,0.25);">Nhấp để thêm ảnh minh chứng</div>
                             <input type="file" accept="image/*" onchange="handleImg(event,${s.num})">
                         </label>
+                    </div>` : `
+                    <div class="step-img-wrap">
+                        <div class="step-img-placeholder" style="cursor:default;">
+                            <div style="font-size:1.4rem;color:rgba(255,255,255,0.1);margin-bottom:5px;"><i class="fa-solid fa-image"></i></div>
+                            <div style="font-size:0.75rem;color:rgba(255,255,255,0.15);">Chưa có ảnh minh chứng</div>
+                        </div>
                     </div>`;
             }
 
@@ -951,41 +962,22 @@
         card.classList.toggle('open');
     }
 
-    async function toggleDone(num) {
+    function toggleDone(num) {
         const isDone = !doneSteps.has(num);
         if (isDone) doneSteps.add(num); else doneSteps.delete(num);
+        // Lưu tiến độ vào localStorage — riêng từng người dùng
+        localStorage.setItem('cns_bai1_done', JSON.stringify([...doneSteps]));
         render();
         const card = document.getElementById('step-' + num);
         if (card) card.classList.add('open');
-
-        try {
-            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}/${num}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ done: isDone })
-            });
-            if (!res.ok) throw new Error("Server error");
-        } catch (e) {
-            console.error("Failed to save progress to server, falling back to LocalStorage:", e);
-            localStorage.setItem('cns_bai1_done', JSON.stringify([...doneSteps]));
-        }
     }
 
-    async function resetAll() {
-        if (!confirm('Reset toàn bộ tiến độ?')) return;
+    function resetAll() {
+        if (!confirm('Reset tiến độ của bạn?')) return;
         doneSteps.clear();
-        savedImgs = {};
+        localStorage.removeItem('cns_bai1_done');
         render();
-
-        try {
-            await fetch(`${API_CONFIG.BASE_URL}/api/cns/${lessonId}`, {
-                method: 'DELETE'
-            });
-            localStorage.removeItem('cns_bai1_done');
-            localStorage.removeItem('cns_bai1_imgs');
-        } catch (e) {
-            console.error("Failed to reset progress on server:", e);
-        }
+        // Không xóa ảnh trên server khi reset tiến độ cá nhân
     }
 
     function scrollToStep(num) {
@@ -1113,6 +1105,7 @@
         if (first) first.classList.add('open');
     }, 100);
     </script>
+    <script src="../assets/js/cns-enhanced.js"></script>
     <script src="../assets/js/common.js"></script>
 </body>
 </html>
