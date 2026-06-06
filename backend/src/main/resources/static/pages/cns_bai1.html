@@ -449,20 +449,6 @@
         fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf/bai1`, { method: 'DELETE' }).catch(() => {});
     }
 
-    async function loadPDFFromServer() {
-        try {
-            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf/bai1`, { signal: AbortSignal.timeout(8000) });
-            if (res.ok) {
-                const d = await res.json();
-                if (d && d.fileUrl) {
-                    pdfData['bai1'] = { name: d.fileName || 'Bài 1.pdf', fileUrl: d.fileUrl, viewUrl: d.viewUrl };
-                    localStorage.setItem('cns_pdf_data', JSON.stringify(pdfData));
-                    renderPDF();
-                }
-            }
-        } catch (e) { console.warn('Không load PDF:', e.message); }
-    }
-
     function toggleAdmin() {
         if (isAdmin) {
             if (confirm('Đăng xuất Admin?')) { sessionStorage.removeItem('cns_admin'); isAdmin = false; updateFab(); renderSteps(); renderPDF(); }

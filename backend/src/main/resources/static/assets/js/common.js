@@ -45,14 +45,16 @@ window.addEventListener('load', () => {
 });
 
 // Auth and Navbar Logic
-const API_CONFIG = {
-    // Cách 1: Đường dẫn tương đối — production tự gọi đúng domain, local trỏ về localhost:8080
-    BASE_URL: (window.location.hostname === '127.0.0.1' || 
-               window.location.hostname === 'localhost' || 
-               window.location.protocol === 'file:') 
-        ? 'http://localhost:8080'
-        : '', // Để trống → trình duyệt tự gọi đúng domain hiện tại (Render, custom domain, v.v.)
-};
+if (typeof API_CONFIG === 'undefined') {
+    window.API_CONFIG = {
+        // Cách 1: Đường dẫn tương đối — production tự gọi đúng domain, local trỏ về localhost:8080
+        BASE_URL: (window.location.hostname === '127.0.0.1' || 
+                   window.location.hostname === 'localhost' || 
+                   window.location.protocol === 'file:') 
+            ? 'http://localhost:8080'
+            : '', // Để trống → trình duyệt tự gọi đúng domain hiện tại (Render, custom domain, v.v.)
+    };
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Unified Navbar Scroll Handling

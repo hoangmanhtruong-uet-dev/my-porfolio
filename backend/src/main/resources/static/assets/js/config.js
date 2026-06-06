@@ -22,6 +22,17 @@ const GLOBAL_CONFIG = {
     }
 };
 
+var API_CONFIG = window.API_CONFIG || {
+    // Tự động nhận diện môi trường để gọi API Backend
+    // Nếu deploy theo dạng Monolith (Option 1): để rỗng '' là đúng.
+    // Nếu deploy tách Frontend/Backend (Option 2): hãy điền URL của Render Backend vào đây.
+    BASE_URL: (window.location.hostname === '127.0.0.1' || 
+               window.location.hostname === 'localhost' || 
+               window.location.protocol === 'file:')
+        ? 'http://localhost:8080' 
+        : '' // Ví dụ: 'https://backend-mtruong.onrender.com'
+};
+
 // Export for use in other scripts
 if (typeof module !== 'undefined') {
     module.exports = GLOBAL_CONFIG;

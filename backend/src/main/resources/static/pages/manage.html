@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="../assets/js/config.js"></script>
     <script src="../assets/js/common.js"></script>
     <style>
         :root {
@@ -895,11 +896,7 @@
         /* ══════════════════════════════════════════════
            API CONFIG
         ══════════════════════════════════════════════ */
-        const BASE_URL = (window.location.hostname === 'localhost' ||
-                          window.location.hostname === '127.0.0.1' ||
-                          window.location.protocol === 'file:')
-            ? 'http://localhost:8080' : '';
-        const API = `${BASE_URL}/api/classes`;
+        const API = `${API_CONFIG.BASE_URL}/api/classes`;
 
         // classes[] là source of truth (mirror từ server)
         let classes = [];
