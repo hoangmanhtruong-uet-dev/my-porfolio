@@ -836,11 +836,20 @@
 
         const GOAL_API = `${API_CONFIG.BASE_URL}/api/goals`;
 
-        // Load tiến độ từ DB
+        // Render ngay với dữ liệu mặc định — không chờ API
+        updateAdminUI();
+        renderGoals('all');
+
+        // Load tiến độ từ DB nền — có timeout, không block trang
         async function loadGoalProgress() {
             try {
-                const res = await fetch(GOAL_API);
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), 5000); // timeout 5s
+                const res = await fetch(GOAL_API, { signal: controller.signal });
+                clearTimeout(timer);
+                if (!res.ok) return;
                 const saved = await res.json();
+                let changed = false;
                 saved.forEach(item => {
                     const g = goalsData.find(g => g.id === item.goalId);
                     if (g) {
@@ -848,14 +857,19 @@
                         g.status    = item.status;
                         g.startDate = item.startDate || '';
                         g.endDate   = item.endDate   || '';
+                        changed = true;
                     }
                 });
+                // Chỉ re-render nếu có dữ liệu mới từ server
+                if (changed) renderGoals(currentFilter);
             } catch (err) {
-                console.warn('Không tải được tiến độ từ DB, dùng dữ liệu mặc định:', err);
+                // AbortError = timeout, hoặc server chưa sẵn — bình thường, không cần báo lỗi
+                if (err.name !== 'AbortError') {
+                    console.warn('Không tải được tiến độ từ DB:', err.message);
+                }
             }
-            updateAdminUI();
-            renderGoals('all');
         }
+        loadGoalProgress();
 
         async function saveGoalData(goalId) {
             const g = goalsData.find(g => g.id === goalId);
@@ -1025,7 +1039,7 @@
 
         // Init
         updateAdminUI();
-        loadGoalProgress();
+        // loadGoalProgress đã được gọi ngay sau khi định nghĩa ở trên
     </script>
     <script src="../assets/js/common.js"></script>
 </body>

@@ -44,6 +44,14 @@ window.addEventListener('load', () => {
     }
 });
 
+// Safety net: ẩn loader sau tối đa 2s dù window.load chưa fire
+setTimeout(() => {
+    const loader = document.getElementById('page-loader');
+    if (loader && !loader.classList.contains('hidden')) {
+        loader.classList.add('hidden');
+    }
+}, 2000);
+
 // Auth and Navbar Logic
 if (typeof API_CONFIG === 'undefined') {
     window.API_CONFIG = {
