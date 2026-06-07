@@ -409,13 +409,6 @@
                     </div>
                     <div style="font-size:0.75rem;color:var(--muted);margin-bottom:16px;">Admin upload file PDF của từng bài. Giáo viên click vào bài tương ứng để xem hoặc tải về.</div>
                                     <div class="pdf-upload-wrap" id="pdf-slot-wrap">
-                    <input type="file" accept="application/pdf" onchange="handlePDF(event)" style="display:none;">
-                    <div class="pdf-upload-icon"><i class="fa-solid fa-file-pdf"></i></div>
-                    <div class="pdf-upload-info">
-                        <div class="pdf-upload-title">Chưa có file bài nộp</div>
-                        <div class="pdf-upload-hint">Admin chưa upload file bài này</div>
-                    </div>
-                    <div class="pdf-upload-actions"></div>
                 </div>
                 </div>
             </div>
@@ -538,14 +531,13 @@
     }
 
     renderSteps(); renderSideNav(); updateRing(); updateFab();
-    CnsPdf.init('bai3', () => isAdmin, () => API_CONFIG.BASE_URL);
     document.addEventListener('keypress', e => { if(e.key==='Enter'&&document.getElementById('admin-modal').classList.contains('open')) checkPwd(); });
     </script>
 
-    <script src="../assets/js/cns-pdf.js"></script>
     <script src="../assets/js/config.js"></script>
+    <script src="../assets/js/cns-pdf.js"></script>
+    <script>document.addEventListener("DOMContentLoaded",function(){CnsPdf.init('bai3', () => isAdmin, () => API_CONFIG.BASE_URL);});</script>
     <script src="../assets/js/common.js"></script>
-    <script src="../assets/js/cns-upload.js"></script>
     <script src="../assets/js/main.js"></script>
 </body>
 </html>
