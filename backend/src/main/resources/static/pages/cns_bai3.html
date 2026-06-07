@@ -477,7 +477,6 @@
     ];
 
     let doneSteps = new Set(JSON.parse(localStorage.getItem('cns_bai3_done') || '[]'));
-    let pdfData   = JSON.parse(localStorage.getItem('cns_pdf_data') || '{}');
     let isAdmin   = sessionStorage.getItem('cns_admin') === 'true';
 
     function renderSteps() {
@@ -522,91 +521,14 @@
         renderSteps(); renderSideNav(); updateRing();
     }
 
-        function renderPDF() {
-        const saved = pdfData['bai3'];
-        const wrap = document.getElementById('pdf-slot-wrap');
-        if (!wrap) return;
-
-        if (saved) {
-            wrap.classList.add('has-file');
-            wrap.querySelector('.pdf-upload-icon i').className = 'fa-solid fa-file-pdf';
-            wrap.querySelector('.pdf-upload-title').textContent = saved.name || 'Bài 3.pdf';
-            wrap.querySelector('.pdf-upload-hint').textContent = 'Đã upload — click "Xem PDF" để mở';
-            // Actions
-            let actions = wrap.querySelector('.pdf-upload-actions');
-            actions.innerHTML = `
-                <a href="${saved.viewUrl || saved.url || saved.fileUrl}" target="_blank" class="pdf-view-link">
-                    <i class="fa-solid fa-eye"></i> Xem PDF
-                </a>
-                ${isAdmin ? `<button class="pdf-del-btn" onclick="removePDF()"><i class="fa-solid fa-trash"></i> Xóa</button>` : ''}
-            `;
-            // Disable file input if not admin
-            const inp = wrap.querySelector('input[type="file"]');
-            if (inp) inp.style.display = isAdmin ? 'block' : 'none';
-        } else {
-            wrap.classList.remove('has-file');
-            wrap.querySelector('.pdf-upload-icon i').className = 'fa-solid fa-file-pdf';
-            wrap.querySelector('.pdf-upload-title').textContent = isAdmin ? 'Nhấp để upload file PDF bài Bài 3' : 'Chưa có file bài nộp';
-            wrap.querySelector('.pdf-upload-hint').textContent = isAdmin ? 'Chấp nhận file .pdf, kích thước tối đa 10MB' : 'Admin chưa upload file bài này';
-            wrap.querySelector('.pdf-upload-actions').innerHTML = '';
-            const inp = wrap.querySelector('input[type="file"]');
-            if (inp) inp.style.display = isAdmin ? 'block' : 'none';
-        }
-    }
-
-    async function handlePDF(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        if (file.type !== 'application/pdf') { alert('Chỉ chấp nhận file PDF!'); return; }
-        const blobUrl = URL.createObjectURL(file);
-        pdfData['bai3'] = { name: file.name, url: blobUrl };
-        renderPDF();
-        try {
-            const formData = new FormData();
-            formData.append('file', file);
-            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf/bai3`, { method: 'POST', body: formData });
-            if (res.ok) {
-                const data = await res.json();
-                pdfData['bai3'] = { name: file.name, fileUrl: data.fileUrl, viewUrl: data.viewUrl };
-                localStorage.setItem('cns_pdf_data', JSON.stringify(pdfData));
-                renderPDF();
-            }
-        } catch (e) {
-            localStorage.setItem('cns_pdf_data', JSON.stringify(pdfData));
-            console.warn('Upload PDF loi:', e);
-        }
-    }
-
-    function removePDF() {
-        if (!confirm('Xóa file PDF bài Bài 3?')) return;
-        delete pdfData['bai3'];
-        localStorage.setItem('cns_pdf_data', JSON.stringify(pdfData));
-        renderPDF();
-        fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf/bai3`, { method: 'DELETE' }).catch(() => {});
-    }
-
-    async function loadPDFFromServer() {
-        try {
-            const res = await fetch(`${API_CONFIG.BASE_URL}/api/cns/pdf/bai3`, { signal: AbortSignal.timeout(8000) });
-            if (res.ok) {
-                const d = await res.json();
-                if (d && d.fileUrl) {
-                    pdfData['bai3'] = { name: d.fileName || 'Bài 3.pdf', fileUrl: d.fileUrl, viewUrl: d.viewUrl };
-                    localStorage.setItem('cns_pdf_data', JSON.stringify(pdfData));
-                    renderPDF();
-                }
-            }
-        } catch (e) { console.warn('Không load PDF:', e.message); }
-    }
-
     function toggleAdmin() {
-        if (isAdmin) { if(confirm('Đăng xuất Admin?')){ sessionStorage.removeItem('cns_admin'); isAdmin=false; updateFab(); renderSteps(); renderPDF(); } }
+        if (isAdmin) { if(confirm('Đăng xuất Admin?')){ sessionStorage.removeItem('cns_admin'); isAdmin=false; updateFab(); renderSteps(); } }
         else { document.getElementById('admin-modal').classList.add('open'); setTimeout(()=>document.getElementById('admin-pwd').focus(),80); }
     }
     function closeModal() { document.getElementById('admin-modal').classList.remove('open'); document.getElementById('admin-pwd').value=''; }
     function checkPwd() {
         const p = document.getElementById('admin-pwd').value;
-        if (p==='1002') { sessionStorage.setItem('cns_admin','true'); isAdmin=true; closeModal(); updateFab(); renderSteps(); renderPDF(); }
+        if (p==='1002') { sessionStorage.setItem('cns_admin','true'); isAdmin=true; closeModal(); updateFab(); renderSteps(); }
         else { const i=document.getElementById('admin-pwd'); i.style.borderColor='var(--red)'; setTimeout(()=>i.style.borderColor='',800); i.value=''; }
     }
     function updateFab() {
@@ -615,8 +537,7 @@
         else { f.innerHTML='<i class="fa-solid fa-lock lock-glow"></i> Admin'; f.className='sys-lock-btn'; }
     }
 
-    renderSteps(); renderSideNav(); updateRing(); updateFab(); renderPDF();
-    loadPDFFromServer();
+    renderSteps(); renderSideNav(); updateRing(); updateFab();
     CnsPdf.init('bai3', () => isAdmin, () => API_CONFIG.BASE_URL);
     document.addEventListener('keypress', e => { if(e.key==='Enter'&&document.getElementById('admin-modal').classList.contains('open')) checkPwd(); });
     </script>
