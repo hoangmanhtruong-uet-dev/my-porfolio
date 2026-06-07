@@ -114,13 +114,26 @@ public class CnsController {
         Map<String, Object> result = new HashMap<>();
         pdfRepo.findAll().forEach(p -> {
             Map<String, String> info = new HashMap<>();
-            // expose a server-side view URL that streams the PDF with inline disposition
             info.put("viewUrl", "/api/cns/pdf/view/" + p.getSlotId());
             info.put("fileUrl", p.getFileUrl());
             info.put("fileName", p.getFileName());
             result.put(p.getSlotId(), info);
         });
         return result;
+    }
+
+    // ── GET: lấy thông tin 1 PDF slot ────────────────────────────────────────
+    @GetMapping("/pdf/{slotId}")
+    public ResponseEntity<Map<String, String>> getPdfSlot(@PathVariable String slotId) {
+        return pdfRepo.findById(slotId)
+            .map(p -> {
+                Map<String, String> info = new HashMap<>();
+                info.put("viewUrl",  "/api/cns/pdf/view/" + p.getSlotId());
+                info.put("fileUrl",  p.getFileUrl());
+                info.put("fileName", p.getFileName());
+                return ResponseEntity.ok(info);
+            })
+            .orElse(ResponseEntity.notFound().build());
     }
 
     // ── POST: upload PDF cho 1 slot ───────────────────────────────────────────

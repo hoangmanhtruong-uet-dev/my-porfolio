@@ -574,9 +574,11 @@
 
     renderSteps(); renderSideNav(); updateRing(); updateFab(); renderPDF();
     loadPDFFromServer();
+    CnsPdf.init('bai2', () => isAdmin, () => API_CONFIG.BASE_URL);
     document.addEventListener('keypress', e => { if(e.key==='Enter'&&document.getElementById('admin-modal').classList.contains('open')) checkPwd(); });
     </script>
 
+    <script src="../assets/js/cns-pdf.js"></script>
     <script src="../assets/js/config.js"></script>
     <script src="../assets/js/common.js"></script>
     <script src="../assets/js/cns-upload.js"></script>
