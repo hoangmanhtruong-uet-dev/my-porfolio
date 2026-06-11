@@ -312,33 +312,293 @@
             font-weight: 600;
         }
 
-        /* Info Box */
-        .info-box {
-            background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(6,182,212,0.06));
-            border: 1.5px solid rgba(59,130,246,0.35);
+        /* Foreword Section Styling */
+        .foreword-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 32px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(168, 85, 247, 0.04));
+            border: 1px solid rgba(59, 130, 246, 0.25);
             border-radius: 24px;
-            padding: 36px 40px;
+            padding: 36px;
             margin-bottom: 50px;
-            display: flex;
-            gap: 24px;
             align-items: center;
-            box-shadow: 0 10px 30px rgba(59,130,246,0.08);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
         }
 
-        .info-box i {
-            font-size: 2.8rem;
+        @media (max-width: 768px) {
+            .foreword-section {
+                grid-template-columns: 1fr;
+                gap: 24px;
+                padding: 24px;
+            }
+        }
+
+        .foreword-left {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .foreword-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .foreword-title i {
             color: #3b82f6;
             text-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
-            flex-shrink: 0;
         }
 
-        .info-box p {
-            font-size: 1.15rem;
-            color: rgba(255,255,255,0.85);
+        .foreword-text {
+            font-size: 1.02rem;
+            color: rgba(255, 255, 255, 0.78);
             line-height: 1.8;
         }
 
-        .info-box strong { color: #60a5fa; }
+        .foreword-text strong {
+            color: #60a5fa;
+        }
+
+        .foreword-author {
+            margin-top: 8px;
+            border-left: 2px solid #a855f7;
+            padding-left: 12px;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        .foreword-right {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .profile-photo-container {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 3px solid rgba(59, 130, 246, 0.4);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-photo-container:hover {
+            transform: scale(1.03);
+            border-color: #3b82f6;
+            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.4);
+        }
+
+        .profile-photo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 600;
+            gap: 6px;
+        }
+
+        .profile-photo-container:hover .photo-overlay {
+            opacity: 1;
+        }
+
+        .photo-overlay i {
+            font-size: 1.4rem;
+        }
+
+        .photo-hint {
+            font-size: 0.72rem;
+            color: rgba(255, 255, 255, 0.45);
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        /* Course Goals Section Styling */
+        .cns-goals-section {
+            margin-bottom: 60px;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 24px;
+            padding: 32px;
+            text-align: left;
+        }
+
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #f8fafc;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: #3b82f6;
+        }
+
+        .section-desc {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.55);
+            margin-bottom: 24px;
+        }
+
+        .goals-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .goal-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 20px 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .goal-item:hover {
+            background: rgba(59, 130, 246, 0.04);
+            border-color: rgba(59, 130, 246, 0.25);
+            transform: translateX(5px);
+        }
+
+        .goal-number {
+            width: 36px;
+            height: 36px;
+            background: #16a34a;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 0 15px rgba(22, 163, 74, 0.3);
+        }
+
+        .goal-content {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .goal-content h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #4ade80;
+        }
+
+        .goal-content p {
+            font-size: 0.92rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        /* Conclusion Section Styling */
+        .conclusion-section {
+            margin-top: 60px;
+            background: linear-gradient(135deg, rgba(22, 163, 74, 0.06), rgba(59, 130, 246, 0.06));
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 24px;
+            padding: 36px;
+            display: flex;
+            gap: 28px;
+            align-items: flex-start;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            text-align: left;
+        }
+
+        @media (max-width: 768px) {
+            .conclusion-section {
+                flex-direction: column;
+                gap: 20px;
+                padding: 24px;
+            }
+        }
+
+        .conclusion-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            font-size: 1.8rem;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
+        }
+
+        .conclusion-content {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .conclusion-content h3 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #f8fafc;
+        }
+
+        .conclusion-content p {
+            font-size: 0.98rem;
+            color: rgba(255, 255, 255, 0.75);
+            line-height: 1.7;
+        }
+
+        .conclusion-content strong {
+            color: #4ade80;
+        }
+
+        .conclusion-signature {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            border-left: 2px solid #22c55e;
+            padding-left: 12px;
+        }
+
+        .conclusion-signature span {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.45);
+        }
+
+        .conclusion-signature strong {
+            font-size: 1.05rem;
+            color: #f8fafc;
+            font-weight: 700;
+        }
     </style>
 </head>
 <body>
@@ -378,16 +638,103 @@
         </div>
 
         <div class="cns-container">
-            <!-- Info Box -->
-            <div class="info-box reveal">
-                <i class="fa-solid fa-bullseye"></i>
-                <p>
-                    Portfolio môn <strong>Công Nghệ Số (INT2210)</strong> — tổng hợp toàn bộ bài tập và báo cáo trong hành trình học tập tại UET. Mục tiêu: <strong>ứng dụng công nghệ số vào thực tiễn</strong>, từ quản lý tệp, tìm kiếm học thuật, viết prompt AI, đến hợp tác nhóm và sáng tạo nội dung số. Mỗi bài là một bước nhỏ trong lộ trình <strong>trở thành lập trình viên toàn diện</strong> — không chỉ biết code mà còn biết <em>làm việc thông minh trong kỷ nguyên số</em>.
-                </p>
+            <!-- Lời mở đầu (Foreword) & Ảnh cá nhân -->
+            <div class="foreword-section reveal">
+                <div class="foreword-left">
+                    <h2 class="foreword-title"><i class="fa-solid fa-quote-left"></i> Lời Mở Đầu</h2>
+                    <p class="foreword-text">
+                        Chào mừng bạn đến với chuyên mục bài tập môn học <strong>Công Nghệ Số (INT2210)</strong> của tôi. Đây không chỉ đơn thuần là nơi lưu giữ các báo cáo thực hành, mà còn đánh dấu hành trình học hỏi chủ động và ứng dụng công nghệ thực tiễn tại UET. 
+                    </p>
+                    <p class="foreword-text">
+                        Qua từng chương và từng bài tập thực tế, tôi đã được trang bị tư duy và năng lực sử dụng hiệu quả các công cụ số, tối ưu hóa quy trình làm việc và tiếp cận <strong>Trí tuệ nhân tạo (AI) một cách có trách nhiệm</strong>. Mỗi bài thực hành chính là một mảnh ghép nhỏ tạo nền tảng vững chắc để xây dựng hình ảnh một lập trình viên hiện đại, sẵn sàng thích ứng trước sự phát triển vượt bậc của công nghệ.
+                    </p>
+                    <div class="foreword-author">
+                        <span>Sinh viên thực hiện:</span>
+                        <strong>Hoàng Mạnh Trường — VNU UET</strong>
+                    </div>
+                </div>
+                <div class="foreword-right">
+                    <div class="profile-photo-container" onclick="document.getElementById('profile-upload-input').click()">
+                        <img id="cns-profile-img" src="../assets/images/cns_profile.jpg" alt="Ảnh cá nhân" onerror="this.src='https://ui-avatars.com/api/?name=Truong&background=3b82f6&color=fff&size=256'">
+                        <div class="photo-overlay">
+                            <i class="fa-solid fa-camera"></i>
+                            <span>Đổi ảnh</span>
+                        </div>
+                    </div>
+                    <input type="file" id="profile-upload-input" accept="image/*" style="display: none;">
+                    <div class="photo-hint">Click vào ảnh để chọn ảnh cá nhân</div>
+                </div>
             </div>
 
-            <!-- Assignments Grid -->
+            <!-- Mục Tiêu Cụ Thể Của Học Phần -->
+            <div class="cns-goals-section reveal">
+                <h2 class="section-title"><i class="fa-solid fa-bullseye"></i> Mục Tiêu Cụ Thể Của Học Phần</h2>
+                <p class="section-desc">Học phần hướng đến việc xây dựng năng lực số toàn diện cho sinh viên thông qua các mục tiêu cụ thể sau:</p>
+                
+                <div class="goals-list">
+                    <div class="goal-item">
+                        <div class="goal-number">1</div>
+                        <div class="goal-content">
+                            <h3>Kiến thức nền tảng</h3>
+                            <p>Giới thiệu cho sinh viên những nội dung cốt lõi của công nghệ số và trí tuệ nhân tạo, tạo nền tảng kiến thức cơ bản về lĩnh vực này.</p>
+                        </div>
+                    </div>
+                    <div class="goal-item">
+                        <div class="goal-number">2</div>
+                        <div class="goal-content">
+                            <h3>Kỹ năng cơ bản</h3>
+                            <p>Phát triển cho sinh viên những kỹ năng cơ bản trong việc sử dụng các công cụ số và một số ứng dụng AI phổ biến để hỗ trợ các hoạt động học tập, nghiên cứu và giao tiếp trên môi trường số.</p>
+                        </div>
+                    </div>
+                    <div class="goal-item">
+                        <div class="goal-number">3</div>
+                        <div class="goal-content">
+                            <h3>Ứng dụng chuyên ngành</h3>
+                            <p>Trang bị cho sinh viên khả năng lựa chọn và áp dụng các công cụ AI phù hợp để giải quyết các nhiệm vụ cơ bản trong các lĩnh vực chuyên ngành khác nhau (thông qua module tự chọn).</p>
+                        </div>
+                    </div>
+                    <div class="goal-item">
+                        <div class="goal-number">4</div>
+                        <div class="goal-content">
+                            <h3>Nhận thức đạo đức</h3>
+                            <p>Nâng cao nhận thức cho sinh viên về các vấn đề đạo đức, an toàn, bảo mật, liêm chính học thuật và các quy định pháp lý liên quan đến việc sử dụng công nghệ số và trí tuệ nhân tạo.</p>
+                        </div>
+                    </div>
+                    <div class="goal-item">
+                        <div class="goal-number">5</div>
+                        <div class="goal-content">
+                            <h3>Thái độ học tập</h3>
+                            <p>Khuyến khích sinh viên hình thành thái độ chủ động, có trách nhiệm và tinh thần học hỏi liên tục đối với sự phát triển nhanh chóng của công nghệ số và trí tuệ nhân tạo.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Danh sách bài tập (01 đến 06) dạng lưới (Grid) -->
+            <div class="reveal" style="margin-bottom: 24px; text-align: left;">
+                <h2 class="section-title"><i class="fa-solid fa-list-check"></i> Danh sách bài tập thực hành</h2>
+            </div>
             <div class="assignments-grid reveal" id="assignments-grid"></div>
+
+            <!-- Lời kết & Hướng ứng dụng thực tế -->
+            <div class="conclusion-section reveal">
+                <div class="conclusion-icon">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div class="conclusion-content">
+                    <h3>Lời Kết & Hướng Ứng Dụng Thực Tế</h3>
+                    <p>
+                        Trải qua học phần <strong>Công Nghệ Số</strong>, tôi không chỉ tích lũy được những kiến thức nền tảng vững chắc về hệ sinh thái số mà còn hình thành tư duy ứng dụng công nghệ một cách thông minh, chủ động và có trách nhiệm. Những kỹ năng thực hành như tối ưu hóa quy trình làm việc trên Notion, viết prompt thông minh để tương tác hiệu quả với Generative AI (Gemini), hay sản xuất nội dung số chuyên nghiệp là những mảnh ghép vô giá trên hành trình phát triển bản thân.
+                    </p>
+                    <p>
+                        Trong thời gian tới, tôi sẽ tiếp tục ứng dụng tối đa các công cụ số vào việc học tập tại UET cũng như các dự án cá nhân để nâng cao hiệu suất làm việc. Xin chân thành cảm ơn giảng viên bộ môn và các bạn học đã đồng hành, hỗ trợ tôi trong suốt học phần ý nghĩa này!
+                    </p>
+                    <div class="conclusion-signature">
+                        <span>Trân trọng,</span>
+                        <strong>Hoàng Mạnh Trường</strong>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -533,6 +880,38 @@
         }
 
         renderAssignments();
+
+        // Profile Image upload & persistence logic
+        const profileInput = document.getElementById('profile-upload-input');
+        const profileImg = document.getElementById('cns-profile-img');
+
+        // Load saved profile image from localStorage on start
+        const savedImg = localStorage.getItem('cns_profile_image');
+        if (savedImg) {
+            profileImg.src = savedImg;
+        }
+
+        // Handle image selection
+        profileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (!file.type.startsWith('image/')) {
+                    alert('Vui lòng chọn tệp hình ảnh hợp lệ.');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const base64Data = evt.target.result;
+                    try {
+                        localStorage.setItem('cns_profile_image', base64Data);
+                    } catch (e) {
+                        console.warn('Không thể lưu ảnh vào localStorage do dung lượng vượt quá giới hạn.');
+                    }
+                    profileImg.src = base64Data;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
     </script>
     <script src="../assets/js/common.js"></script>
     <script src="../assets/js/cns-upload.js"></script>
