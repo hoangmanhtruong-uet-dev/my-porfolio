@@ -17,9 +17,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 // Allow public access to static frontend assets
                 .requestMatchers("/", "/index.html", "/pages/**", "/assets/**").permitAll()
-                // Allow public access to specific APIs
-                .requestMatchers("/api/locations/**").permitAll()
-                .requestMatchers("/api/health").permitAll()
+                // Allow public access to all APIs under /api/**
+                .requestMatchers("/api/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/api-docs/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/actuator/health").permitAll()
                 // Allow WebSocket connections
