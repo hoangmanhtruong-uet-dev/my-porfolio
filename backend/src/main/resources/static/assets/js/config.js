@@ -6,13 +6,13 @@ const GLOBAL_CONFIG = {
         nameFemale: 'Béo 👸 💮',
         zodiacMale: 'Bọ Cạp',
         zodiacFemale: 'Xử Nữ',
-        imgMale: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
-        imgFemale: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=200&q=80'
+        imgMale: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%2336558f%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2224%22 fill=%22%23fff%22 text-anchor=%22middle%22 dy=%22.3em%22%3E🤵%3C/text%3E%3C/svg%3E',
+        imgFemale: 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%23ff69b4%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2224%22 fill=%22%23fff%22 text-anchor=%22middle%22 dy=%22.3em%22%3E👸%3C/text%3E%3C/svg%3E'
     },
     // Exam/Academic Config
     academic: {
         examName: 'Kỳ thi Cuối kỳ - UET',
-        examDate: '2025-06-15T08:00:00',
+        examDate: new Date().toISOString(), // Fetched from backend if needed
         hackerrankUser: 'h25020423'
     },
     // Music Config
@@ -23,14 +23,13 @@ const GLOBAL_CONFIG = {
 };
 
 var API_CONFIG = window.API_CONFIG || {
-    // Tự động nhận diện môi trường để gọi API Backend
-    // Nếu deploy theo dạng Monolith (Option 1): để rỗng '' là đúng.
-    // Nếu deploy tách Frontend/Backend (Option 2): hãy điền URL của Render Backend vào đây.
+    // PRODUCTION: https://my-porfolio-1-b1x3.onrender.com (Monolith Deploy)
+    // LOCAL: http://localhost:8080
     BASE_URL: (window.location.hostname === '127.0.0.1' || 
                window.location.hostname === 'localhost' || 
                window.location.protocol === 'file:')
         ? 'http://localhost:8080' 
-        : '' // Ví dụ: 'https://backend-mtruong.onrender.com'
+        : '' // Production: Frontend & Backend on same domain
 };
 
 // Export for use in other scripts

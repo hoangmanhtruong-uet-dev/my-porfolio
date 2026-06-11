@@ -10,7 +10,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/ai")
-@CrossOrigin(origins = "*") // Cân nhắc thay '*' bằng domain frontend của bạn khi deploy
+@CrossOrigin(origins = {"https://my-porfolio-1-b1x3.onrender.com", "http://localhost:3000", "http://localhost:8080"})
 public class AIController {
 
     @Autowired

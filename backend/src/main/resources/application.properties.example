@@ -1,20 +1,62 @@
 # Copy thành application.properties (KHÔNG commit file đó)
 # cp application.properties.example application.properties
+# For Docker: Use environment variables instead
+# docker run -e SPRING_DATASOURCE_URL=... -e GEMINI_API_KEY=... ...
 
-# --- Aiven MySQL ---
-spring.datasource.url=jdbc:mysql://HOST:PORT/DATABASE?sslMode=REQUIRED&serverTimezone=UTC
-spring.datasource.username=avnadmin
-spring.datasource.password=YOUR_AIVEN_PASSWORD
+# --- Aiven MySQL (Production) ---
+# URL format: jdbc:mysql://host:port/database?sslMode=REQUIRED&serverTimezone=UTC
+spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/love_db?sslMode=DISABLED&serverTimezone=UTC}
+spring.datasource.username=${SPRING_DATASOURCE_USERNAME:root}
+spring.datasource.password=${SPRING_DATASOURCE_PASSWORD:password}
+spring.datasource.hikari.maximum-pool-size=${DATASOURCE_POOL_SIZE:20}
+spring.datasource.hikari.minimum-idle=5
+spring.datasource.hikari.connection-timeout=20000
+spring.datasource.hikari.idle-timeout=600000
+spring.datasource.hikari.max-lifetime=1800000
 
 # Nếu lỗi SSL, tải CA certificate từ Aiven → lưu backend/src/main/resources/ca.pem
 # rồi thêm vào URL: &sslMode=VERIFY_CA&trustCertificateKeyStoreUrl=file:src/main/resources/ca.pem&trustCertificateKeyStoreType=PEM
 
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=false
+# PRODUCTION: Use 'validate' to prevent accidental schema changes
+# DEVELOPMENT: Use 'update' or 'create-drop'
+spring.jpa.hibernate.ddl-auto=${HIBERNATE_DDL_AUTO:validate}
+spring.jpa.show-sql=${SHOW_SQL:false}
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+spring.jpa.properties.hibernate.format_sql=false
 
 spring.servlet.multipart.max-file-size=10MB
 spring.servlet.multipart.max-request-size=10MB
 
 server.port=8080
+server.compression.enabled=true
+server.compression.min-response-size=1024
 
-gemini.api.key=YOUR_GEMINI_API_KEY
+# Logging Configuration
+logging.level.root=${LOG_LEVEL_ROOT:INFO}
+logging.level.com.love.portfolio=${LOG_LEVEL_APP:INFO}
+logging.file.name=${LOG_FILE_NAME:logs/app.log}
+logging.file.max-size=10MB
+logging.file.max-history=10
+logging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n
+
+# Actuator Endpoints
+management.endpoints.web.exposure.include=health,metrics,info
+management.endpoint.health.show-details=when-authorized
+
+# API Documentation (Swagger/OpenAPI)
+springdoc.api-docs.path=/api-docs
+springdoc.swagger-ui.path=/swagger-ui.html
+springdoc.swagger-ui.operations-sorter=method
+springdoc.swagger-ui.tags-sorter=alpha
+
+# AI Services
+gemini.api.key=${GEMINI_API_KEY}
+
+# CORS & Security
+server.servlet.context-path=/
+server.error.include-message=always
+server.error.include-binding-errors=always
+
+# Render/Production specific
+server.shutdown=graceful
+spring.lifecycle.timeout-per-shutdown-phase=30s
