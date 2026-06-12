@@ -12,7 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/codelearn")
-@CrossOrigin(origins = "*")
+
 public class CodeLearnController {
 
     @GetMapping("/stats/{username}")

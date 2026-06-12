@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/bucket")
-@CrossOrigin(origins = "*")
+
 public class BucketController {
 
     @Autowired private BucketCategoryRepository catRepo;

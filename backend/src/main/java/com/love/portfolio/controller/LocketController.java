@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/locket")
-@CrossOrigin(origins = "*")
+
 public class LocketController {
 
     @Autowired

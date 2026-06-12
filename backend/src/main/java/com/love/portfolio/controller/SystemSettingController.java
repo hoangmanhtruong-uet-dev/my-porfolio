@@ -11,7 +11,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/settings")
-@CrossOrigin(origins = "*")
+
 public class SystemSettingController {
 
     @Autowired

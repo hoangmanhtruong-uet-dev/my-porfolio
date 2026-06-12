@@ -11,7 +11,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/hackerrank")
-@CrossOrigin(origins = "*")
+
 public class HackerRankController {
 
     @GetMapping("/stats/{username}")

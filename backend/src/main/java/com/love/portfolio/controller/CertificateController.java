@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/certificates")
-@CrossOrigin(origins = "*")
+
 public class CertificateController {
 
     @Autowired

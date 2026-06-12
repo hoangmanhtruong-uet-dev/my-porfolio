@@ -28,7 +28,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/cns")
-@CrossOrigin(origins = "*")
+
 public class CnsController {
 
     @Autowired

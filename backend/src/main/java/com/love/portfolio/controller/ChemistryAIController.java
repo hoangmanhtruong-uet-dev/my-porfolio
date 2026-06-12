@@ -7,7 +7,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/chemistry")
-@CrossOrigin(origins = "*")
+
 public class ChemistryAIController {
 
     @Autowired
