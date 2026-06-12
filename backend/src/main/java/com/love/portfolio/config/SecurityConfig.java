@@ -14,6 +14,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
+            .headers(headers -> headers
+                .frameOptions(frameOptions -> frameOptions.sameOrigin())
+            )
             .authorizeHttpRequests(authz -> authz
                 // Allow public access to static frontend assets
                 .requestMatchers("/", "/index.html", "/pages/**", "/assets/**").permitAll()
